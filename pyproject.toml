@@ -60,6 +60,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "hf>=0.0.14",
     "psycopg2-binary>=2.9.10",
+    "google-genai>=1.55.0",
 ]
 
 [project.optional-dependencies]
@@ -89,7 +90,7 @@ cluster = [
 ]
 eval = [
     "scikit-image>=0.25.2",
-    "psycopg2>=2.9.10",
+    #"psycopg2>=2.9.10",
 ]
 all = [
     "docker>=6.0.0",
