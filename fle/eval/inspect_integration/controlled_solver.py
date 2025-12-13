@@ -200,7 +200,7 @@ Analyze the current state and write a Python program using the FLE API to progre
                     # Generate response using Inspect's model with reasoning support
                     generation_config = {
                         "max_tokens": 4096,  # More tokens for complex programs
-                        "transforms": ["middle-out"],
+                        #"transforms": ["middle-out"], todo robert fix this properly
                         "reasoning_effort": "minimal",
                         # "temperature": 0.1
                     }
