@@ -16,25 +16,44 @@ def simple_production_score() -> Scorer:
         try:
             # Use typed store to get trajectory data
             trajectory_data = store_as(TrajectoryData)
-            production_score = (
-                trajectory_data.final_score or trajectory_data.production_score or 0.0
-            )
+
+            # Use measured throughput if available, otherwise fall back to ground truth
+            if trajectory_data.throughput_available and trajectory_data.final_measured_throughput > 0:
+                achieved_throughput = trajectory_data.final_measured_throughput
+                metric_type = "throughput"
+            else:
+                # Fallback to ground truth (for backward compat)
+                achieved_throughput = (
+                    trajectory_data.final_score or trajectory_data.production_score or 0.0
+                )
+                metric_type = "ground_truth"
+
+            # Get ground truth separately for display
+            ground_truth_score = trajectory_data.final_ground_truth_score or 0.0
             error = trajectory_data.error
 
-            # Get metadata using the working approach
+            # Get metadata
             metadata = (
                 getattr(state, "metadata", {}) if hasattr(state, "metadata") else {}
             )
             expected_score = metadata.get("expected_production_score", 16.0)
 
-            # Calculate success based on quota achievement
-            success = production_score >= expected_score and not error
+            # Calculate success based on throughput achievement
+            success = achieved_throughput >= expected_score and not error
+
+            # Build explanation showing both metrics
+            if metric_type == "throughput":
+                explanation = f"Throughput: {achieved_throughput:.1f}/{expected_score} items/60s, Ground Factorio Reward: {ground_truth_score:.1f}, Success: {success}"
+            else:
+                explanation = f"Score: {achieved_throughput:.1f}/{expected_score}, Ground Factorio Reward: {ground_truth_score:.1f}, Success: {success}"
+
+            if error:
+                explanation += f", Error: {error}"
 
             return Score(
                 value=success,  # Boolean for accuracy metric
                 answer="success" if success else "failure",
-                explanation=f"Production score: {production_score:.1f}/{expected_score}, Success: {success}"
-                + (f", Error: {error}" if error else ""),
+                explanation=explanation,
             )
 
         except Exception as e:

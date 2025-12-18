@@ -155,7 +155,7 @@ def fle_inspect_eval(args):
         if hasattr(args, "epochs_reducer") and args.epochs_reducer:
             cmd.extend(["--epochs-reducer", args.epochs_reducer])
 
-        #cmd.extend(["-M", "transforms=['middle-out']"]) todo robert fix
+
         # Set environment variables for dynamic task configuration
         import os
 

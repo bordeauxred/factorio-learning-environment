@@ -294,6 +294,6 @@ freeplay.on_init = function()
 
 end
 
-story_init_helpers(story_table)
+story_init_helpers(global.story_table)
 
 return freeplay

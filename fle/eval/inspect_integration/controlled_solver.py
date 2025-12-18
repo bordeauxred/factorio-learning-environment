@@ -27,6 +27,8 @@ from fle.env.gym_env.registry import get_environment_info
 from fle.env.utils.controller_loader.system_prompt_generator import (
     SystemPromptGenerator,
 )
+from fle.eval.inspect_integration.factorio_agent import calculate_production_score
+from fle.commons.constants import REWARD_OVERRIDE_KEY
 
 from fle.eval.inspect_integration.simple_server_pool import get_simple_server_pool
 from fle.eval.tasks.task_definitions.lab_play.throughput_tasks import THROUGHPUT_TASKS
@@ -60,6 +62,23 @@ class TrajectoryData(StoreModel):
     scores: List[float] = Field(default_factory=list)
     steps: List[dict] = Field(default_factory=list)  # Using dict for step data
     error: str = Field(default="")
+
+    # NEW: Ground truth tracking
+    ground_truth_scores: List[float] = Field(default_factory=list)
+    final_ground_truth_score: float = Field(default=0.0)
+
+    # NEW: Reward tracking
+    step_rewards: List[float] = Field(default_factory=list)
+    cumulative_reward: float = Field(default=0.0)
+
+    # NEW: Reward type metadata
+    reward_types: List[str] = Field(default_factory=list)  # "task_override" or "ground_truth_delta"
+    task_override_count: int = Field(default=0)
+
+    # NEW: Throughput tracking (task-specific measurement)
+    measured_throughputs: List[float] = Field(default_factory=list)
+    final_measured_throughput: float = Field(default=0.0)
+    throughput_available: bool = Field(default=False)
 
 
 @solver
@@ -171,6 +190,12 @@ Now begin working toward this objective step by step."""
             production_scores = []
             step_results = []
 
+            # NEW: Ground truth and reward tracking
+            ground_truth_scores = []
+            step_rewards = []
+            reward_types = []
+            measured_throughputs = []
+
             for step in range(trajectory_length):
                 step_start = time.time()
 
@@ -180,6 +205,8 @@ Now begin working toward this objective step by step."""
                     obs_formatted = BasicObservationFormatter(
                         include_research=False
                     ).format(observation)
+
+                    #total_game_score  = calculate_production_score(gym_env)
 
                     # Create step message with current game state
                     current_score = production_scores[-1] if production_scores else 0
@@ -200,7 +227,6 @@ Analyze the current state and write a Python program using the FLE API to progre
                     # Generate response using Inspect's model with reasoning support
                     generation_config = {
                         "max_tokens": 4096,  # More tokens for complex programs
-                        #"transforms": ["middle-out"], todo robert fix this properly
                         "reasoning_effort": "minimal",
                         # "temperature": 0.1
                     }
@@ -260,9 +286,39 @@ Analyze the current state and write a Python program using the FLE API to progre
 
                     # Calculate flows
                     flow = obs["flows"]
-                    # Calculate production score
-                    production_score = obs["score"] if obs["score"] else 0
-                    production_scores.append(production_score)
+
+                    # Extract ground truth production score from info dict
+                    ground_truth_score = info.get("production_score", 0.0)
+                    production_score = ground_truth_score  # For backward compatibility with existing code
+
+                    # Extract measured throughput from task verification (if available)
+                    measured_throughput = 0.0
+                    throughput_available = False
+
+                    if info.get("task_verification"):
+                        task_ver = info["task_verification"]
+                        if hasattr(task_ver, "meta"):
+                            # Look for throughput measurement in meta dict
+                            # The key varies by task type (e.g., "iron_ore_per_minute", "rocket_per_minute")
+                            for key, value in task_ver.meta.items():
+                                if "per_minute" in key or key == REWARD_OVERRIDE_KEY:
+                                    measured_throughput = value
+                                    throughput_available = True
+                                    break
+
+                    # Determine reward type
+                    reward_type = "ground_truth_delta"
+                    if info.get("task_verification"):
+                        task_ver = info["task_verification"]
+                        if hasattr(task_ver, "meta") and REWARD_OVERRIDE_KEY in task_ver.meta:
+                            reward_type = "task_override"
+
+                    # Track all metrics
+                    production_scores.append(ground_truth_score)  # Backward compat
+                    ground_truth_scores.append(ground_truth_score)
+                    step_rewards.append(reward)
+                    reward_types.append(reward_type)
+                    measured_throughputs.append(measured_throughput)
 
                     if not program_output:
                         if not program.code:
@@ -272,6 +328,19 @@ Analyze the current state and write a Python program using the FLE API to progre
                         else:
                             program_output = "None"
                     # Create comprehensive feedback message
+                    prev_ground_truth = ground_truth_scores[-2] if len(ground_truth_scores) >= 2 else 0.0
+                    ground_truth_delta = ground_truth_score - prev_ground_truth
+
+                    # Build throughput section if available
+                    throughput_section = ""
+                    if throughput_available:
+                        throughput_section = f"""
+**Task Throughput:**
+- Measured: {measured_throughput:.2f} items/60s
+- Quota: {quota} items/60s
+- {"✓ Meeting quota" if measured_throughput >= quota else "✗ Below quota"}
+"""
+
                     feedback_content = f"""## Step {step + 1} Execution Results
 
 **Program Output (STDOUT/STDERR):**
@@ -279,12 +348,13 @@ Analyze the current state and write a Python program using the FLE API to progre
 {program_output}
 ```
 
-**Execution Info:**
-- Reward: {reward}
-
-**Performance Results:**
-- Production score: {production_score:.1f} (was {current_score:.1f})
-- Score change: {production_score - current_score:+.1f}
+**Reward Information:**
+- Step Reward: {reward:.2f}
+- Reward Type: {reward_type.replace('_', ' ').title()}
+{throughput_section}
+**Ground Factorio Reward (Economic Value):**
+- Current: {ground_truth_score:.1f} (was {prev_ground_truth:.1f})
+- Delta: {ground_truth_delta:+.1f}
 
 **Flows**
 {flow}
@@ -311,27 +381,12 @@ Continue to step {step + 2}."""
 
                     state.messages.append(feedback_message)
 
-                    # Trim messages if we have too many user/assistant pairs (keep system prompt)
-                    if (
-                        len(state.messages) > 25
-                    ):  # 1 system + 32 user/assistant messages = 33 total
-                        # Defensively preserve system message - ensure it exists and is a system message
-                        if (
-                            len(state.messages) > 0
-                            and state.messages[0].role == "system"
-                        ):
-                            system_message = state.messages[0]
-                            recent_messages = state.messages[-24:]
-                            state.messages = [system_message] + recent_messages
-                            logger.info(
-                                f"🧹 Trimmed conversation to {len(state.messages)} messages (kept system + last 32)"
-                            )
-                        else:
-                            # Fallback: just keep last 32 messages if no valid system message found
-                            state.messages = state.messages[-24:]
-                            logger.warning(
-                                f"⚠️ No valid system message found - kept last {len(state.messages)} messages only"
-                            )
+                    # Apply middle-out transformation to manage context window
+                    from fle.eval.inspect_integration.transforms import middle_out
+                    
+                    # Use a safe token limit (e.g., 1M for Gemini 1.5 Pro, or lower for others)
+                    # This can be made configurable via metadata if needed
+                    state.messages = middle_out(state.messages, max_tokens=1_000_000)
 
                     step_time = time.time() - step_start
 
@@ -355,11 +410,31 @@ Continue to step {step + 2}."""
 
                     # Store intermediate progress using typed store
                     trajectory_data = store_as(TrajectoryData)
-                    trajectory_data.production_score = production_score
-                    trajectory_data.current_score = production_score
+                    # Backward compatible fields
+                    trajectory_data.production_score = ground_truth_score
+                    trajectory_data.current_score = ground_truth_score
+                    trajectory_data.scores = production_scores
+
+                    # New ground truth tracking
+                    trajectory_data.ground_truth_scores = ground_truth_scores
+                    trajectory_data.final_ground_truth_score = ground_truth_score
+
+                    # New reward tracking
+                    trajectory_data.step_rewards = step_rewards
+                    trajectory_data.cumulative_reward = sum(step_rewards)
+
+                    # Reward type metadata
+                    trajectory_data.reward_types = reward_types
+                    trajectory_data.task_override_count = sum(1 for rt in reward_types if rt == "task_override")
+
+                    # NEW: Throughput tracking
+                    trajectory_data.measured_throughputs = measured_throughputs
+                    trajectory_data.final_measured_throughput = measured_throughputs[-1] if measured_throughputs else 0.0
+                    trajectory_data.throughput_available = any(measured_throughputs)
+
+                    # Existing fields
                     trajectory_data.total_steps = step + 1
                     trajectory_data.steps = step_results
-                    trajectory_data.scores = production_scores
 
                     # Apply intermediate scoring for real-time metrics tracking
                     try:
@@ -373,6 +448,11 @@ Continue to step {step + 2}."""
                             production_score=production_score,
                             expected_score=quota,
                             scores_history=production_scores,
+                            ground_truth_score=ground_truth_score,
+                            step_reward=reward,
+                            reward_type=reward_type,
+                            measured_throughput=measured_throughput,
+                            throughput_available=throughput_available,
                         )
                     except Exception as scoring_error:
                         logger.warning(
@@ -402,28 +482,48 @@ Continue to step {step + 2}."""
                     step += 1
 
             # Final results
-            final_score = production_scores[-1] if production_scores else 0.0
-            # achievements = gym_env.get_achievements() if hasattr(gym_env, "get_achievements") else {}
+            final_ground_truth = ground_truth_scores[-1] if ground_truth_scores else 0.0
+            final_throughput = measured_throughputs[-1] if measured_throughputs else 0.0
 
             # Store final results using typed store
             trajectory_data = store_as(TrajectoryData)
-            trajectory_data.production_score = final_score
-            trajectory_data.final_score = final_score
+            # Backward compatible fields
+            trajectory_data.production_score = final_ground_truth
+            trajectory_data.final_score = final_ground_truth
+            trajectory_data.scores = production_scores
+
+            # New ground truth tracking
+            trajectory_data.ground_truth_scores = ground_truth_scores
+            trajectory_data.final_ground_truth_score = final_ground_truth
+
+            # New reward tracking
+            trajectory_data.step_rewards = step_rewards
+            trajectory_data.cumulative_reward = sum(step_rewards) if step_rewards else 0.0
+
+            # Reward type metadata
+            trajectory_data.reward_types = reward_types
+            trajectory_data.task_override_count = sum(1 for rt in reward_types if rt == "task_override")
+
+            # NEW: Throughput tracking
+            trajectory_data.measured_throughputs = measured_throughputs
+            trajectory_data.final_measured_throughput = final_throughput
+            trajectory_data.throughput_available = any(measured_throughputs)
+
+            # Existing fields
             trajectory_data.total_steps = len(step_results)
             trajectory_data.steps = step_results
-            trajectory_data.scores = production_scores
 
             # Set final model output with summary
             state.output = ModelOutput(
-                completion=f"Completed {len(step_results)}-step trajectory with final score: {final_score:.1f}",
+                completion=f"Completed {len(step_results)}-step trajectory with final score: {final_ground_truth:.1f}",
                 model=model_name,
             )
 
             logger.info(
-                f"🎉 Controlled trajectory complete: {final_score:.1f} score after {len(step_results)} steps"
+                f"🎉 Controlled trajectory complete: {final_ground_truth:.1f} score after {len(step_results)} steps"
             )
             transcript().info(
-                f"🎉 Controlled trajectory complete: {final_score:.1f} score after {len(step_results)} steps"
+                f"🎉 Controlled trajectory complete: {final_ground_truth:.1f} score after {len(step_results)} steps"
             )
 
         except Exception as e:

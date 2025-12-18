@@ -35,6 +35,7 @@ STONE_WALL_THROUGHPUT = "stone_wall_throughput"
 SUFURIC_ACID_THROUGHPUT = "sufuric_acid_throughput"
 SULFUR_THROUGHPUT = "sulfur_throughput"
 UTILITY_SCIENCE_PACK_THROUGHPUT = "utility_science_pack_throughput"
+ROCKET_THROUGHPUT = "rocket_throughput"
 
 
 class ThroughputTaskConfig(BaseModel):
@@ -244,6 +245,13 @@ stone_wall_throughput = ThroughputTaskConfig(
     task_key=STONE_WALL_THROUGHPUT,
 )
 
+rocket_throughput = ThroughputTaskConfig(
+    goal_description="Create a factory that produces 1 rocket per 60 ingame seconds. Maximise automation, efficiency and scale",
+    throughput_entity=Prototype.Rocket,
+    quota=1,
+    task_key="rocket_throughput",
+)
+
 
 # Create a dictionary for easy lookup by task key
 THROUGHPUT_TASKS = {
@@ -271,6 +279,7 @@ THROUGHPUT_TASKS = {
     SUFURIC_ACID_THROUGHPUT: sufuric_acid_throughput,
     SULFUR_THROUGHPUT: sulfur_throughput,
     UTILITY_SCIENCE_PACK_THROUGHPUT: utility_science_pack_throughput,
+    ROCKET_THROUGHPUT: rocket_throughput,
 }
 
 

@@ -12,15 +12,49 @@ logger = logging.getLogger(__name__)
 
 
 @scorer(metrics=[mean()])
+def measured_throughput_scorer() -> Scorer:
+    """Track raw measured throughput"""
+
+    async def score(state: AgentState, target: Target) -> Score:
+        try:
+            trajectory_data = store_as(TrajectoryData)
+            throughput = (
+                trajectory_data.final_measured_throughput
+                if trajectory_data.throughput_available
+                else 0.0
+            )
+
+            return Score(
+                value=throughput,
+                answer=f"{throughput:.2f}",
+                explanation=f"Measured Throughput: {throughput:.2f}",
+                metadata={"throughput": throughput},
+            )
+        except Exception as e:
+            logger.error(f"Error in measured throughput scorer: {e}")
+            return Score(
+                value=0.0, answer="0.00", explanation=f"Scorer error: {str(e)}"
+            )
+
+    return score
+
+
+@scorer(metrics=[mean()])
 def throughput_proportion_scorer() -> Scorer:
     """Track proportion of desired throughput achieved"""
 
     async def score(state: AgentState, target: Target) -> Score:
         try:
             trajectory_data = store_as(TrajectoryData)
-            production_score = (
-                trajectory_data.final_score or trajectory_data.production_score or 0.0
-            )
+
+            # Use measured throughput if available, otherwise fall back to ground truth
+            if trajectory_data.throughput_available and trajectory_data.final_measured_throughput > 0:
+                achieved_throughput = trajectory_data.final_measured_throughput
+                metric_type = "throughput"
+            else:
+                # Fallback to ground truth (for backward compat)
+                achieved_throughput = trajectory_data.final_ground_truth_score or 0.0
+                metric_type = "ground_truth"
 
             # Get expected quota from metadata
             metadata = (
@@ -30,7 +64,7 @@ def throughput_proportion_scorer() -> Scorer:
 
             # Calculate proportion (capped at 1.0)
             proportion = (
-                min(production_score / expected_score, 1.0)
+                min(achieved_throughput / expected_score, 1.0)
                 if expected_score > 0
                 else 0.0
             )
@@ -38,12 +72,13 @@ def throughput_proportion_scorer() -> Scorer:
             return Score(
                 value=proportion,
                 answer=f"{proportion:.3f}",
-                explanation=f"Throughput proportion: {production_score:.2f}/{expected_score:.2f} = {proportion:.3f}",
+                explanation=f"{metric_type.title()}: {achieved_throughput:.2f}/{expected_score:.2f} = {proportion:.3f}",
                 metadata={
-                    "production_score": production_score,
+                    "achieved_throughput": achieved_throughput,
                     "expected_score": expected_score,
                     "proportion": proportion,
-                    "quota_achieved": production_score >= expected_score,
+                    "quota_achieved": achieved_throughput >= expected_score,
+                    "metric_type": metric_type,
                 },
             )
 
@@ -164,9 +199,20 @@ def comprehensive_factorio_scorer() -> Scorer:
     async def score(state: AgentState, target: Target) -> Score:
         try:
             trajectory_data = store_as(TrajectoryData)
-            production_score = (
-                trajectory_data.final_score or trajectory_data.production_score or 0.0
-            )
+
+            # Use measured throughput if available, otherwise ground truth
+            if trajectory_data.throughput_available and trajectory_data.final_measured_throughput > 0:
+                achieved_score = trajectory_data.final_measured_throughput
+                metric_type = "throughput"
+            else:
+                achieved_score = (
+                    trajectory_data.final_score or trajectory_data.production_score or 0.0
+                )
+                metric_type = "ground_truth"
+
+            # Get ground truth separately for metadata
+            ground_truth_score = trajectory_data.final_ground_truth_score or 0.0
+
             scores = trajectory_data.scores or []
             error = trajectory_data.error
             total_steps = trajectory_data.total_steps or 0
@@ -179,11 +225,11 @@ def comprehensive_factorio_scorer() -> Scorer:
 
             # Calculate all metrics
             throughput_proportion = (
-                min(production_score / expected_score, 1.0)
+                min(achieved_score / expected_score, 1.0)
                 if expected_score > 0
                 else 0.0
             )
-            quota_achieved = production_score >= expected_score and not error
+            quota_achieved = achieved_score >= expected_score and not error
 
             # Step change metrics
             last_step_change = scores[-1] - scores[-2] if len(scores) >= 2 else 0.0
@@ -193,7 +239,7 @@ def comprehensive_factorio_scorer() -> Scorer:
             )
 
             # Performance metrics
-            score_per_step = production_score / total_steps if total_steps > 0 else 0.0
+            score_per_step = achieved_score / total_steps if total_steps > 0 else 0.0
             max_single_gain = max(
                 (scores[i] - scores[i - 1] for i in range(1, len(scores))), default=0.0
             )
@@ -202,7 +248,8 @@ def comprehensive_factorio_scorer() -> Scorer:
             success = quota_achieved
 
             explanation_parts = [
-                f"Score: {production_score:.2f}/{expected_score:.2f}",
+                f"Throughput: {achieved_score:.2f}/{expected_score:.2f}" if metric_type == "throughput" else f"Score: {achieved_score:.2f}/{expected_score:.2f}",
+                f"Ground Factorio Reward: {ground_truth_score:.2f}",
                 f"Proportion: {throughput_proportion:.3f}",
                 f"Last change: {last_step_change:+.3f}",
                 f"Total change: {total_change:+.3f}",
@@ -222,9 +269,10 @@ def comprehensive_factorio_scorer() -> Scorer:
                 answer=str(1) if success else str(throughput_proportion),
                 explanation=explanation,
                 metadata={
-                    # Core metrics you requested
+                    # Core metrics
                     "throughput_proportion": throughput_proportion,
-                    "production_score": production_score,
+                    "achieved_throughput": achieved_score,
+                    "ground_truth_score": ground_truth_score,  # Keep separate
                     "last_step_change": last_step_change,
                     # Additional context
                     "expected_score": expected_score,
@@ -242,6 +290,12 @@ def comprehensive_factorio_scorer() -> Scorer:
                     # Task context
                     "env_id": metadata.get("env_id", "unknown"),
                     "trajectory_length": metadata.get("trajectory_length", 64),
+                    # NEW: Metric type and reward tracking
+                    "metric_type": metric_type,
+                    "throughput_available": trajectory_data.throughput_available,
+                    "cumulative_reward": trajectory_data.cumulative_reward or 0.0,
+                    "task_override_count": trajectory_data.task_override_count or 0,
+                    "reward_type_mix": f"{trajectory_data.task_override_count or 0} task / {total_steps - (trajectory_data.task_override_count or 0)} GT",
                 },
             )
 
@@ -296,6 +350,113 @@ def comprehensive_factorio_scorer() -> Scorer:
 #     return score
 
 
+@scorer(metrics=[mean()])
+def ground_truth_score_tracker() -> Scorer:
+    """Track ground truth production score (absolute)"""
+
+    async def score(state: AgentState, target: Target) -> Score:
+        try:
+            trajectory_data = store_as(TrajectoryData)
+            ground_truth_score = trajectory_data.final_ground_truth_score or 0.0
+            total_steps = trajectory_data.total_steps or 0
+
+            return Score(
+                value=ground_truth_score,
+                answer=f"{ground_truth_score:.2f}",
+                explanation=f"Ground truth score: {ground_truth_score:.2f} over {total_steps} steps",
+                metadata={
+                    "ground_truth_score": ground_truth_score,
+                    "total_steps": total_steps,
+                    "score_per_step": ground_truth_score / total_steps
+                    if total_steps > 0
+                    else 0,
+                    "score_trajectory": trajectory_data.ground_truth_scores[-10:]
+                    if trajectory_data.ground_truth_scores
+                    else [],
+                },
+            )
+        except Exception as e:
+            logger.error(f"Error in ground truth tracker: {e}")
+            return Score(
+                value=0.0, answer="0.00", explanation=f"Scorer error: {str(e)}"
+            )
+
+    return score
+
+
+@scorer(metrics=[mean()])
+def reward_tracker() -> Scorer:
+    """Track cumulative reward (task-based or ground truth delta)"""
+
+    async def score(state: AgentState, target: Target) -> Score:
+        try:
+            trajectory_data = store_as(TrajectoryData)
+            cumulative_reward = trajectory_data.cumulative_reward or 0.0
+            total_steps = trajectory_data.total_steps or 0
+            task_override_count = trajectory_data.task_override_count or 0
+
+            reward_mix = f"{task_override_count} task-based, {total_steps - task_override_count} ground-truth"
+
+            return Score(
+                value=cumulative_reward,
+                answer=f"{cumulative_reward:.2f}",
+                explanation=f"Cumulative reward: {cumulative_reward:.2f} ({reward_mix})",
+                metadata={
+                    "cumulative_reward": cumulative_reward,
+                    "total_steps": total_steps,
+                    "task_override_count": task_override_count,
+                    "ground_truth_count": total_steps - task_override_count,
+                    "avg_reward_per_step": cumulative_reward / total_steps
+                    if total_steps > 0
+                    else 0,
+                    "reward_trajectory": trajectory_data.step_rewards[-10:]
+                    if trajectory_data.step_rewards
+                    else [],
+                },
+            )
+        except Exception as e:
+            logger.error(f"Error in reward tracker: {e}")
+            return Score(
+                value=0.0, answer="0.00", explanation=f"Scorer error: {str(e)}"
+            )
+
+    return score
+
+
+@scorer(metrics=[mean()])
+def reward_type_analyzer() -> Scorer:
+    """Analyze proportion of task-based vs ground truth rewards"""
+
+    async def score(state: AgentState, target: Target) -> Score:
+        try:
+            trajectory_data = store_as(TrajectoryData)
+            total_steps = trajectory_data.total_steps or 0
+            task_override_count = trajectory_data.task_override_count or 0
+
+            task_proportion = (
+                task_override_count / total_steps if total_steps > 0 else 0.0
+            )
+
+            return Score(
+                value=task_proportion,
+                answer=f"{task_proportion:.3f}",
+                explanation=f"Task-based reward proportion: {task_proportion:.3f} ({task_override_count}/{total_steps})",
+                metadata={
+                    "task_proportion": task_proportion,
+                    "task_override_count": task_override_count,
+                    "ground_truth_count": total_steps - task_override_count,
+                    "total_steps": total_steps,
+                },
+            )
+        except Exception as e:
+            logger.error(f"Error in reward type analyzer: {e}")
+            return Score(
+                value=0.0, answer="0.000", explanation=f"Scorer error: {str(e)}"
+            )
+
+    return score
+
+
 # Intermediate scoring functions for real-time trajectory analysis
 
 
@@ -305,6 +466,11 @@ async def score_step_intermediate(
     production_score: float,
     expected_score: float,
     scores_history: List[float],
+    ground_truth_score: float = None,
+    step_reward: float = None,
+    reward_type: str = "unknown",
+    measured_throughput: float = None,
+    throughput_available: bool = False,
 ) -> List[Score]:
     """
     Score intermediate step during trajectory execution.
@@ -314,19 +480,25 @@ async def score_step_intermediate(
 
     try:
         # 1. Throughput Proportion Score
+        # Use measured throughput if available, otherwise fall back to production_score
+        score_value = measured_throughput if throughput_available and measured_throughput > 0 else production_score
+        metric_label = "Throughput" if throughput_available and measured_throughput > 0 else "Score"
+
         proportion = (
-            min(production_score / expected_score, 1.0) if expected_score > 0 else 0.0
+            min(score_value / expected_score, 1.0) if expected_score > 0 else 0.0
         )
         proportion_score = Score(
             value=proportion,
             answer=f"{proportion:.3f}",
-            explanation=f"Step {step_num}: Throughput proportion {production_score:.2f}/{expected_score:.2f} = {proportion:.3f}",
+            explanation=f"Step {step_num}: {metric_label} {score_value:.2f}/{expected_score:.2f} items/60s, Ground Factorio Reward: {ground_truth_score:.1f}, Proportion: {proportion:.3f}" if ground_truth_score is not None else f"Step {step_num}: {metric_label} proportion {score_value:.2f}/{expected_score:.2f} = {proportion:.3f}",
             metadata={
                 "step": step_num,
                 "metric_type": "throughput_proportion",
-                "production_score": production_score,
+                "achieved_throughput": score_value,
+                "ground_truth_score": ground_truth_score if ground_truth_score is not None else production_score,
                 "expected_score": expected_score,
                 "proportion": proportion,
+                "using_throughput": throughput_available and measured_throughput > 0,
             },
         )
         intermediate_scores.append(proportion_score)
@@ -366,6 +538,35 @@ async def score_step_intermediate(
             )
             intermediate_scores.append(step_change_score)
 
+        # NEW: Add ground truth tracking score
+        if ground_truth_score is not None:
+            gt_score_obj = Score(
+                value=ground_truth_score,
+                answer=f"{ground_truth_score:.2f}",
+                explanation=f"Step {step_num}: Ground truth {ground_truth_score:.2f}",
+                metadata={
+                    "step": step_num,
+                    "metric_type": "ground_truth_score",
+                    "ground_truth_score": ground_truth_score,
+                },
+            )
+            intermediate_scores.append(gt_score_obj)
+
+        # NEW: Add reward tracking score
+        if step_reward is not None:
+            reward_score_obj = Score(
+                value=step_reward,
+                answer=f"{step_reward:.2f}",
+                explanation=f"Step {step_num}: Reward {step_reward:.2f} ({reward_type})",
+                metadata={
+                    "step": step_num,
+                    "metric_type": "step_reward",
+                    "step_reward": step_reward,
+                    "reward_type": reward_type,
+                },
+            )
+            intermediate_scores.append(reward_score_obj)
+
         return intermediate_scores
 
     except Exception as e:
@@ -385,6 +586,11 @@ async def apply_intermediate_scoring(
     production_score: float,
     expected_score: float,
     scores_history: List[float],
+    ground_truth_score: float = None,
+    step_reward: float = None,
+    reward_type: str = "unknown",
+    measured_throughput: float = None,
+    throughput_available: bool = False,
 ):
     """
     Apply intermediate scoring during trajectory execution.
@@ -393,7 +599,9 @@ async def apply_intermediate_scoring(
     try:
         # Get intermediate scores for this step
         intermediate_scores = await score_step_intermediate(
-            state, step_num, production_score, expected_score, scores_history
+            state, step_num, production_score, expected_score, scores_history,
+            ground_truth_score, step_reward, reward_type,
+            measured_throughput, throughput_available
         )
 
         # Apply each score using inspect_ai's score function

@@ -7,6 +7,11 @@ from typing import List
 
 from fle.eval.inspect_integration.controlled_solver import factorio_controlled_solver
 from fle.eval.inspect_integration.simple_scorer import simple_production_score
+from fle.eval.inspect_integration.enhanced_scorer import (
+    ground_truth_score_tracker,
+    throughput_proportion_scorer,
+    measured_throughput_scorer,
+)
 from fle.eval.tasks.task_definitions.lab_play.throughput_tasks import THROUGHPUT_TASKS
 
 
@@ -19,7 +24,12 @@ def create_factorio_task(env_id: str):
         return Task(
             dataset=create_agent_dataset(),
             solver=factorio_controlled_solver(),
-            scorer=simple_production_score(),
+            scorer=[
+                simple_production_score(),
+                ground_truth_score_tracker(),
+                measured_throughput_scorer(),
+                throughput_proportion_scorer(),
+            ],
             name=env_id,  # Use the actual task name
         )
 
@@ -37,7 +47,12 @@ def factorio_agent_evaluation():
     return Task(
         dataset=create_agent_dataset(),
         solver=factorio_controlled_solver(),  # Use controlled solver for full trajectory
-        scorer=simple_production_score(),
+        scorer=[
+            simple_production_score(),
+            ground_truth_score_tracker(),
+            measured_throughput_scorer(),
+            throughput_proportion_scorer(),
+        ],
         name=env_id,  # Use the actual task name for better identification
     )
 

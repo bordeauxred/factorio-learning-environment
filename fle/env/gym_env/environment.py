@@ -411,8 +411,11 @@ class FactorioGymEnv(gym.Env):
             namespace._get_production_stats()
         )
 
+        # Capture score before action
+        pre_score, _ = namespace.score()
+
         # Execute the action
-        initial_score, eval_time, result = self.instance.eval(
+        eval_score, eval_time, result = self.instance.eval(
             action.code, agent_idx=agent_idx, timeout=60
         )
         # Check for errors
@@ -423,7 +426,7 @@ class FactorioGymEnv(gym.Env):
         if self.task:
             # First get the raw verification
             task_success = self.task.verify(
-                initial_score, self.instance, step_statistics={}
+                eval_score, self.instance, step_statistics={}
             )
             # Then enhance the response with task output
             task_response = self.task.enhance_response_with_task_output(
@@ -436,7 +439,7 @@ class FactorioGymEnv(gym.Env):
         if task_success and REWARD_OVERRIDE_KEY in task_success.meta:
             reward = task_success.meta[REWARD_OVERRIDE_KEY]
         else:
-            reward = production_score - initial_score
+            reward = production_score - pre_score
         reward = float(reward) - self.error_penalty
 
         output_game_state = GameState.from_instance(self.instance)

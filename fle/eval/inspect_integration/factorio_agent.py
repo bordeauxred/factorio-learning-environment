@@ -422,13 +422,27 @@ def get_rendered_image(gym_env: FactorioGymEnv) -> str:
 
 
 def calculate_production_score(gym_env: FactorioGymEnv, task) -> float:
-    """Calculate production score from gym environment"""
+    """Calculate production score from gym environment
+
+    Args:
+        gym_env: The Factorio gym environment
+        task: The task (unused, kept for backward compatibility)
+
+    Returns:
+        float: The ground truth production score from the Factorio game engine
+    """
     try:
-        # Use existing scoring logic
-        if hasattr(gym_env, "get_production_score"):
-            return gym_env.get_production_score()
+        # Get production score directly from the namespace
+        if hasattr(gym_env, "instance") and hasattr(gym_env.instance, "namespaces"):
+            production_score, _ = gym_env.instance.namespaces[0].score()
+            return production_score
+
+        # Fallback: try to get from last observation if available
+        if hasattr(gym_env, "last_observation") and gym_env.last_observation:
+            return gym_env.last_observation.score
 
         # Last resort
+        logger.warning("Could not calculate production score - no valid source found")
         return 0.0
 
     except Exception as e:
