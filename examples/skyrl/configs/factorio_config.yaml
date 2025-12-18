@@ -1,0 +1,62 @@
+# Factorio RL Training Configuration
+# Based on SkyrL PPO config
+
+# Model configuration
+model:
+  name: "Qwen/Qwen2.5-1.5B-Instruct"  # Starting with a smaller model
+  # name: "meta-llama/Llama-3.2-1B-Instruct"  # Alternative
+
+# Trainer configuration  
+trainer:
+  algorithm: "ppo"  # or "grpo" for GRPO
+  learning_rate: 1e-5
+  num_train_epochs: 1
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_grad_norm: 1.0
+  
+  # Placement - adjust based on your GPU count
+  placement:
+    policy_num_gpus_per_node: 1
+  
+  # Logging
+  logger: "wandb"  # or "console" for stdout
+  project_name: "factorio-rl"
+  experiment_name: "factorio-ppo-v1"
+
+# Generator configuration
+generator:
+  num_inference_engines: 1
+  batched: false  # Use async for multi-turn environments
+  async_engine: true
+  max_new_tokens: 2048  # Allow for longer code generation
+  temperature: 0.7
+  top_p: 0.9
+
+# Environment configuration
+env:
+  env_class: "factorio"  # Registered environment name
+  max_turns: 10
+  
+  # Factorio-specific settings
+  host: "localhost"
+  port: 27000
+
+# Dataset configuration
+data:
+  train_data_path: "${HOME}/data/factorio/train.parquet"
+  validation_data_path: "${HOME}/data/factorio/validation.parquet"
+  
+# PPO-specific configuration
+ppo:
+  num_rollouts_per_step: 4
+  clip_range: 0.2
+  kl_coef: 0.1
+  entropy_coef: 0.01
+  value_loss_coef: 0.5
+  gae_lambda: 0.95
+  gamma: 0.99
+
+# Ray configuration
+ray:
+  num_cpus: 8

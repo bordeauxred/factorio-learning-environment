@@ -1,0 +1,56 @@
+# Factorio training config for SkyrL
+
+# Model
+trainer:
+  policy:
+    model:
+      path: "Qwen/Qwen2.5-1.5B-Instruct"
+  critic:
+    model:
+      path: "Qwen/Qwen2.5-1.5B-Instruct"
+
+  # Training
+  algorithm:
+    advantage_estimator: "gae"
+    use_kl_loss: true
+  
+  placement:
+    colocate_all: true
+    policy_num_gpus_per_node: 1
+    ref_num_gpus_per_node: 1
+    critic_num_gpus_per_node: 1
+  
+  strategy: fsdp2
+  epochs: 5
+  train_batch_size: 32
+  policy_mini_batch_size: 8
+  max_prompt_length: 1024
+  
+  logger: "console"
+  project_name: "factorio"
+  run_name: "factorio_ppo"
+  
+  ckpt_path: "${oc.env:HOME}/ckpts/factorio"
+  ckpt_interval: 5
+
+# Generator
+generator:
+  num_inference_engines: 1
+  backend: vllm
+  run_engines_locally: true
+  async_engine: true
+  batched: false  # For multi-turn environments
+  n_samples_per_prompt: 4
+  sampling_params:
+    max_generate_length: 2048
+    temperature: 0.7
+  gpu_memory_utilization: 0.8
+
+# Environment
+environment:
+  env_class: factorio
+
+# Data
+data:
+  train_data: ["${oc.env:HOME}/data/factorio/train.parquet"]
+  val_data: ["${oc.env:HOME}/data/factorio/validation.parquet"]
