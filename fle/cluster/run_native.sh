@@ -4,8 +4,8 @@
 FACTORIO_VERSION="1.1.110"
 FACTORIO_URL="https://www.factorio.com/get-download/${FACTORIO_VERSION}/headless/linux64"
 INSTALL_DIR="factorio_server"
-SCENARIOS_DIR="../scenarios" # Relative to script location
-CONFIG_DIR="../config"       # Relative to script location
+SCENARIOS_DIR="scenarios" # Relative to script location
+CONFIG_DIR="config"       # Relative to script location
 
 # Function to download and install Factorio
 install_factorio() {

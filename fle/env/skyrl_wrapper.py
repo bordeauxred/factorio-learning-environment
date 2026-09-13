@@ -3,6 +3,7 @@ SkyRL-Gym compatible environment for Factorio Learning Environment.
 
 This wrapper bridges FLE's FactorioGymEnv with SkyrL's BaseTextEnv interface.
 """
+import os
 from typing import Dict, Any, Tuple, List
 
 # SkyrL imports
@@ -44,10 +45,16 @@ class FactorioEnv(BaseTextEnv):
         self.gym_env = None
         self.formatter = BasicObservationFormatter(include_research=False)
         self.turns = 0
+        
+        # Determine worker index for port mapping
+        # 1. Check kwargs (passed by skyrl_gym.make)
+        # 2. Check env var (set by Ray/SkyRL)
+        self.run_idx = kwargs.get("run_idx", int(os.environ.get("RAY_WORKER_INDEX", 0)))
     
     def init(self, prompt: List[Dict[str, str]]) -> Tuple[List[Dict[str, str]], Dict[str, Any]]:
         """Initialize environment with a prompt."""
-        self.gym_env = gym.make(self.env_id)
+        # Pass run_idx to FLE's registry to select the correct Factorio instance
+        self.gym_env = gym.make(self.env_id, run_idx=self.run_idx)
         self.gym_env.reset()
         self.turns = 0
         return prompt, {}

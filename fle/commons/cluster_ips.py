@@ -47,6 +47,47 @@ def get_local_container_ips() -> tuple[List[str], List[int], List[int]]:
     return ips, udp_ports, tcp_ports
 
 
+def get_local_native_ports() -> tuple[List[str], List[int], List[int]]:
+    """Get ports of running Factorio processes in the local native setup."""
+    # Find factorio processes and extract rcon-port
+    # Example cmd: factorio --rcon-port 27000 ...
+    try:
+        cmd = ["pgrep", "-af", "factorio"]
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        lines = result.stdout.strip().split("\n")
+    except Exception:
+        lines = []
+
+    ips = []
+    udp_ports = []
+    tcp_ports = []
+
+    for line in lines:
+        if "--rcon-port" in line:
+            parts = line.split()
+            try:
+                idx = parts.index("--rcon-port")
+                port = int(parts[idx + 1])
+                tcp_ports.append(port)
+                ips.append("127.0.0.1")
+                # UDP port is usually --port, default 34197
+                udp_port = 34197
+                if "--port" in line:
+                    u_idx = parts.index("--port")
+                    udp_port = int(parts[u_idx + 1])
+                udp_ports.append(udp_port)
+            except (ValueError, IndexError):
+                continue
+
+    # order by port number
+    combined = sorted(zip(tcp_ports, udp_ports, ips))
+    if combined:
+        tcp_ports, udp_ports, ips = zip(*combined)
+        return list(ips), list(udp_ports), list(tcp_ports)
+    
+    return [], [], []
+
+
 if __name__ == "__main__":
     ips, udp_ports, tcp_ports = get_local_container_ips()
     if ips:

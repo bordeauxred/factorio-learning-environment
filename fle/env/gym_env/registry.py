@@ -107,11 +107,16 @@ def make_factorio_env(spec: GymEnvironmentSpec, run_idx: int) -> FactorioGymEnv:
         if not address and not tcp_port:
             try:
                 ips, udp_ports, tcp_ports = get_local_container_ips()
-            except ValueError:
-                raise RuntimeError("No Factorio containers available")
+            except Exception:
+                ips, tcp_ports = [], []
 
             if len(tcp_ports) == 0:
-                raise RuntimeError("No Factorio containers available")
+                # Try native discovery
+                from fle.commons.cluster_ips import get_local_native_ports
+                ips, udp_ports, tcp_ports = get_local_native_ports()
+                
+            if len(tcp_ports) == 0:
+                raise RuntimeError("No Factorio instances (Docker or Native) found. Start one with fle/cluster/run_native.sh")
 
             # Apply port offset for multiple terminal sessions
             container_idx = PORT_OFFSET + run_idx
