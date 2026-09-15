@@ -1,0 +1,12 @@
+{
+  "checkpoint": ".fle/runs/candidate_l2/model_316.pt",
+  "replay": ".fle/runs/candidate_l2/replay_316.npz",
+  "boundary": "first saved training reset",
+  "device": "mps",
+  "candidate_count": 467,
+  "warmup_decisions": 10,
+  "timed_decisions": 100,
+  "median_ms": 5.63,
+  "mean_ms": 5.722,
+  "p95_ms": 6.113
+}

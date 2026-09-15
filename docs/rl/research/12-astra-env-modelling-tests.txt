@@ -1,0 +1,53 @@
+............................................................s            [100%]
+=============================== warnings summary ===============================
+fle/eval/tasks/task_definitions/lab_play/throughput_tasks.py:40
+  /Users/robertmueller/Desktop/agents/factorio-learning-environment/fle/eval/tasks/task_definitions/lab_play/throughput_tasks.py:40: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ThroughputTaskConfig(BaseModel):
+
+fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:35
+  /Users/robertmueller/Desktop/agents/factorio-learning-environment/fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:35: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class UnboundedThroughputTaskConfig(BaseModel):
+
+fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:66
+  /Users/robertmueller/Desktop/agents/factorio-learning-environment/fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:66: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class DefaultTaskConfig(BaseModel):
+
+fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:86
+  /Users/robertmueller/Desktop/agents/factorio-learning-environment/fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:86: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class UnboundedProductionTaskConfig(BaseModel):
+
+fle/eval/tasks/task_definitions/multiagent/multiagent_tasks.py:19
+  /Users/robertmueller/Desktop/agents/factorio-learning-environment/fle/eval/tasks/task_definitions/multiagent/multiagent_tasks.py:19: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class MultiagentUnboundedThroughputTaskConfig(BaseModel):
+
+fle/eval/tasks/task_definitions/lab_play/throughput_tasks.py:62: 24 warnings
+  /Users/robertmueller/Desktop/agents/factorio-learning-environment/fle/eval/tasks/task_definitions/lab_play/throughput_tasks.py:62: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    data = self.dict()
+
+fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:57
+  /Users/robertmueller/Desktop/agents/factorio-learning-environment/fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:57: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    data = self.dict()
+
+fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:83
+  /Users/robertmueller/Desktop/agents/factorio-learning-environment/fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:83: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    return self.dict()
+
+fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:114
+  /Users/robertmueller/Desktop/agents/factorio-learning-environment/fle/eval/tasks/task_definitions/unbounded/unbounded_tasks.py:114: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    return self.dict()
+
+fle/eval/tasks/task_definitions/multiagent/multiagent_tasks.py:42
+fle/eval/tasks/task_definitions/multiagent/multiagent_tasks.py:42
+fle/eval/tasks/task_definitions/multiagent/multiagent_tasks.py:42
+  /Users/robertmueller/Desktop/agents/factorio-learning-environment/fle/eval/tasks/task_definitions/multiagent/multiagent_tasks.py:42: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    data = self.dict()
+
+tests/rl/test_policy_dqn.py::test_update_copy_and_periodic_reset
+  /Users/robertmueller/Desktop/agents/factorio-learning-environment/fle/rl/dqn_her.py:135: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+  Consider using tensor.detach() first. (Triggered internally at /Users/runner/work/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:821.)
+    return LearnerStats(float(loss), float(td.abs().mean()), self.updates, self.real_transitions, beta,
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/rl/test_vocabulary_live.py:15: set FLE_RL_LIVE_HOST to opt into live vocabulary test
+60 passed, 1 skipped, 36 warnings in 5.73s

@@ -1,0 +1,18 @@
+{
+  "created_unit": 635,
+  "entities_before_reset": [
+    634,
+    635
+  ],
+  "entities_after_reset": [
+    634
+  ],
+  "ghost_rows_after_reset": 0,
+  "synthetic_elapsed_ticks": 987654321,
+  "true_tick_before_wait": 51576,
+  "true_tick_after_wait": 51644,
+  "trace_tick_after_wait": 51644,
+  "episode_tick_after_wait": 68,
+  "wait_overshoot": 8,
+  "action_outcome": "ok"
+}

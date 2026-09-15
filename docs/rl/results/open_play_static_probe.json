@@ -1,0 +1,40 @@
+{
+  "manual": {
+    "before": [
+      0.0,
+      0.0
+    ],
+    "after_first": [
+      3.0,
+      -1.0
+    ],
+    "after": [
+      6.0,
+      -1.0
+    ],
+    "first_delta_automated": -1.0,
+    "second_delta_automated": 0.0,
+    "first_outcome": "ok",
+    "second_outcome": "ok",
+    "error": null,
+    "inventory": {
+      "iron-ore": 2
+    }
+  },
+  "drill": {
+    "before": [
+      0.0,
+      0.0
+    ],
+    "after": [
+      34.0,
+      34.0
+    ],
+    "delta_automated": 34.0,
+    "outcome": "ok",
+    "error": null,
+    "automatic": {
+      "iron-ore": 14
+    }
+  }
+}

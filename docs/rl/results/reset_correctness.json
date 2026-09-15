@@ -1,0 +1,68 @@
+{
+  "cold_start_s": 0.3038300829939544,
+  "initial_reset_ms": {
+    "server_reset": 143.81541701732203,
+    "pause": 2.37204204313457,
+    "vocabulary_check": 229.75941601907834,
+    "full_sync_rcon": 25152.4397500325,
+    "full_sync_bytes": 1626993,
+    "full_sync_parse": 4.0778330294415355,
+    "client_rebuild": 128.64320899825543,
+    "goal_setup": 1.814125047530979,
+    "encode": 4.183167009614408,
+    "total": 25668.367499951273
+  },
+  "before": {
+    "unit": 977,
+    "entity_present": true,
+    "position": [
+      10.0,
+      6.0
+    ],
+    "inventory": {
+      "iron-ore": 7
+    },
+    "achieved": {
+      "iron-plate": 7
+    },
+    "raw": {
+      "iron-plate": 12
+    },
+    "tick": 12853
+  },
+  "after": {
+    "epoch": 2,
+    "trace_epoch": 2,
+    "entity_present": false,
+    "position": [
+      0.0,
+      0.0
+    ],
+    "inventory": {},
+    "achieved": {},
+    "raw": {},
+    "episode_tick": 0,
+    "tick": 12861,
+    "reset_ms": {
+      "server_reset": 129.33045899262652,
+      "pause": 5.073667038232088,
+      "vocabulary_check": 0.0004169996827840805,
+      "full_sync_rcon": 17.463875003159046,
+      "full_sync_bytes": 4761,
+      "full_sync_parse": 0.06145902443677187,
+      "client_rebuild": 0.10662502609193325,
+      "goal_setup": 0.15991699183359742,
+      "encode": 4.23895800486207,
+      "total": 156.65424999315292
+    }
+  },
+  "ledgers": "{\"harvested\":{},\"crafted\":{},\"elapsed\":0}",
+  "wait": {
+    "true_start": 12861,
+    "true_after": 12933,
+    "trace_tick": 72,
+    "episode_tick": 72,
+    "counter_valid": true,
+    "synthetic_elapsed": 987654321
+  }
+}
