@@ -283,6 +283,32 @@ right INSERT. At the measured ~1.4 decisions per wall second, a scratch run of a
 hours is not expected to stumble into it. That is the honest prior for FULL-1, and it is
 the reason FULL-2 seeds replay with demonstrations of exactly that chain.
 
+### Greedy behaviour with no reward collapses onto one verb
+
+As epsilon fell in FULL-1 the action distribution changed, and the change is
+diagnostic rather than encouraging. Comparing the first 400 decisions (epsilon ~1.0)
+with everything after decision 1000 (epsilon < 0.5):
+
+| | PLACE | MOVE_TO | RESEARCH | FAST_FORWARD | MINE |
+|---|---:|---:|---:|---:|---:|
+| early, epsilon ~1.0 | 15% | 13% | 13% | ~9% | 11% |
+| later, epsilon < 0.5 | 9% | 21% | **24%** | 10% | 9% |
+
+RESEARCH is the verb that **never succeeds** on this map - there are no science packs and
+no lab, so every attempt is refused. A policy that has never seen a non-zero reward has
+no basis for preferring anything, so its argmax follows initialization noise, and here it
+latched onto the one verb that cannot pay. This is what a sparse-reward null result looks
+like from the inside, and it is the sharpest argument for the two follow-up experiments
+in section 8: the problem is not that the learner prefers bad actions, it is that nothing
+in its experience distinguishes any action from any other.
+
+### A note on what these logs cannot tell us
+
+The `raw_error` field that records the game's own refusal message was added after these
+two runs had already started, so their step logs carry only the classifier's label. The
+per-verb table above therefore rests on the coarse taxonomy. The next run will carry the
+messages themselves.
+
 ### A configuration error worth recording
 
 The first launch used the default per-head epsilon schedule, which anneals over 100,000
