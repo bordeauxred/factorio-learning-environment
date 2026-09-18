@@ -48,7 +48,73 @@ it is non-negative.
 
 ## 2. Environment
 
-_To be filled when the live semantic environment lands._
+**Observation.** PR #414's tiered client, promoted into `fle/smarq/obs.py` unchanged in
+layout: `grid (17,96,96)` of 3-tile cells, `entity_view (2048,38)` of the entities
+nearest the character, `entity_mask`, `globals (10,)`. Added: `entity_ids`, the stable
+Factorio unit numbers of the rows, so an entity pointer chosen at one boundary can be
+resolved at execution and recognised in replay. On top of it, `fle/smarq/raster.py`
+builds an **exact-tile egocentric raster** (default 96x96 tiles, 8 binary channels:
+occupied, impassable, resource, belt, machine, tree/rock, player, in-build-reach)
+derived only from state the client already holds. `in_build_reach` is an observation
+channel and masks nothing.
+
+**Action grammar.** Eleven verbs, decided autoregressively: MOVE_TO, MINE, CRAFT,
+PLACE, PICKUP, ROTATE, INSERT, EXTRACT, SET_RECIPE, RESEARCH, FAST_FORWARD. Heads are
+verb, prototype (87), position (9216 exact tiles at raster 96), direction (4), entity
+pointer (2048), item (143), quantity (1/2/4/8/16/32/ALL), recipe (143), technology (61),
+duration (1 s/10 s/60 s). Vocabularies are read from the live game and cached.
+
+**Navigation semantics.** The executor may compute a reachable interaction position and
+walk there; it never alters the requested coordinate. `PLACE(prototype, x, y, dir)`
+preserves `(x, y)` exactly and fails as `blocked` / `unreachable` /
+`insufficient_inventory` / `invalid_argument` rather than relocating. There is no
+`nearest_buildable`, no `place_entity_next_to`, no snapping, no projection, and no
+`connect_entities` macro anywhere in `fle/smarq/` (asserted by test and by grep).
+One FLE behaviour had to be refused explicitly: `place_entity` silently relocates
+offshore pumps, so SM-ARQ rejects that case instead of accepting a moved coordinate.
+
+**Masks.** Structural only: placeable prototypes, live entities, entities with an
+inventory for INSERT/EXTRACT, recipe-capable machines for SET_RECIPE, hand-craftable
+recipes, unresearched technologies. Nothing is masked by inventory contents, occupancy,
+reach, distance or quality, and the position head is never masked at all.
+
+**Episode.** Fixed simulated-time budget (default 30 game minutes = 108,000 ticks) plus
+an emergency cap of 1000 decisions. Repeated FAST_FORWARD consumes the same budget.
+
+**Starting state.** FLE's standard open-play kit: 50 coal, 50 iron and 50 copper plates,
+9 stone furnaces, 3 burner mining drills, 1 electric drill, 32 burner inserters, 50
+belts, 1 assembling machine, boiler, steam engine, poles. **No ore.** Measured on these
+maps, the nearest iron ore is **170 tiles away on port 27004 and 274 tiles on port
+27000**. Automated production therefore requires a genuine journey: with a 96-tile
+window the agent must chain several MOVE_TO hops before an ore tile is even addressable
+by the position head. In game time that journey is cheap (about 13 ticks per tile, so
+~2,200 ticks for 170 tiles, ~2% of a 30-minute episode); the difficulty is exploration,
+not time.
+
+## 2b. TOY-B: can this interface automate at all?
+
+Before asking whether a learner can find it, the question is whether the action grammar
+can express it. The scripted expert in `tests/benchmarks/smarq_live_demo.py` uses only
+semantic actions with exact coordinates, on port 27004, starting beside an ore patch:
+
+```
+MOVE_TO      (-197,-229)                                   -> ok    tau=29t
+PLACE        burner-mining-drill (-197,-231) SOUTH         -> ok    tau=9t
+INSERT       slot 0, coal x8                               -> ok    tau=5t   automated -3
+PLACE        stone-furnace (-197,-229) NORTH               -> ok    tau=5t
+INSERT       slot 0, coal x8                               -> ok    tau=7t
+FAST_FORWARD 60 s                                          -> ok    tau=3600t automated +66
+FAST_FORWARD 60 s                                          -> ok    tau=3600t automated +76
+```
+
+Automated production score went **0 → 139 over 120 simulated seconds** (60.9 wall
+seconds for the whole demonstration, 7,269 simulated ticks). The interface can automate,
+with exact geometry and no build planner. Two honest caveats: the automated score first
+dips to −3 because fuel consumption is charged before output is credited, and the
+demonstration's own bookkeeping of entity slots is naive (rows are re-sorted nearest-first
+each observation, so its second INSERT addressed the drill rather than the furnace, and
+its EXTRACT of a plate that did not exist returned `tool_error`). The learner is not
+affected by that: it re-chooses a pointer from the current observation at every boundary.
 
 ## 3. Algorithm
 
