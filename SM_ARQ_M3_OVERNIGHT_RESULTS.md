@@ -345,6 +345,33 @@ brief, visible in a policy that has already stopped exploring: the agent hand-mi
 because hand-mining is the only thing that ever succeeds, and the automated objective
 correctly refuses to pay for it.
 
+### Demonstration seeding taught the agent to wait, not to build
+
+The most informative behaviour of the night appeared in the greedy phase of the two
+re-runs on the fixed environment. Both policies converged on FAST_FORWARD, and the
+demo-seeded one most strongly:
+
+| run (greedy, ~4,600-5,000 decisions) | top verbs |
+|---|---|
+| FULL-1 re-run, scratch | FAST_FORWARD 22%, RESEARCH 16%, MINE 16% |
+| FULL-2 re-run, demo-seeded | **FAST_FORWARD 29%**, RESEARCH 26%, CRAFT 12% |
+
+There is a mechanism behind that, and it is a caution about seeding value learners with
+demonstrations. In a demonstration the reward arrives **on the FAST_FORWARD steps**: the
+drill and furnace were placed and fuelled several decisions earlier, and the automated
+score then climbs by +66, +76, +75 while simulated time passes. A value learner trained
+on those transitions correctly concludes that FAST_FORWARD is the valuable action, but it
+only pays in states that already contain a fuelled drill. If the state encoder does not
+sharply distinguish "a fuelled drill is running nearby" from "empty ground", the learned
+value leaks onto FAST_FORWARD everywhere, and the policy waits instead of building.
+
+The demonstrations seeded the payoff rather than the prerequisite. Three remedies follow
+directly, in increasing order of effort: turn on the n-step semantic returns already
+implemented behind a flag, so credit reaches the setup actions; weight demonstration
+transitions toward the setup steps rather than uniformly; or give the state encoder an
+explicit "is anything of mine currently producing" feature so the two situations cannot
+be confused. The first is a flag, and it is the cheapest thing to try next.
+
 ### Greedy behaviour with no reward collapses onto one verb
 
 As epsilon fell in FULL-1 the action distribution changed, and the change is
