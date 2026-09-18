@@ -245,8 +245,17 @@ measured, never projected.
 
 | run | decisions | episodes | simulated | final automated (max / mean) | final production (max / mean) | automated per game min | decisions / wall s | updates | wall |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| FULL-1 scratch | 7,266 | 19 | 528.4 game min | **0 / −0.68** | 923 / 229 | −0.024 | 1.03 | 7,266 | 1 h 58 m |
-| FULL-2 demo-seeded | 7,606 | 24 | 681.3 game min | **0 / −0.83** | 661 / 148 | −0.025 | 0.98 | 7,606 | 2 h 00 m |
+| FULL-1 scratch (confounded) | 7,266 | 19 | 528.4 game min | **0 / −0.68** | 923 / 229 | −0.024 | 1.03 | 7,266 | 1 h 58 m |
+| FULL-2 demo-seeded (confounded) | 7,606 | 24 | 681.3 game min | **0 / −0.83** | 661 / 148 | −0.025 | 0.98 | 7,606 | 2 h 00 m |
+| **FULL-1 re-run, fixed** | 7,249 | 24 | 686 game min | **0 / −0.75** | 889 / 282 | −0.02 | 1.01 | 7,249 | 2 h 00 m |
+| **FULL-2 re-run, fixed** | 6,248 | 37 | 1,060 game min | **0 / −0.59** | 1,278 / 114 | −0.02 | 0.87 | 6,248 | 2 h 00 m |
+
+The bottom two rows are the ones to read. They ran on an environment where every verb can
+succeed - PLACE accepted 37/679 and 35/433, ROTATE 43/47, SET_RECIPE 5/5 - and they still
+ended with **an automated production score of 0**, across 61 episodes and 1,746 simulated
+game minutes, while the general production score reached 1,278. The null result is no
+longer confounded: it is what SM-ARQ does with ~7,000 decisions against a reward that
+needs a two-link conjunction of probability ~10⁻¹⁰ per decision pair.
 
 Aggregate simulation throughput was 4.5 game-seconds per wall-second across three
 workers; episodes ended on the simulated-time budget in every case except the three that
