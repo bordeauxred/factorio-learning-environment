@@ -143,7 +143,7 @@ class DoubleDQNLearner:
         if head in (C.POSITION, C.DIRECTION, C.QUANTITY, C.DURATION):
             return torch.ones((len(masks), size), dtype=torch.bool, device=self.device)
         entity_choices = None
-        if head == C.RECIPE:
+        if head in (C.ITEM, C.RECIPE):
             entity_choices = (
                 selected[:, C.HEAD_INDEX[C.ENTITY]].detach().cpu().numpy()
             )
@@ -186,6 +186,21 @@ class DoubleDQNLearner:
             self._prefix(selected, indices),
         )
 
+    @staticmethod
+    def _head_groups(
+        codes: np.ndarray,
+        depth: int,
+        head_index: int,
+        head: str,
+        verbs: np.ndarray,
+        coarse_move: bool,
+    ) -> tuple[np.ndarray, ...]:
+        group = np.flatnonzero(codes[:, depth] == head_index)
+        if not coarse_move or head != C.POSITION or group.size == 0:
+            return (group,)
+        move = verbs[group] == C.VERB_INDEX["MOVE_TO"]
+        return tuple(part for part in (group[move], group[~move]) if part.size)
+
     def _batched_next_values(
         self,
         online_next: EncodedState,
@@ -226,37 +241,48 @@ class DoubleDQNLearner:
 
         for depth in range(codes.shape[1]):
             for head_index, head in enumerate(C.HEADS):
-                group_np = np.flatnonzero(codes[:, depth] == head_index)
-                if group_np.size == 0:
-                    continue
-                group = torch.as_tensor(group_np, device=self.device)
-                group_masks = [masks[index] for index in group_np]
-                group_verbs_np = verbs_np[group_np]
-                online_q = self._head_q(
-                    self.online, online_encoded, group, head, verbs, selected
-                )
-                legal = self._legal_batch(
-                    group_masks, head, group_verbs_np, selected.index_select(0, group), online_q.shape[1]
-                )
-                choices = online_q.masked_fill(~legal, -torch.inf).argmax(dim=1)
-
-                final_np = lengths[group_np] == depth + 1
-                if final_np.any():
-                    final_local_np = np.flatnonzero(final_np)
-                    final_local = torch.as_tensor(final_local_np, device=self.device)
-                    final_group = group.index_select(0, final_local)
-                    target_q = self._head_q(
-                        self.target,
-                        target_encoded,
-                        final_group,
-                        head,
-                        verbs,
-                        selected,
+                for group_np in self._head_groups(
+                    codes,
+                    depth,
+                    head_index,
+                    head,
+                    verbs_np,
+                    self.online.coarse_move,
+                ):
+                    if group_np.size == 0:
+                        continue
+                    group = torch.as_tensor(group_np, device=self.device)
+                    group_masks = [masks[index] for index in group_np]
+                    group_verbs_np = verbs_np[group_np]
+                    online_q = self._head_q(
+                        self.online, online_encoded, group, head, verbs, selected
                     )
-                    chosen = choices.index_select(0, final_local)
-                    evaluated = target_q.gather(1, chosen[:, None]).squeeze(1).float()
-                    local_values.index_copy_(0, final_group, evaluated)
-                selected[group, head_index] = choices
+                    legal = self._legal_batch(
+                        group_masks,
+                        head,
+                        group_verbs_np,
+                        selected.index_select(0, group),
+                        online_q.shape[1],
+                    )
+                    choices = online_q.masked_fill(~legal, -torch.inf).argmax(dim=1)
+
+                    final_np = lengths[group_np] == depth + 1
+                    if final_np.any():
+                        final_local_np = np.flatnonzero(final_np)
+                        final_local = torch.as_tensor(final_local_np, device=self.device)
+                        final_group = group.index_select(0, final_local)
+                        target_q = self._head_q(
+                            self.target,
+                            target_encoded,
+                            final_group,
+                            head,
+                            verbs,
+                            selected,
+                        )
+                        chosen = choices.index_select(0, final_local)
+                        evaluated = target_q.gather(1, chosen[:, None]).squeeze(1).float()
+                        local_values.index_copy_(0, final_group, evaluated)
+                    selected[group, head_index] = choices
         values.index_copy_(0, root_indices, local_values)
         return values
 
@@ -297,39 +323,46 @@ class DoubleDQNLearner:
 
         for depth in range(max_depth):
             for head_index, head in enumerate(C.HEADS):
-                group_np = np.flatnonzero(codes[:, depth] == head_index)
-                if group_np.size == 0:
-                    continue
-                group = torch.as_tensor(group_np, device=self.device)
-                choices_np = action_heads_np[group_np, head_index]
-                if (choices_np < 0).any():
-                    verb = C.VERBS[verbs_np[group_np[0]]]
-                    raise ValueError(f"transition is missing {head} for {verb}")
-                choices = torch.as_tensor(choices_np, device=self.device)
-                online_q = self._head_q(
-                    self.online, online_state, group, head, verbs, selected
-                )
-                chosen_q = online_q.gather(1, choices[:, None]).squeeze(1).float()
-                predictions[depth + 1] = predictions[depth + 1].index_add(
-                    0, group, chosen_q
-                )
-                with torch.no_grad():
-                    legal = self._legal_batch(
-                        [masks[index] for index in group_np],
-                        head,
-                        verbs_np[group_np],
-                        selected.index_select(0, group),
-                        online_q.shape[1],
+                for group_np in self._head_groups(
+                    codes,
+                    depth,
+                    head_index,
+                    head,
+                    verbs_np,
+                    self.online.coarse_move,
+                ):
+                    if group_np.size == 0:
+                        continue
+                    group = torch.as_tensor(group_np, device=self.device)
+                    choices_np = action_heads_np[group_np, head_index]
+                    if (choices_np < 0).any():
+                        verb = C.VERBS[verbs_np[group_np[0]]]
+                        raise ValueError(f"transition is missing {head} for {verb}")
+                    choices = torch.as_tensor(choices_np, device=self.device)
+                    online_q = self._head_q(
+                        self.online, online_state, group, head, verbs, selected
                     )
-                    greedy = online_q.detach().masked_fill(~legal, -torch.inf).argmax(dim=1)
-                    target_q = self._head_q(
-                        self.target, target_state, group, head, verbs, selected
+                    chosen_q = online_q.gather(1, choices[:, None]).squeeze(1).float()
+                    predictions[depth + 1] = predictions[depth + 1].index_add(
+                        0, group, chosen_q
                     )
-                    bootstrap = target_q.gather(1, greedy[:, None]).squeeze(1).float()
-                    bootstraps[depth] = bootstraps[depth].index_add(
-                        0, group, bootstrap
-                    )
-                selected[group, head_index] = choices
+                    with torch.no_grad():
+                        legal = self._legal_batch(
+                            [masks[index] for index in group_np],
+                            head,
+                            verbs_np[group_np],
+                            selected.index_select(0, group),
+                            online_q.shape[1],
+                        )
+                        greedy = online_q.detach().masked_fill(~legal, -torch.inf).argmax(dim=1)
+                        target_q = self._head_q(
+                            self.target, target_state, group, head, verbs, selected
+                        )
+                        bootstrap = target_q.gather(1, greedy[:, None]).squeeze(1).float()
+                        bootstraps[depth] = bootstraps[depth].index_add(
+                            0, group, bootstrap
+                        )
+                    selected[group, head_index] = choices
 
         with torch.no_grad():
             next_values = self._batched_next_values(

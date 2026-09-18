@@ -211,6 +211,8 @@ class Masks:
 
     ``entity`` masks depend on the verb being constructed, so they are supplied
     per verb: ``entity[verb_index]`` is the (ENTITY_SLOTS,) mask for that verb.
+    ``item_for_entity`` is consulted only by INSERT/EXTRACT, after the entity
+    has been chosen, and contains prototype/type compatibility only.
     ``recipe_for_entity`` is consulted only by SET_RECIPE, after the entity has
     been chosen: ``recipe_for_entity(slot) -> (n_recipes,) bool``.
     """
@@ -221,6 +223,7 @@ class Masks:
     craft_recipe: np.ndarray  # (n_recipes,) bool - hand-craftable category
     technology: np.ndarray  # (n_technologies,) bool - exists and not researched
     entity: np.ndarray  # (N_VERBS, ENTITY_SLOTS) bool
+    item_for_entity: Any = None  # callable(slot:int) -> np.ndarray | None
     recipe_for_entity: Any = None  # callable(slot:int) -> np.ndarray | None
 
 

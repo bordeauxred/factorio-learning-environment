@@ -56,6 +56,7 @@ class TrainingConfig:
     run_root: Path = Path("runs")
     replay_capacity: int = 20_000
     force_fallback: bool = False
+    coarse_move: bool = False
 
     @property
     def run_dir(self) -> Path:
@@ -183,9 +184,16 @@ class PolicyDecision:
 class FallbackRandomPolicy:
     """Deterministic-seed structural random policy for offline runner tests."""
 
-    def __init__(self, vocab: C.VocabProtocol, seed: int = 0) -> None:
+    def __init__(
+        self,
+        vocab: C.VocabProtocol,
+        seed: int = 0,
+        *,
+        coarse_move: bool = False,
+    ) -> None:
         self.vocab = vocab
         self.rng = np.random.default_rng(seed)
+        self.coarse_move = bool(coarse_move)
 
     def state_dict(self) -> dict[str, Any]:
         return {"rng": self.rng.bit_generator.state}
@@ -214,10 +222,18 @@ class FallbackRandomPolicy:
         kwargs: dict[str, Any] = {}
         sequence = C.HEAD_SEQUENCE[verb]
         if C.POSITION in sequence:
-            position = int(self.rng.integers(observation.raster_tiles**2))
-            kwargs["tile"] = C.position_to_tile(
-                position, observation.raster_origin, observation.raster_tiles
-            )
+            if verb == "MOVE_TO" and self.coarse_move:
+                from fle.smarq.actions import move_position_to_tile
+
+                position = int(self.rng.integers(C.GRID_SIZE**2))
+                kwargs["tile"] = move_position_to_tile(
+                    position, observation.player_tile
+                )
+            else:
+                position = int(self.rng.integers(observation.raster_tiles**2))
+                kwargs["tile"] = C.position_to_tile(
+                    position, observation.raster_origin, observation.raster_tiles
+                )
         if C.PROTOTYPE in sequence:
             kwargs["prototype"] = self.vocab.prototypes[self._choice(masks.prototype)]
         if C.DIRECTION in sequence:
@@ -225,7 +241,10 @@ class FallbackRandomPolicy:
         if C.ENTITY in sequence:
             kwargs["entity_slot"] = self._choice(masks.entity[C.VERB_INDEX[verb]])
         if C.ITEM in sequence:
-            kwargs["item"] = self.vocab.items[self._choice(masks.item)]
+            item_mask = masks.item
+            if verb in {"INSERT", "EXTRACT"} and callable(masks.item_for_entity):
+                item_mask = masks.item_for_entity(kwargs["entity_slot"])
+            kwargs["item"] = self.vocab.items[self._choice(item_mask)]
         if C.QUANTITY in sequence:
             kwargs["quantity"] = C.QUANTITIES[int(self.rng.integers(C.N_QUANTITIES))]
         if C.RECIPE in sequence:
@@ -239,7 +258,13 @@ class FallbackRandomPolicy:
             kwargs["duration_seconds"] = C.DURATIONS_SECONDS[
                 int(self.rng.integers(C.N_DURATIONS))
             ]
-        action = semantic_action(verb, observation, self.vocab, **kwargs)
+        action = semantic_action(
+            verb,
+            observation,
+            self.vocab,
+            coarse_move=self.coarse_move,
+            **kwargs,
+        )
         return PolicyDecision(action, 0.0, True, epsilons)
 
 
@@ -292,9 +317,18 @@ class _ExternalPolicyAdapter:
             )
         kwargs: dict[str, Any] = {}
         if C.POSITION in selected:
-            kwargs["tile"] = C.position_to_tile(
-                selected[C.POSITION], observation.raster_origin, observation.raster_tiles
-            )
+            if C.VERBS[verb] == "MOVE_TO" and self.policy.network.coarse_move:
+                from fle.smarq.actions import move_position_to_tile
+
+                kwargs["tile"] = move_position_to_tile(
+                    selected[C.POSITION], observation.player_tile
+                )
+            else:
+                kwargs["tile"] = C.position_to_tile(
+                    selected[C.POSITION],
+                    observation.raster_origin,
+                    observation.raster_tiles,
+                )
         if C.PROTOTYPE in selected:
             kwargs["prototype"] = self.policy.vocab.prototypes[selected[C.PROTOTYPE]]
         if C.DIRECTION in selected:
@@ -313,7 +347,13 @@ class _ExternalPolicyAdapter:
             ]
         if C.DURATION in selected:
             kwargs["duration_seconds"] = C.DURATIONS_SECONDS[selected[C.DURATION]]
-        action = semantic_action(C.VERBS[verb], observation, self.policy.vocab, **kwargs)
+        action = semantic_action(
+            C.VERBS[verb],
+            observation,
+            self.policy.vocab,
+            coarse_move=self.policy.network.coarse_move,
+            **kwargs,
+        )
         if not np.array_equal(action.heads, heads):  # pragma: no cover - contract invariant
             raise RuntimeError("policy head decoding changed the selected indices")
         return PolicyDecision(
@@ -390,7 +430,11 @@ def _build_backend(
         network = SMARQNetwork(
             **_supported_kwargs(
                 SMARQNetwork,
-                {"vocab": env.vocab, "raster_tiles": config.raster_tiles},
+                {
+                    "vocab": env.vocab,
+                    "raster_tiles": config.raster_tiles,
+                    "coarse_move": config.coarse_move,
+                },
             )
         )
         replay = PrioritizedReplay(
@@ -452,7 +496,11 @@ def _build_backend(
     replay = FallbackReplay(min(config.replay_capacity, 128), config.seed)
     learner = FallbackLearner(replay, config.seed + 1)
     policies = [
-        FallbackRandomPolicy(env.vocab, config.seed + 10_000 + worker)
+        FallbackRandomPolicy(
+            env.vocab,
+            config.seed + 10_000 + worker,
+            coarse_move=config.coarse_move,
+        )
         for worker in range(config.workers)
     ]
 
@@ -486,6 +534,7 @@ def _default_env_factory(
                 decision_cap=config.decision_cap,
                 reward_mode=config.reward_mode,
                 seed=seed,
+                coarse_move=config.coarse_move,
             )
         try:
             if config.env == "live-nearore":
@@ -504,6 +553,7 @@ def _default_env_factory(
                 "decision_cap": config.decision_cap,
                 "reward_mode": config.reward_mode,
                 "seed": seed,
+                "coarse_move": config.coarse_move,
             },
         )
         return SemanticEnv(**kwargs)
@@ -530,6 +580,37 @@ def load_checkpoint(path: str | Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError("checkpoint payload is not a mapping")
     return value
+
+
+def vocabulary_contract(vocab: C.VocabProtocol) -> dict[str, Any]:
+    """Return the ordered symbols that assign meaning to categorical indices."""
+    fields = ("prototypes", "items", "recipes", "technologies", "entity_types", "fluids")
+    return {
+        "names": {
+            name: list(getattr(vocab, name))
+            for name in fields
+            if hasattr(vocab, name)
+        },
+        "game_version": str(getattr(vocab, "game_version", "unknown")),
+    }
+
+
+def assert_checkpoint_vocabulary(
+    checkpoint: dict[str, Any], vocab: C.VocabProtocol
+) -> None:
+    expected = checkpoint.get("vocabulary")
+    if expected is None:
+        raise ValueError(
+            "checkpoint has no vocabulary contract; refusing to resume because "
+            "categorical indices cannot be verified"
+        )
+    actual = vocabulary_contract(vocab)
+    if expected != actual:
+        raise ValueError(
+            "checkpoint vocabulary does not match the environment vocabulary "
+            f"(checkpoint game={expected.get('game_version')!r}, "
+            f"environment game={actual['game_version']!r})"
+        )
 
 
 @dataclass
@@ -606,13 +687,26 @@ def run_training(
     np.random.seed(config.seed)
     factory = env_factory or _default_env_factory(config)
     envs = [factory(worker, config.seed + worker) for worker in range(config.workers)]
+    environment_vocabulary = vocabulary_contract(envs[0].vocab)
+    for worker, env in enumerate(envs[1:], start=1):
+        if vocabulary_contract(env.vocab) != environment_vocabulary:
+            for opened_env in envs:
+                opened_env.close()
+            raise ValueError(f"worker {worker} vocabulary does not match worker 0")
+    resume_payload: dict[str, Any] | None = None
+    if config.resume:
+        resume_payload = load_checkpoint(config.resume)
+        try:
+            assert_checkpoint_vocabulary(resume_payload, envs[0].vocab)
+        except Exception:
+            for env in envs:
+                env.close()
+            raise
     backend = _build_backend(envs[0], config)
     shared = _SharedState()
     updates = 0
     demo_transitions = 0
-    resume_payload: dict[str, Any] | None = None
-    if config.resume:
-        resume_payload = load_checkpoint(config.resume)
+    if resume_payload is not None:
         backend.load_state_dict(resume_payload["backend_state"])
         shared.claimed = int(resume_payload.get("decisions", 0))
         shared.completed = shared.claimed
@@ -845,6 +939,7 @@ def run_training(
                 "demo_transitions": demo_transitions,
                 "backend_name": backend.name,
                 "backend_state": backend.state_dict(),
+                "vocabulary": environment_vocabulary,
                 "python_random_state": random.getstate(),
                 "numpy_random_state": np.random.get_state(),
             }
@@ -964,6 +1059,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--total-decisions", type=int)
     parser.add_argument("--checkpoint-every", type=int, default=1_000)
     parser.add_argument("--resume")
+    parser.add_argument("--coarse-move", action="store_true")
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--dry-run", action="store_true")
     return parser
@@ -992,6 +1088,7 @@ def main(argv: list[str] | None = None) -> int:
         resume=args.resume,
         seed=args.seed,
         dry_run=args.dry_run,
+        coarse_move=args.coarse_move,
     )
     result = run_training(config)
     print(

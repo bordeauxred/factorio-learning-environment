@@ -4,6 +4,11 @@ The spatial decoder uses FiLM rather than concatenating a broadcast action
 vector.  FiLM keeps the native-resolution activation small (eight channels),
 which matters at a 288-tile raster, while still making every spatial score
 conditional on the verb, prototype, and all other preceding arguments.
+
+When ``coarse_move`` is enabled, MOVE_TO has a separate spatial decoder over
+the retained 96x96 coarse grid.  It still records its choice in the frozen
+POSITION action slot; exact POSITION decoding and every existing head size and
+index are unchanged when the flag is disabled.
 """
 
 from __future__ import annotations
@@ -95,12 +100,14 @@ class SMARQNetwork(nn.Module):
         entity_slots: int = 512,
         entity_id_capacity: int = 4096,
         state_dim: int = 256,
+        coarse_move: bool = False,
     ) -> None:
         super().__init__()
         if raster_tiles <= 0:
             raise ValueError("raster_tiles must be positive")
         self.vocab = vocab
         self.raster_tiles = raster_tiles
+        self.coarse_move = bool(coarse_move)
         if entity_slots <= 0 or entity_slots > C.ENTITY_SLOTS:
             raise ValueError(f"entity_slots must be in [1, {C.ENTITY_SLOTS}]")
         self.entity_slots = int(entity_slots)
@@ -184,6 +191,14 @@ class SMARQNetwork(nn.Module):
         self.spatial_out = nn.Sequential(
             nn.ReLU(), nn.Conv2d(8, 8, 3, padding=1), nn.ReLU(), nn.Conv2d(8, 1, 1)
         )
+        if self.coarse_move:
+            self.move_spatial_film = nn.Linear(256, 16)
+            self.move_spatial_out = nn.Sequential(
+                nn.ReLU(),
+                nn.Conv2d(8, 8, 3, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(8, 1, 1),
+            )
         self.pointer_context = nn.Linear(256, 128)
         self.pointer_entity = nn.Linear(128, 128)
         self.pointer_bias = nn.Linear(128, 1)
@@ -353,6 +368,23 @@ class SMARQNetwork(nn.Module):
             raise KeyError(head)
         context = self.action_context(encoded, verb, selected)
         if head == C.POSITION:
+            if self.coarse_move:
+                verb_tensor = self._selection_tensor(
+                    verb, encoded.z_state.shape[0], encoded.z_state.device
+                )
+                move_rows = verb_tensor == C.VERB_INDEX["MOVE_TO"]
+                if move_rows.all():
+                    grid = F.interpolate(
+                        self.spatial_grid(encoded.spatial),
+                        size=(C.GRID_SIZE, C.GRID_SIZE),
+                        mode="bilinear",
+                        align_corners=False,
+                    )
+                    scale, shift = self.move_spatial_film(context).chunk(2, dim=-1)
+                    grid = grid * (1 + scale[:, :, None, None]) + shift[:, :, None, None]
+                    return self.move_spatial_out(grid).flatten(1)
+                if move_rows.any():
+                    raise ValueError("mixed MOVE_TO and exact POSITION batch")
             grid = F.interpolate(
                 self.spatial_grid(encoded.spatial),
                 size=(self.raster_tiles, self.raster_tiles),

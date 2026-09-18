@@ -34,7 +34,19 @@ def mask_for_head(
     if head == C.PROTOTYPE:
         value = _field(masks, "prototype")
     elif head == C.ITEM:
-        value = _field(masks, "item")
+        provider = _field(masks, "item_for_entity")
+        slot = selected.get(C.ENTITY, -1)
+        if callable(provider):
+            value = provider(slot)
+        elif isinstance(provider, Mapping):
+            value = provider.get(slot)
+        elif provider is not None and np.asarray(provider).ndim == 2 and slot >= 0:
+            value = np.asarray(provider)[slot]
+        else:
+            value = None
+        if value is None:
+            # Verbs without an entity target retain the global item mask.
+            value = _field(masks, "item")
     elif head == C.TECHNOLOGY:
         value = _field(masks, "technology")
     elif head == C.ENTITY:
@@ -182,9 +194,18 @@ class AutoregressivePolicy:
     ) -> C.Action:
         kwargs: dict[str, Any] = {}
         if C.POSITION in selected:
-            kwargs["tile"] = C.position_to_tile(
-                selected[C.POSITION], tuple(observation["raster_origin"]), self.network.raster_tiles
-            )
+            if C.VERBS[verb] == "MOVE_TO" and self.network.coarse_move:
+                from fle.smarq.actions import move_position_to_tile
+
+                kwargs["tile"] = move_position_to_tile(
+                    selected[C.POSITION], tuple(observation["player_tile"])
+                )
+            else:
+                kwargs["tile"] = C.position_to_tile(
+                    selected[C.POSITION],
+                    tuple(observation["raster_origin"]),
+                    self.network.raster_tiles,
+                )
         if C.PROTOTYPE in selected:
             kwargs["prototype"] = self.vocab.prototypes[selected[C.PROTOTYPE]]
         if C.DIRECTION in selected:
@@ -239,4 +260,3 @@ class AutoregressivePolicy:
 
 
 Policy = AutoregressivePolicy
-

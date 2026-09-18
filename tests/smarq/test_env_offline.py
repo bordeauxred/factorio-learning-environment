@@ -5,7 +5,7 @@ import numpy as np
 from fle.smarq import contract as C
 from fle.smarq.actions import ActionCodec
 from fle.smarq.contract import Action, Masks, Observation
-from fle.smarq.env import ExecutionOutcome, FLEActionExecutor, SemanticEnv
+from fle.smarq.env import FLEActionExecutor, SemanticEnv, classify_failure
 from fle.smarq.vocab import StableVocab
 
 
@@ -15,13 +15,18 @@ def make_action(verb: str, **kwargs) -> Action:
 
 class RecordingExecutor(FLEActionExecutor):
     def __init__(self, response=None, error=None):
-        self.client = SimpleNamespace(entity_ids=np.zeros(C.ENTITY_SLOTS, dtype=np.int64))
+        self.client = SimpleNamespace(
+            entity_ids=np.zeros(C.ENTITY_SLOTS, dtype=np.int64),
+            build_distance=10.0,
+            resource_reach_distance=2.7,
+        )
         self.response = response
         self.error = error
         self.navigated = []
         self.calls = []
 
-    def _navigate(self, tile, remaining, exact_destination=False):
+    def _navigate(self, tile, remaining, exact_destination=False, reach=None):
+        del reach
         self.navigated.append((tile, exact_destination))
         return 17
 
@@ -81,6 +86,23 @@ def test_navigation_inside_move_preserves_requested_target() -> None:
     assert outcome.success
     assert executor.navigated == [(target, True)]
     assert executor.calls == []
+
+
+def test_recorded_failure_messages_are_classified() -> None:
+    cases = (
+        ("No coal to insert from your inventory", "INSERT", "insufficient_inventory"),
+        ("Failed to craft item: insufficient ingredients", "CRAFT", "insufficient_inventory"),
+        ("Nothing within reach to harvest", "MINE", "unreachable"),
+        ("No entity to rotate", "ROTATE", "no_such_entity"),
+        ("Could not find a valid furnace entity", "EXTRACT", "no_such_entity"),
+        (
+            "Could not find a nearby entity that accepts this item",
+            "INSERT",
+            "invalid_argument",
+        ),
+    )
+    for message, verb, expected in cases:
+        assert classify_failure(message, verb) == expected
 
 
 def empty_observation(tick: int) -> Observation:

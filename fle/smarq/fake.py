@@ -69,6 +69,7 @@ class FakeSemanticEnv:
         decision_cap: int = 200,
         reward_mode: str = "automated",
         seed: int = 0,
+        coarse_move: bool = False,
     ) -> None:
         if reward_mode not in C.REWARD_MODES:
             raise ValueError(reward_mode)
@@ -77,6 +78,7 @@ class FakeSemanticEnv:
         self.tick_budget = tick_budget
         self.decision_cap = decision_cap
         self.reward_mode = reward_mode
+        self.coarse_move = bool(coarse_move)
         self._rng = np.random.default_rng(seed)
         self._vocab = FakeVocab()
         self.reset(seed)

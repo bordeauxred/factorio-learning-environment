@@ -51,7 +51,16 @@ class ExecutionOutcome:
 
 def classify_failure(error: BaseException | str, verb: str) -> str:
     text = str(error).lower()
-    if any(token in text for token in ("path not found", "could not get path", "too far", "move closer")):
+    if any(
+        token in text
+        for token in (
+            "path not found",
+            "could not get path",
+            "too far",
+            "move closer",
+            "nothing within reach",
+        )
+    ):
         return "unreachable"
     if verb == "PLACE" and any(
         token in text
@@ -63,6 +72,7 @@ def classify_failure(error: BaseException | str, verb: str) -> str:
         for token in (
             "no item",
             "in inventory",
+            "from your inventory",
             "ingredients",
             "inventory is full",
             "not enough",
@@ -71,9 +81,20 @@ def classify_failure(error: BaseException | str, verb: str) -> str:
         )
     ):
         return "insufficient_inventory"
+    if "no entity to rotate" in text or (
+        "could not find a valid" in text and "entity" in text
+    ):
+        return "no_such_entity"
     if any(
         token in text
-        for token in ("invalid", "doesn't exist", "isn't something", "cannot be crafted", "already researched")
+        for token in (
+            "invalid",
+            "doesn't exist",
+            "isn't something",
+            "cannot be crafted",
+            "already researched",
+            "accepts this item",
+        )
     ):
         return "invalid_argument"
     return "tool_error"
@@ -365,6 +386,7 @@ class SemanticEnv(C.SemanticEnvProtocol):
         reward_mode: str = "automated",
         execution_speed: float = MEASURED_EXECUTION_SPEED,
         instance: Any | None = None,
+        coarse_move: bool = False,
     ) -> None:
         if not 1 <= port <= 65535:
             raise ValueError(f"port {port} is not a valid TCP port")
@@ -375,6 +397,7 @@ class SemanticEnv(C.SemanticEnvProtocol):
         self.tick_budget = int(tick_budget)
         self.decision_cap = int(decision_cap)
         self.reward_mode = reward_mode
+        self.coarse_move = bool(coarse_move)
         self.instance = instance or FactorioInstance(
             address="localhost",
             tcp_port=port,
@@ -387,11 +410,12 @@ class SemanticEnv(C.SemanticEnvProtocol):
         self._owns_instance = instance is None
         self.clock = SimClock(self.instance, execution_speed=execution_speed)
         self._vocab = load_vocab(self.instance.rcon_client)
-        self.codec = ActionCodec(self._vocab)
+        self.codec = ActionCodec(self._vocab, coarse_move=self.coarse_move)
         self.client = TensorClient(vocab=self._vocab)
         self.raster_builder = ExactTileRaster(self.raster_tiles)
         self.executor = FLEActionExecutor(self.instance, self.clock, self.client)
         self.metadata = MaskMetadata()
+        self._last_technology_mask_size: int | None = None
         self.episode_start_tick = 0
         self.episode_decisions = 0
         self._score = (0.0, 0.0)
@@ -448,8 +472,22 @@ class SemanticEnv(C.SemanticEnvProtocol):
         )
 
     def masks(self) -> Masks:
-        self.metadata = MaskMetadata.from_rcon(self.instance.rcon_client, self._vocab)
-        return build_masks(self._vocab, self.client, self.metadata)
+        if not self.metadata.entity:
+            self.metadata = MaskMetadata.from_rcon(
+                self.instance.rcon_client, self._vocab
+            )
+        else:
+            self.metadata.refresh_research(self.instance.rcon_client)
+        masks = build_masks(self._vocab, self.client, self.metadata)
+        technology_mask_size = int(masks.technology.sum())
+        if technology_mask_size != self._last_technology_mask_size:
+            print(
+                f"technology_mask_size={technology_mask_size}/"
+                f"{len(self._vocab.technologies)}",
+                flush=True,
+            )
+            self._last_technology_mask_size = technology_mask_size
+        return masks
 
     def reset(self, seed: int | None = None) -> tuple[Observation, Masks]:
         del seed
@@ -539,16 +577,23 @@ def _random_action(
             continue
         if C.ENTITY in C.HEAD_SEQUENCE[verb] and not masks.entity[verb_index].any():
             continue
+        if verb == "RESEARCH" and not masks.technology.any():
+            continue
         candidates.append(verb_index)
     verb_index = int(rng.choice(candidates))
     verb = C.VERBS[verb_index]
     heads = C.empty_heads()
     for head in C.HEAD_SEQUENCE[verb]:
         if head == C.POSITION:
-            half = max(2, observation.raster_tiles // 4)
-            x = int(rng.integers(observation.raster_tiles // 2 - half, observation.raster_tiles // 2 + half))
-            y = int(rng.integers(observation.raster_tiles // 2 - half, observation.raster_tiles // 2 + half))
-            value = y * observation.raster_tiles + x
+            side = (
+                C.GRID_SIZE
+                if verb == "MOVE_TO" and codec.coarse_move
+                else observation.raster_tiles
+            )
+            half = max(2, side // 4)
+            x = int(rng.integers(side // 2 - half, side // 2 + half))
+            y = int(rng.integers(side // 2 - half, side // 2 + half))
+            value = y * side + x
         elif head == C.PROTOTYPE:
             value = int(rng.choice(np.nonzero(masks.prototype)[0]))
         elif head == C.DIRECTION:
@@ -556,7 +601,12 @@ def _random_action(
         elif head == C.ENTITY:
             value = int(rng.choice(np.nonzero(masks.entity[verb_index])[0]))
         elif head == C.ITEM:
-            value = int(rng.choice(np.nonzero(masks.item)[0]))
+            legal = masks.item
+            if verb in {"INSERT", "EXTRACT"} and callable(masks.item_for_entity):
+                legal = masks.item_for_entity(int(heads[C.HEAD_INDEX[C.ENTITY]]))
+            if legal is None or not legal.any():
+                return _random_action(rng, codec, observation, masks)
+            value = int(rng.choice(np.nonzero(legal)[0]))
         elif head == C.QUANTITY:
             value = int(rng.integers(C.N_QUANTITIES))
         elif head == C.RECIPE:
@@ -582,12 +632,14 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--raster-tiles", type=int, default=C.RASTER_TILES_DEFAULT)
     parser.add_argument("--reward-mode", choices=C.REWARD_MODES, default="automated")
+    parser.add_argument("--coarse-move", action="store_true")
     args = parser.parse_args()
     rng = np.random.default_rng(args.seed)
     env = SemanticEnv(
         port=args.port,
         raster_tiles=args.raster_tiles,
         reward_mode=args.reward_mode,
+        coarse_move=args.coarse_move,
     )
     try:
         for episode in range(args.episodes):

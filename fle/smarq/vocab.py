@@ -156,10 +156,21 @@ class StableVocab:
 
 
 def load_vocab(rcon: Any | None = None, cache_path: str | Path | None = None) -> StableVocab:
-    """Load an existing cache, or deterministically build from RCON/FLE data."""
+    """Load a cache or build from a live Factorio prototype table.
+
+    Calling this without either RCON or an existing cache is refused: the FLE
+    enum fallback is intentionally incomplete and must never define neural
+    categorical indices.  Offline callers that explicitly need test data can
+    use :meth:`StableVocab.fallback` directly.
+    """
     if cache_path is not None and Path(cache_path).exists():
         return StableVocab.read_json(cache_path)
-    vocab = StableVocab.from_rcon(rcon) if rcon is not None else StableVocab.fallback()
+    if rcon is None:
+        raise RuntimeError(
+            "load_vocab requires a live RCON client or an existing cache; "
+            "StableVocab.fallback() is test-only and must not build a network"
+        )
+    vocab = StableVocab.from_rcon(rcon)
     if cache_path is not None:
         vocab.write_json(cache_path)
     return vocab

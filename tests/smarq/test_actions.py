@@ -80,9 +80,11 @@ def test_masks_are_structural_and_position_has_no_mask() -> None:
             "stone-furnace": EntityCapability(
                 holds_items=True,
                 recipe_categories=frozenset({"smelting"}),
+                accepted_items=frozenset({"coal", "iron-ore"}),
             )
         },
         researched={"automation"},
+        startable_technologies={"logistics"},
     )
     first = build_masks(stable_vocab, client, metadata)
     assert not hasattr(first, C.POSITION)
@@ -98,6 +100,84 @@ def test_masks_are_structural_and_position_has_no_mask() -> None:
     np.testing.assert_array_equal(first.prototype, second.prototype)
     np.testing.assert_array_equal(first.item, second.item)
     np.testing.assert_array_equal(first.entity, second.entity)
+
+
+def test_entity_item_mask_uses_type_compatibility_not_contents() -> None:
+    stable_vocab = StableVocab(
+        prototypes=("<none>", "burner-mining-drill"),
+        items=("<none>", "coal", "copper-plate", "iron-plate"),
+        recipes=("<none>",),
+        technologies=("<none>",),
+        entity_types=("<none>", "burner-mining-drill"),
+        game_version="recorded-2.0.73",
+    )
+    client = TensorClient(vocab=stable_vocab)
+    client.apply_entity("h1:-:0:0:0;u9,burner-mining-drill,1,2,0,1,W2:2")
+    metadata = MaskMetadata(
+        placeable={"burner-mining-drill"},
+        entity={
+            "burner-mining-drill": EntityCapability(
+                holds_items=True,
+                accepted_items=frozenset({"coal"}),
+            )
+        },
+    )
+
+    masks = build_masks(stable_vocab, client, metadata)
+    for verb in ("INSERT", "EXTRACT"):
+        assert masks.entity[C.VERB_INDEX[verb], 0]
+    assert masks.item_for_entity(0).tolist() == [False, True, False, False]
+    # The global item head remains independent of inventory/state contents.
+    assert masks.item.tolist() == [False, True, True, True]
+
+
+def test_unstartable_technologies_are_masked() -> None:
+    stable_vocab = vocab()
+    client = TensorClient(vocab=stable_vocab)
+    metadata = MaskMetadata(
+        startable_technologies={"logistics"},
+        researched={"automation"},
+    )
+    masks = build_masks(stable_vocab, client, metadata)
+    assert masks.technology.tolist() == [False, False, True]
+
+
+def test_coarse_move_off_preserves_frozen_head_layout_and_sizes() -> None:
+    stable_vocab = vocab()
+    expected_heads = (
+        "position",
+        "prototype",
+        "direction",
+        "entity",
+        "item",
+        "quantity",
+        "recipe",
+        "technology",
+        "duration",
+    )
+    expected_sizes = stable_vocab.head_sizes(96)
+    codec = ActionCodec(stable_vocab, coarse_move=False)
+
+    assert C.HEADS == expected_heads
+    assert C.HEAD_INDEX == {name: index for index, name in enumerate(expected_heads)}
+    assert stable_vocab.head_sizes(96) == expected_sizes
+    assert not codec.coarse_move
+
+
+def test_coarse_move_reaches_three_tile_grid_without_changing_place_decode() -> None:
+    obs = observation()
+    move_heads = C.empty_heads()
+    move_heads[C.HEAD_INDEX[C.POSITION]] = 31 * C.GRID_SIZE + 43
+    codec = ActionCodec(vocab(), coarse_move=True)
+    move = codec.decode(C.VERB_INDEX["MOVE_TO"], move_heads, obs)
+    assert move.tile == (-15, -51)
+
+    place_heads = C.empty_heads()
+    place_heads[C.HEAD_INDEX[C.PROTOTYPE]] = 1
+    place_heads[C.HEAD_INDEX[C.POSITION]] = 31 * 96 + 43
+    place_heads[C.HEAD_INDEX[C.DIRECTION]] = 0
+    place = codec.decode(C.VERB_INDEX["PLACE"], place_heads, obs)
+    assert place.tile == (-5, -17)
 
 
 def test_executor_module_has_no_geometry_substitution_helpers() -> None:

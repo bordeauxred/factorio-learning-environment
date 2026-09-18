@@ -162,12 +162,14 @@ def _pack_masks(
                 result["_entity_shape"] = array.shape
             else:
                 result[name] = array.copy()
-    provider = (
-        masks.get("recipe_for_entity")
-        if isinstance(masks, Mapping)
-        else getattr(masks, "recipe_for_entity", None)
-    )
-    if provider is not None:
+    for provider_name in ("item_for_entity", "recipe_for_entity"):
+        provider = (
+            masks.get(provider_name)
+            if isinstance(masks, Mapping)
+            else getattr(masks, provider_name, None)
+        )
+        if provider is None:
+            continue
         if callable(provider):
             resolved: dict[int, np.ndarray] = {}
             slots: np.ndarray
@@ -184,13 +186,13 @@ def _pack_masks(
                 value = provider(int(slot))
                 if value is not None:
                     resolved[int(slot)] = np.asarray(value, dtype=bool).copy()
-            result["recipe_for_entity"] = resolved
+            result[provider_name] = resolved
         elif isinstance(provider, Mapping):
-            result["recipe_for_entity"] = {
+            result[provider_name] = {
                 int(key): np.asarray(value, dtype=bool).copy() for key, value in provider.items()
             }
         else:
-            result["recipe_for_entity"] = np.asarray(provider, dtype=bool).copy()
+            result[provider_name] = np.asarray(provider, dtype=bool).copy()
     # A pre-resolved mask is also accepted by policy.mask_for_head.
     if isinstance(masks, Mapping) and "recipe" in masks:
         result["recipe"] = np.asarray(masks["recipe"], dtype=bool).copy()

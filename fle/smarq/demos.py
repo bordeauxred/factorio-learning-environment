@@ -13,6 +13,7 @@ from typing import Any, Protocol
 import numpy as np
 
 from fle.smarq import contract as C
+from fle.smarq.actions import move_position_to_tile, tile_to_move_position
 
 
 class DemoReplayProtocol(Protocol):
@@ -40,6 +41,7 @@ def semantic_action(
     recipe: str | None = None,
     technology: str | None = None,
     duration_seconds: int | None = None,
+    coarse_move: bool = False,
 ) -> C.Action:
     """Encode one literal semantic action using the frozen head layout."""
     if verb not in C.VERB_INDEX:
@@ -48,7 +50,14 @@ def semantic_action(
     if C.POSITION in C.HEAD_SEQUENCE[verb]:
         if tile is None:
             raise ValueError(f"{verb} requires an exact tile")
-        position = C.tile_to_position(tile, observation.raster_origin, observation.raster_tiles)
+        if verb == "MOVE_TO" and coarse_move:
+            position = tile_to_move_position(tile, observation.player_tile)
+            if position is not None:
+                tile = move_position_to_tile(position, observation.player_tile)
+        else:
+            position = C.tile_to_position(
+                tile, observation.raster_origin, observation.raster_tiles
+            )
         if position is None:
             raise ValueError(
                 f"literal tile {tile} is outside raster at {observation.raster_origin}"
@@ -128,13 +137,21 @@ class ScriptedDemo:
         observation: C.Observation,
         masks: C.Masks,
         vocab: C.VocabProtocol,
+        *,
+        coarse_move: bool = False,
     ) -> C.Action:
         del masks  # Scripts are allowed to fail; masks are structural only.
         if self.finished:
             raise StopIteration
         spec = self._specs[self._index]
         self._index += 1
-        return semantic_action(spec.verb, observation, vocab, **spec.arguments)
+        return semantic_action(
+            spec.verb,
+            observation,
+            vocab,
+            coarse_move=coarse_move,
+            **spec.arguments,
+        )
 
     def __len__(self) -> int:
         return len(self._specs)
@@ -218,7 +235,7 @@ class HandMiningDemo(ScriptedDemo):
 
 
 def masks_as_dict(masks: C.Masks) -> dict[str, Any]:
-    """Store replayable mask arrays, resolving the contextual recipe callback."""
+    """Store replayable arrays, resolving contextual item/recipe callbacks."""
     result: dict[str, Any] = {
         "verb": masks.verb,
         "prototype": masks.prototype,
@@ -227,6 +244,16 @@ def masks_as_dict(masks: C.Masks) -> dict[str, Any]:
         "technology": masks.technology,
         "entity": masks.entity,
     }
+    if callable(masks.item_for_entity):
+        slots = np.flatnonzero(np.asarray(masks.entity, dtype=bool).any(axis=0))
+        items: dict[int, np.ndarray] = {}
+        for slot in slots:
+            value = masks.item_for_entity(int(slot))
+            if value is not None:
+                items[int(slot)] = np.asarray(value, dtype=bool)
+        result["item_for_entity"] = items
+    elif masks.item_for_entity is not None:
+        result["item_for_entity"] = masks.item_for_entity
     if callable(masks.recipe_for_entity):
         slots = np.flatnonzero(np.asarray(masks.entity, dtype=bool).any(axis=0))
         recipes: dict[int, np.ndarray] = {}
@@ -278,7 +305,12 @@ def collect_demonstration(
     actions: list[C.Action] = []
     total_reward = 0.0
     while not policy.finished:
-        action = policy.next_action(observation, masks, env.vocab)
+        action = policy.next_action(
+            observation,
+            masks,
+            env.vocab,
+            coarse_move=bool(getattr(env, "coarse_move", False)),
+        )
         result, next_masks = env.step(action)
         transition = C.Transition(
             observation=observation.as_dict(),

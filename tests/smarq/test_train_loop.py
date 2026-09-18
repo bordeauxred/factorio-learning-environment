@@ -13,6 +13,8 @@ from fle.smarq.train import (
     load_checkpoint,
     run_training,
     save_checkpoint,
+    assert_checkpoint_vocabulary,
+    vocabulary_contract,
 )
 
 
@@ -89,3 +91,29 @@ def test_demonstrations_enter_training_replay(tmp_path):
     demo_flags = [transition.is_demo for transition in replay["transitions"]]
     assert result.demo_transitions > 0
     assert any(demo_flags)
+
+
+def test_checkpoint_persists_vocabulary_contract(tmp_path):
+    result = run_training(_config(tmp_path, run_name="vocab", workers=1))
+    payload = load_checkpoint(result.checkpoint)
+    env = FakeSemanticEnv(raster_tiles=8)
+    assert payload["vocabulary"] == vocabulary_contract(env.vocab)
+
+
+def test_checkpoint_vocabulary_mismatch_refuses_resume(tmp_path) -> None:
+    env = FakeSemanticEnv(raster_tiles=8)
+    payload = {"vocabulary": vocabulary_contract(env.vocab)}
+    payload["vocabulary"]["names"]["items"][1] = "not-coal"
+    checkpoint = save_checkpoint(tmp_path / "mismatch.pkl", payload)
+    with pytest.raises(ValueError, match="checkpoint vocabulary does not match"):
+        run_training(
+            _config(
+                tmp_path,
+                run_name="mismatch",
+                workers=1,
+                resume=str(checkpoint),
+            )
+        )
+    # The public validator is the same guard used before backend state loading.
+    with pytest.raises(ValueError, match="checkpoint vocabulary does not match"):
+        assert_checkpoint_vocabulary(payload, env.vocab)
