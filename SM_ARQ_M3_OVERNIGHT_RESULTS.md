@@ -366,11 +366,19 @@ sharply distinguish "a fuelled drill is running nearby" from "empty ground", the
 value leaks onto FAST_FORWARD everywhere, and the policy waits instead of building.
 
 The demonstrations seeded the payoff rather than the prerequisite. Three remedies follow
-directly, in increasing order of effort: turn on the n-step semantic returns already
-implemented behind a flag, so credit reaches the setup actions; weight demonstration
-transitions toward the setup steps rather than uniformly; or give the state encoder an
-explicit "is anything of mine currently producing" feature so the two situations cannot
-be confused. The first is a flag, and it is the cheapest thing to try next.
+directly, in increasing order of effort:
+
+1. **n-step semantic returns**, so credit reaches the setup actions rather than stopping
+   at the step that collected the reward. Note that this is *not* a flag, despite the
+   learner exposing `n_step` and `make_n_step_transition`: the training loop never calls
+   either, and never passes `n_step` when it constructs the learner. The capability is
+   implemented and unreachable. Wiring it means buffering consecutive transitions per
+   worker and pushing the combined transition into replay - an hour of work and a test,
+   and still the cheapest of the three.
+2. **Weight demonstration transitions toward the setup steps** rather than inserting them
+   uniformly, so the placement and the fuelling carry the priority rather than the wait.
+3. **Give the state encoder an explicit "is anything of mine currently producing"
+   feature**, so a state with a running drill cannot be confused with empty ground.
 
 ### Greedy behaviour with no reward collapses onto one verb
 
@@ -503,8 +511,8 @@ learner; only the episode start moves, which is a task definition rather than a 
 what the policy controls. If SM-ARQ learns the automation rung from there and not from
 spawn, the bottleneck is the 53-tile approach and the answer is a curriculum over start
 positions. If it fails there too, the bottleneck is credit assignment, and the next move
-is dense demonstrations with the n-step returns that are already implemented behind a
-flag.
+is dense demonstrations with n-step returns, which have to be wired into the training
+loop first (see section 7).
 
 That experiment is already running: `runs/nearore-scratch` started at 07:33 on the three
 servers FULL-1 freed, with episodes teleported to within a few tiles of an ore patch
