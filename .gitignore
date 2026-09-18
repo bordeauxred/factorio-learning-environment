@@ -84,3 +84,13 @@ cortex
 CLAUDE.md
 /server/CLAUDE.md
 configs
+.gstack/
+
+# RL training artifacts (large, machine-generated)
+/runs/
+/resources
+/tinker-cookbook/
+*.pt
+*.pkl
+*.pkl.gz
+Docker.raw
