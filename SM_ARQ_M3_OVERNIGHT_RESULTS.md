@@ -294,5 +294,34 @@ the decay matched to the decisions the run will really collect (`--epsilon-decay
 
 ## 8. Verdict
 
-_To be chosen from A (clear swim) / B (weak swim) / C (infrastructure works, learning
-unresolved) / D (drown), with the single highest-value next experiment._
+_Chosen when the runs stop; the evidence that will decide it is stated here in advance so
+the choice is not made to fit the story._
+
+- **A, clear swim**: a scratch or demo-seeded policy reaches automated production on its
+  own and its automated score per game minute rises over training.
+- **B, weak swim**: the demo-seeded policy repeats the automation chain after the
+  demonstrations, even partially (drill placed on ore and fuelled), more often than
+  chance.
+- **C, infrastructure works, learning unresolved**: the interface and the SMDP are
+  demonstrably correct - TOY-A passes, TOY-B automates, the learner learns on the toy
+  environment - but neither live run shows automation within the compute available.
+- **D, drown**: something in the formulation is broken rather than merely slow.
+
+### What would be worth running next
+
+The exploration arithmetic in section 7 makes the prediction sharp: the first automated
+reward sits behind a five-decision conjunction whose random probability is about
+3 in 100,000 per decision. Two experiments follow from that, and they are cheap:
+
+1. **Start distribution, not algorithm.** Sample each episode's start beside an ore patch
+   (the TOY-B lab setup, which needs only a teleport at reset) so the agent faces the
+   automation rung without the travel prefix. If SM-ARQ learns the rung there and not in
+   open play, the bottleneck is reaching ore, and the fix is a curriculum over start
+   positions rather than a different learner.
+2. **Make the demonstrations dense and let n-step carry them.** Six demonstrations is
+   about 60 transitions in a 30,000-entry replay. Collecting a few hundred, and turning
+   on the n-step semantic returns that are already implemented behind a flag, would put
+   real weight behind the only trajectories that ever see reward.
+
+Both are configuration changes to what already exists, which is the point of having
+built the interface first.
