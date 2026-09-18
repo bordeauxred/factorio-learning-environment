@@ -218,7 +218,19 @@ over 5000 decisions, three workers each on their own Factorio server.
 | FULL-1 `full1-scratch` | automated | scratch | 27000-27002 | running |
 | FULL-2 `full2-demo` | automated | 6 live burner demonstrations at PER priority 10 | 27003-27005 | ran 2 h 00 m |
 | FULL-3 | production (ablation) | scratch | - | not run: the six servers were committed to FULL-1/2, which the brief prioritises, and then to the near-ore arm below |
-| NEAR-ORE (extra, not in the brief) | automated | scratch, episodes start beside ore | 27000-27002 | started 07:33 on the servers FULL-1 freed |
+| NEAR-ORE (extra, not in the brief) | automated | scratch, episodes start beside ore | 27000-27002 | ran 07:33-08:49 across three restarts as defects were found; data in `runs/nearore-scratch-*` |
+| **FULL-1 re-run** `full1-scratch-fixed` | automated | scratch | 27000-27002 | started 08:49 with all three environment fixes |
+| **FULL-2 re-run** `full2-demo-fixed` | automated | 6 live demonstrations | 27003-27005 | started 08:50 with all three environment fixes |
+
+Once the three defects were found, the near-ore follow-up was stopped in favour of
+re-running the brief's own two runs on a working environment: a null result from a
+crippled environment answers nothing, and the brief gives FULL-1 and FULL-2 priority.
+The first minutes of the re-runs already show a different environment:
+
+| | original FULL-1 | FULL-1 re-run, first 551 decisions |
+|---|---|---|
+| PLACE accepted | 8 / 538 (1.5%) | **9 / 86 (10.5%)** |
+| MINE succeeded | 0 (all out of reach) | **10 / 86 (11.6%)** |
 
 Results are filled from `tests/benchmarks/smarq_status.py`; every number here is
 measured, never projected.
