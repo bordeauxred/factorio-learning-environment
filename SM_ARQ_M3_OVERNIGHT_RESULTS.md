@@ -492,13 +492,14 @@ automated score from 0 to 139 in 120 simulated seconds, and the improved demonst
 earns 262. The learner learns on the toy environment (return 63.3 against 2.1 for a
 random policy). Placement geometry is never abstracted anywhere in the code.
 
-*Unresolved.* Neither live run produced a single point of automated production. FULL-1
-ran 7,266 decisions over 528 simulated game minutes with epsilon annealed to 0.09;
-FULL-2 ran 7,606 decisions over 681 game minutes with six demonstrations seeded at
-priority 10. Both ended every episode on the simulated-time budget with an automated
-score of 0, while the general production score climbed to 923 and 661 respectively. The
-demonstrations did move the value function — FULL-2's mean max Q reached 29 against
-FULL-1's 0.16 — but not the behaviour.
+*Unresolved.* No live run produced a single point of automated production - not the two
+confounded runs, and not the two re-runs on the repaired environment. Across all four:
+28,369 decisions, 104 episodes, 2,955 simulated game minutes, automated score 0
+throughout, while the general production score climbed as high as 1,278 by hand. The
+demonstrations moved the value function - the demo-seeded runs reached a mean max Q of
+25-29 against 0.07-0.16 for scratch - but they moved it onto the wrong action: both
+greedy policies converged on FAST_FORWARD, because that is where the reward lands inside
+a demonstration (section 7).
 
 This is not a verdict about semi-Markov autoregressive Q-learning, and after the defects
 found at 08:00 it is not even a clean verdict about exploration: FULL-1 and FULL-2 ran
@@ -508,10 +509,10 @@ DQN normally needs, and the first reward sits behind a five-decision conjunction
 random probability is about 3 in 100,000 per decision. The run measured exploration, and
 exploration lost.
 
-**The first thing to do is therefore not a new idea but an honest re-run**: FULL-1 and
-FULL-2 again, unchanged except for the three environment fixes, so that the null result
-means what it appears to mean. Only after that does the experiment below become the
-interesting one.
+That re-run has since been done: both priority runs were repeated for a full two hours
+each on the repaired environment, and both again ended at an automated score of 0. The
+null result is therefore real rather than an artefact, and the follow-up below is the
+right next question.
 
 ### The single highest-value next experiment
 
