@@ -273,7 +273,17 @@ class FLEActionExecutor:
                 )
                 position = response.get("position", {}) if isinstance(response, dict) else {}
                 placed = (float(position.get("x", math.nan)), float(position.get("y", math.nan)))
-                if placed != (float(action.tile[0]), float(action.tile[1])):
+                # Factorio reports an entity's CENTRE, not its origin tile: a 1x1
+                # entity placed on tile (54, 2) reports (54.5, 2.5), while an even
+                # footprint centres on the tile corner and reports (54, 2). Both
+                # cover exactly the requested tile. Comparing the centre to the
+                # tile directly rejected every odd-footprint placement as if the
+                # game had moved it. Flooring the centre recovers the tile, and
+                # still catches a real relocation such as FLE's offshore pump.
+                if math.isnan(placed[0]) or math.isnan(placed[1]):
+                    raise RuntimeError(f"placement returned no position: {response}")
+                covered = (math.floor(placed[0]), math.floor(placed[1]))
+                if covered != (int(action.tile[0]), int(action.tile[1])):
                     raise RuntimeError(f"exact placement returned {placed}, requested {action.tile}")
             elif action.verb == "MINE":
                 response, _, overshoot = self._run_tool(

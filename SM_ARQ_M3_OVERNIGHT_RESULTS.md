@@ -357,11 +357,32 @@ on the same map and the same policy:
 | MINE | 0 / 246 succeeded | **7 / 58** |
 | PICKUP | 0 / 152 succeeded | **8 / 10** |
 
-**This means FULL-1 and FULL-2 ran with two of their eleven verbs unable to succeed.**
-Their null results still stand as reported - the automated score never moved and the
-exploration arithmetic is unchanged, since neither MINE nor PICKUP is on the path to
-automated production - but they were handicapped, and any comparison against later runs
-must say so. The near-ore arm was restarted at 08:09 with both fixes in place.
+**PLACE rejected its own successes.** Factorio reports an entity's *centre*, not its
+origin tile: a 1x1 entity placed on tile (54, 2) reports position (54.5, 2.5). The check
+that was meant to catch FLE silently relocating an offshore pump compared that centre
+directly against the requested tile, so **every successful placement of an odd-footprint
+entity was raised as a failure**. Only even-footprint entities - the burner mining drill
+and the stone furnace, which centre on a tile corner - ever passed, which is exactly why
+the TOY-B demonstration worked while the policy's placements did not. Flooring the
+reported centre recovers the tile it covers and still catches a genuine relocation.
+
+| verb | before | after |
+|---|---|---|
+| MINE | 0 / 246 succeeded | **7 / 58**, later 61 / 429 |
+| PICKUP | 0 / 152 succeeded | **8 / 10** |
+| PLACE | 0 / 201 succeeded | **5 / 72** |
+
+**This changes what FULL-1 and FULL-2 measured.** They ran with MINE unable to reach any
+resource, PICKUP unable to target anything but the character, and PLACE rejecting its own
+successes for every entity except the 2x2 ones. Their automated score genuinely never
+moved, and that is reported honestly above - but the null result cannot be attributed to
+exploration difficulty alone, because the environment was partly broken underneath it.
+The exploration arithmetic in this section remains the best available estimate of the
+difficulty; it is no longer a sufficient explanation of the observed zero. Any future
+comparison against those two runs has to carry this caveat, and the honest course is to
+re-run them now that the three defects are fixed.
+
+The near-ore arm was restarted at 08:34 with all three fixes in place.
 
 ### A note on what these logs cannot tell us
 
@@ -403,11 +424,18 @@ score of 0, while the general production score climbed to 923 and 661 respective
 demonstrations did move the value function — FULL-2's mean max Q reached 29 against
 FULL-1's 0.16 — but not the behaviour.
 
-This is not a verdict about semi-Markov autoregressive Q-learning. It is a verdict about
-what two hours buys on one M3: 7,000 decisions is roughly 0.2% of what a sparse-reward
+This is not a verdict about semi-Markov autoregressive Q-learning, and after the defects
+found at 08:00 it is not even a clean verdict about exploration: FULL-1 and FULL-2 ran
+with three of their verbs crippled (section 7). What can be said without qualification is
+that the machinery is correct and the compute was thin. On the compute: 7,000 decisions is roughly 0.2% of what a sparse-reward
 DQN normally needs, and the first reward sits behind a five-decision conjunction whose
 random probability is about 3 in 100,000 per decision. The run measured exploration, and
 exploration lost.
+
+**The first thing to do is therefore not a new idea but an honest re-run**: FULL-1 and
+FULL-2 again, unchanged except for the three environment fixes, so that the null result
+means what it appears to mean. Only after that does the experiment below become the
+interesting one.
 
 ### The single highest-value next experiment
 
