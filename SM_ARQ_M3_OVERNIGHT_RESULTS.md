@@ -208,9 +208,31 @@ runs, which the brief gives priority.
 
 ## 6. Full results
 
-| run | reward | scratch/demo | simulated horizon | semantic decisions | final production score | final automated score | automated / game minute | game-s per wall-s | wall clock |
-|---|---|---|---|---|---|---|---|---|---|
-| _pending_ | | | | | | | | | |
+Both runs are open play on the existing FLE world, reward = delta automated production
+score, 30 simulated game minutes per episode, emergency cap 1000 decisions, H = 3600
+simulated seconds, raster 96, batch 128, replay ratio 1.0, per-head epsilon annealed
+over 5000 decisions, three workers each on their own Factorio server.
+
+| run | reward | seeding | ports | status |
+|---|---|---|---|---|
+| FULL-1 `full1-scratch` | automated | scratch | 27000-27002 | running |
+| FULL-2 `full2-demo` | automated | 6 live burner demonstrations at PER priority 10 | 27003-27005 | running |
+| FULL-3 | production (ablation) | scratch | - | not run: all six servers are committed to FULL-1/2, which the brief prioritises |
+
+Results are filled from `tests/benchmarks/smarq_status.py`; every number here is
+measured, never projected.
+
+| run | decisions | episodes | max automated | automated / game min | decisions per wall s | updates |
+|---|---:|---:|---:|---:|---:|---:|
+| _filling as the runs progress_ | | | | | | |
+
+### What the scratch run does early
+
+One thing is visible before any learning claim can be made: the scratch policy
+accumulates **production score by hand** - 397 points within its first few hundred
+decisions - while its **automated score stays at 0**. That is the brief's manual-grinding
+hypothesis appearing unprompted, and it is exactly why the main objective is the
+automated score rather than the general one.
 
 ## 7. Failure analysis
 
