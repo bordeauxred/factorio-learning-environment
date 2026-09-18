@@ -1,0 +1,1712 @@
+{
+  "version": 1,
+  "factorio": "2.0.73",
+  "channels": [
+    {
+      "id": 0,
+      "name": "accumulator",
+      "direction": 0,
+      "members": [
+        [
+          "accumulator",
+          0
+        ],
+        [
+          "accumulator",
+          4
+        ],
+        [
+          "accumulator",
+          8
+        ],
+        [
+          "accumulator",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 1,
+      "name": "active-provider-chest",
+      "direction": 0,
+      "members": [
+        [
+          "active-provider-chest",
+          0
+        ],
+        [
+          "active-provider-chest",
+          4
+        ],
+        [
+          "active-provider-chest",
+          8
+        ],
+        [
+          "active-provider-chest",
+          12
+        ],
+        [
+          "buffer-chest",
+          0
+        ],
+        [
+          "buffer-chest",
+          4
+        ],
+        [
+          "buffer-chest",
+          8
+        ],
+        [
+          "buffer-chest",
+          12
+        ],
+        [
+          "constant-combinator",
+          0
+        ],
+        [
+          "constant-combinator",
+          4
+        ],
+        [
+          "constant-combinator",
+          8
+        ],
+        [
+          "constant-combinator",
+          12
+        ],
+        [
+          "iron-chest",
+          0
+        ],
+        [
+          "iron-chest",
+          4
+        ],
+        [
+          "iron-chest",
+          8
+        ],
+        [
+          "iron-chest",
+          12
+        ],
+        [
+          "passive-provider-chest",
+          0
+        ],
+        [
+          "passive-provider-chest",
+          4
+        ],
+        [
+          "passive-provider-chest",
+          8
+        ],
+        [
+          "passive-provider-chest",
+          12
+        ],
+        [
+          "requester-chest",
+          0
+        ],
+        [
+          "requester-chest",
+          4
+        ],
+        [
+          "requester-chest",
+          8
+        ],
+        [
+          "requester-chest",
+          12
+        ],
+        [
+          "steel-chest",
+          0
+        ],
+        [
+          "steel-chest",
+          4
+        ],
+        [
+          "steel-chest",
+          8
+        ],
+        [
+          "steel-chest",
+          12
+        ],
+        [
+          "storage-chest",
+          0
+        ],
+        [
+          "storage-chest",
+          4
+        ],
+        [
+          "storage-chest",
+          8
+        ],
+        [
+          "storage-chest",
+          12
+        ],
+        [
+          "wooden-chest",
+          0
+        ],
+        [
+          "wooden-chest",
+          4
+        ],
+        [
+          "wooden-chest",
+          8
+        ],
+        [
+          "wooden-chest",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 2,
+      "name": "arithmetic-combinator",
+      "direction": 0,
+      "members": [
+        [
+          "arithmetic-combinator",
+          0
+        ],
+        [
+          "arithmetic-combinator",
+          8
+        ],
+        [
+          "decider-combinator",
+          0
+        ],
+        [
+          "decider-combinator",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 3,
+      "name": "arithmetic-combinator",
+      "direction": 4,
+      "members": [
+        [
+          "arithmetic-combinator",
+          4
+        ],
+        [
+          "arithmetic-combinator",
+          12
+        ],
+        [
+          "decider-combinator",
+          4
+        ],
+        [
+          "decider-combinator",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 4,
+      "name": "artillery-turret",
+      "direction": 0,
+      "members": [
+        [
+          "artillery-turret",
+          0
+        ],
+        [
+          "artillery-turret",
+          4
+        ],
+        [
+          "artillery-turret",
+          8
+        ],
+        [
+          "artillery-turret",
+          12
+        ],
+        [
+          "assembling-machine-1",
+          0
+        ],
+        [
+          "assembling-machine-1",
+          4
+        ],
+        [
+          "assembling-machine-1",
+          8
+        ],
+        [
+          "assembling-machine-1",
+          12
+        ],
+        [
+          "assembling-machine-2",
+          0
+        ],
+        [
+          "assembling-machine-2",
+          4
+        ],
+        [
+          "assembling-machine-2",
+          8
+        ],
+        [
+          "assembling-machine-2",
+          12
+        ],
+        [
+          "assembling-machine-3",
+          0
+        ],
+        [
+          "assembling-machine-3",
+          4
+        ],
+        [
+          "assembling-machine-3",
+          8
+        ],
+        [
+          "assembling-machine-3",
+          12
+        ],
+        [
+          "beacon",
+          0
+        ],
+        [
+          "beacon",
+          4
+        ],
+        [
+          "beacon",
+          8
+        ],
+        [
+          "beacon",
+          12
+        ],
+        [
+          "centrifuge",
+          0
+        ],
+        [
+          "centrifuge",
+          4
+        ],
+        [
+          "centrifuge",
+          8
+        ],
+        [
+          "centrifuge",
+          12
+        ],
+        [
+          "chemical-plant",
+          0
+        ],
+        [
+          "chemical-plant",
+          4
+        ],
+        [
+          "chemical-plant",
+          8
+        ],
+        [
+          "chemical-plant",
+          12
+        ],
+        [
+          "electric-furnace",
+          0
+        ],
+        [
+          "electric-furnace",
+          4
+        ],
+        [
+          "electric-furnace",
+          8
+        ],
+        [
+          "electric-furnace",
+          12
+        ],
+        [
+          "lab",
+          0
+        ],
+        [
+          "lab",
+          4
+        ],
+        [
+          "lab",
+          8
+        ],
+        [
+          "lab",
+          12
+        ],
+        [
+          "radar",
+          0
+        ],
+        [
+          "radar",
+          4
+        ],
+        [
+          "radar",
+          8
+        ],
+        [
+          "radar",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 5,
+      "name": "big-electric-pole",
+      "direction": 0,
+      "members": [
+        [
+          "big-electric-pole",
+          0
+        ],
+        [
+          "big-electric-pole",
+          4
+        ],
+        [
+          "big-electric-pole",
+          8
+        ],
+        [
+          "big-electric-pole",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 6,
+      "name": "boiler",
+      "direction": 0,
+      "members": [
+        [
+          "boiler",
+          0
+        ],
+        [
+          "heat-exchanger",
+          0
+        ]
+      ]
+    },
+    {
+      "id": 7,
+      "name": "boiler",
+      "direction": 4,
+      "members": [
+        [
+          "boiler",
+          4
+        ],
+        [
+          "heat-exchanger",
+          4
+        ]
+      ]
+    },
+    {
+      "id": 8,
+      "name": "boiler",
+      "direction": 8,
+      "members": [
+        [
+          "boiler",
+          8
+        ],
+        [
+          "heat-exchanger",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 9,
+      "name": "boiler",
+      "direction": 12,
+      "members": [
+        [
+          "boiler",
+          12
+        ],
+        [
+          "heat-exchanger",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 10,
+      "name": "bulk-inserter",
+      "direction": 0,
+      "members": [
+        [
+          "bulk-inserter",
+          0
+        ],
+        [
+          "bulk-inserter",
+          4
+        ],
+        [
+          "bulk-inserter",
+          8
+        ],
+        [
+          "bulk-inserter",
+          12
+        ],
+        [
+          "burner-inserter",
+          0
+        ],
+        [
+          "burner-inserter",
+          4
+        ],
+        [
+          "burner-inserter",
+          8
+        ],
+        [
+          "burner-inserter",
+          12
+        ],
+        [
+          "fast-inserter",
+          0
+        ],
+        [
+          "fast-inserter",
+          4
+        ],
+        [
+          "fast-inserter",
+          8
+        ],
+        [
+          "fast-inserter",
+          12
+        ],
+        [
+          "inserter",
+          0
+        ],
+        [
+          "inserter",
+          4
+        ],
+        [
+          "inserter",
+          8
+        ],
+        [
+          "inserter",
+          12
+        ],
+        [
+          "long-handed-inserter",
+          0
+        ],
+        [
+          "long-handed-inserter",
+          4
+        ],
+        [
+          "long-handed-inserter",
+          8
+        ],
+        [
+          "long-handed-inserter",
+          12
+        ],
+        [
+          "medium-electric-pole",
+          0
+        ],
+        [
+          "medium-electric-pole",
+          4
+        ],
+        [
+          "medium-electric-pole",
+          8
+        ],
+        [
+          "medium-electric-pole",
+          12
+        ],
+        [
+          "small-electric-pole",
+          0
+        ],
+        [
+          "small-electric-pole",
+          4
+        ],
+        [
+          "small-electric-pole",
+          8
+        ],
+        [
+          "small-electric-pole",
+          12
+        ],
+        [
+          "small-lamp",
+          0
+        ],
+        [
+          "small-lamp",
+          4
+        ],
+        [
+          "small-lamp",
+          8
+        ],
+        [
+          "small-lamp",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 11,
+      "name": "burner-mining-drill",
+      "direction": 0,
+      "members": [
+        [
+          "burner-mining-drill",
+          0
+        ],
+        [
+          "burner-mining-drill",
+          4
+        ],
+        [
+          "burner-mining-drill",
+          8
+        ],
+        [
+          "burner-mining-drill",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 12,
+      "name": "car",
+      "direction": 0,
+      "members": [
+        [
+          "car",
+          0
+        ],
+        [
+          "car",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 13,
+      "name": "car",
+      "direction": 4,
+      "members": [
+        [
+          "car",
+          4
+        ],
+        [
+          "car",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 14,
+      "name": "cargo-wagon",
+      "direction": 0,
+      "members": [
+        [
+          "cargo-wagon",
+          0
+        ],
+        [
+          "cargo-wagon",
+          8
+        ],
+        [
+          "fluid-wagon",
+          0
+        ],
+        [
+          "fluid-wagon",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 15,
+      "name": "cargo-wagon",
+      "direction": 4,
+      "members": [
+        [
+          "cargo-wagon",
+          4
+        ],
+        [
+          "cargo-wagon",
+          12
+        ],
+        [
+          "fluid-wagon",
+          4
+        ],
+        [
+          "fluid-wagon",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 16,
+      "name": "electric-mining-drill",
+      "direction": 0,
+      "members": [
+        [
+          "electric-mining-drill",
+          0
+        ],
+        [
+          "electric-mining-drill",
+          4
+        ],
+        [
+          "electric-mining-drill",
+          8
+        ],
+        [
+          "electric-mining-drill",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 17,
+      "name": "express-splitter",
+      "direction": 0,
+      "members": [
+        [
+          "express-splitter",
+          0
+        ],
+        [
+          "express-splitter",
+          8
+        ],
+        [
+          "fast-splitter",
+          0
+        ],
+        [
+          "fast-splitter",
+          8
+        ],
+        [
+          "splitter",
+          0
+        ],
+        [
+          "splitter",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 18,
+      "name": "express-splitter",
+      "direction": 4,
+      "members": [
+        [
+          "express-splitter",
+          4
+        ],
+        [
+          "express-splitter",
+          12
+        ],
+        [
+          "fast-splitter",
+          4
+        ],
+        [
+          "fast-splitter",
+          12
+        ],
+        [
+          "splitter",
+          4
+        ],
+        [
+          "splitter",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 19,
+      "name": "express-transport-belt",
+      "direction": 0,
+      "members": [
+        [
+          "express-transport-belt",
+          0
+        ],
+        [
+          "express-transport-belt",
+          4
+        ],
+        [
+          "express-transport-belt",
+          8
+        ],
+        [
+          "express-transport-belt",
+          12
+        ],
+        [
+          "express-underground-belt",
+          0
+        ],
+        [
+          "express-underground-belt",
+          4
+        ],
+        [
+          "express-underground-belt",
+          8
+        ],
+        [
+          "express-underground-belt",
+          12
+        ],
+        [
+          "fast-transport-belt",
+          0
+        ],
+        [
+          "fast-transport-belt",
+          4
+        ],
+        [
+          "fast-transport-belt",
+          8
+        ],
+        [
+          "fast-transport-belt",
+          12
+        ],
+        [
+          "fast-underground-belt",
+          0
+        ],
+        [
+          "fast-underground-belt",
+          4
+        ],
+        [
+          "fast-underground-belt",
+          8
+        ],
+        [
+          "fast-underground-belt",
+          12
+        ],
+        [
+          "transport-belt",
+          0
+        ],
+        [
+          "transport-belt",
+          4
+        ],
+        [
+          "transport-belt",
+          8
+        ],
+        [
+          "transport-belt",
+          12
+        ],
+        [
+          "underground-belt",
+          0
+        ],
+        [
+          "underground-belt",
+          4
+        ],
+        [
+          "underground-belt",
+          8
+        ],
+        [
+          "underground-belt",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 20,
+      "name": "flamethrower-turret",
+      "direction": 0,
+      "members": [
+        [
+          "flamethrower-turret",
+          0
+        ],
+        [
+          "flamethrower-turret",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 21,
+      "name": "flamethrower-turret",
+      "direction": 4,
+      "members": [
+        [
+          "flamethrower-turret",
+          4
+        ],
+        [
+          "flamethrower-turret",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 22,
+      "name": "gate",
+      "direction": 0,
+      "members": [
+        [
+          "gate",
+          0
+        ],
+        [
+          "gate",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 23,
+      "name": "gate",
+      "direction": 4,
+      "members": [
+        [
+          "gate",
+          4
+        ],
+        [
+          "gate",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 24,
+      "name": "gun-turret",
+      "direction": 0,
+      "members": [
+        [
+          "gun-turret",
+          0
+        ],
+        [
+          "gun-turret",
+          4
+        ],
+        [
+          "gun-turret",
+          8
+        ],
+        [
+          "gun-turret",
+          12
+        ],
+        [
+          "laser-turret",
+          0
+        ],
+        [
+          "laser-turret",
+          4
+        ],
+        [
+          "laser-turret",
+          8
+        ],
+        [
+          "laser-turret",
+          12
+        ],
+        [
+          "power-switch",
+          0
+        ],
+        [
+          "power-switch",
+          4
+        ],
+        [
+          "power-switch",
+          8
+        ],
+        [
+          "power-switch",
+          12
+        ],
+        [
+          "steel-furnace",
+          0
+        ],
+        [
+          "steel-furnace",
+          4
+        ],
+        [
+          "steel-furnace",
+          8
+        ],
+        [
+          "steel-furnace",
+          12
+        ],
+        [
+          "stone-furnace",
+          0
+        ],
+        [
+          "stone-furnace",
+          4
+        ],
+        [
+          "stone-furnace",
+          8
+        ],
+        [
+          "stone-furnace",
+          12
+        ],
+        [
+          "substation",
+          0
+        ],
+        [
+          "substation",
+          4
+        ],
+        [
+          "substation",
+          8
+        ],
+        [
+          "substation",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 25,
+      "name": "heat-pipe",
+      "direction": 0,
+      "members": [
+        [
+          "heat-pipe",
+          0
+        ],
+        [
+          "heat-pipe",
+          4
+        ],
+        [
+          "heat-pipe",
+          8
+        ],
+        [
+          "heat-pipe",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 26,
+      "name": "land-mine",
+      "direction": 0,
+      "members": [
+        [
+          "land-mine",
+          0
+        ],
+        [
+          "land-mine",
+          4
+        ],
+        [
+          "land-mine",
+          8
+        ],
+        [
+          "land-mine",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 27,
+      "name": "locomotive",
+      "direction": 0,
+      "members": [
+        [
+          "locomotive",
+          0
+        ],
+        [
+          "locomotive",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 28,
+      "name": "locomotive",
+      "direction": 4,
+      "members": [
+        [
+          "locomotive",
+          4
+        ],
+        [
+          "locomotive",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 29,
+      "name": "nuclear-reactor",
+      "direction": 0,
+      "members": [
+        [
+          "nuclear-reactor",
+          0
+        ],
+        [
+          "nuclear-reactor",
+          4
+        ],
+        [
+          "nuclear-reactor",
+          8
+        ],
+        [
+          "nuclear-reactor",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 30,
+      "name": "offshore-pump",
+      "direction": 0,
+      "members": [
+        [
+          "offshore-pump",
+          0
+        ]
+      ]
+    },
+    {
+      "id": 31,
+      "name": "offshore-pump",
+      "direction": 4,
+      "members": [
+        [
+          "offshore-pump",
+          4
+        ]
+      ]
+    },
+    {
+      "id": 32,
+      "name": "offshore-pump",
+      "direction": 8,
+      "members": [
+        [
+          "offshore-pump",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 33,
+      "name": "offshore-pump",
+      "direction": 12,
+      "members": [
+        [
+          "offshore-pump",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 34,
+      "name": "oil-refinery",
+      "direction": 0,
+      "members": [
+        [
+          "oil-refinery",
+          0
+        ],
+        [
+          "oil-refinery",
+          4
+        ],
+        [
+          "oil-refinery",
+          8
+        ],
+        [
+          "oil-refinery",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 35,
+      "name": "pipe",
+      "direction": 0,
+      "members": [
+        [
+          "pipe",
+          0
+        ],
+        [
+          "pipe",
+          4
+        ],
+        [
+          "pipe",
+          8
+        ],
+        [
+          "pipe",
+          12
+        ],
+        [
+          "stone-wall",
+          0
+        ],
+        [
+          "stone-wall",
+          4
+        ],
+        [
+          "stone-wall",
+          8
+        ],
+        [
+          "stone-wall",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 36,
+      "name": "pipe-to-ground",
+      "direction": 0,
+      "members": [
+        [
+          "pipe-to-ground",
+          0
+        ]
+      ]
+    },
+    {
+      "id": 37,
+      "name": "pipe-to-ground",
+      "direction": 4,
+      "members": [
+        [
+          "pipe-to-ground",
+          4
+        ]
+      ]
+    },
+    {
+      "id": 38,
+      "name": "pipe-to-ground",
+      "direction": 8,
+      "members": [
+        [
+          "pipe-to-ground",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 39,
+      "name": "pipe-to-ground",
+      "direction": 12,
+      "members": [
+        [
+          "pipe-to-ground",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 40,
+      "name": "programmable-speaker",
+      "direction": 0,
+      "members": [
+        [
+          "programmable-speaker",
+          0
+        ],
+        [
+          "programmable-speaker",
+          4
+        ],
+        [
+          "programmable-speaker",
+          8
+        ],
+        [
+          "programmable-speaker",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 41,
+      "name": "pump",
+      "direction": 0,
+      "members": [
+        [
+          "pump",
+          0
+        ],
+        [
+          "pump",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 42,
+      "name": "pump",
+      "direction": 4,
+      "members": [
+        [
+          "pump",
+          4
+        ],
+        [
+          "pump",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 43,
+      "name": "pumpjack",
+      "direction": 0,
+      "members": [
+        [
+          "pumpjack",
+          0
+        ],
+        [
+          "pumpjack",
+          4
+        ],
+        [
+          "pumpjack",
+          8
+        ],
+        [
+          "pumpjack",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 44,
+      "name": "straight-rail",
+      "direction": 0,
+      "members": [
+        [
+          "straight-rail",
+          0
+        ],
+        [
+          "straight-rail",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 45,
+      "name": "straight-rail",
+      "direction": 4,
+      "members": [
+        [
+          "straight-rail",
+          4
+        ],
+        [
+          "straight-rail",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 46,
+      "name": "rail-chain-signal",
+      "direction": 0,
+      "members": [
+        [
+          "rail-chain-signal",
+          0
+        ],
+        [
+          "rail-signal",
+          0
+        ]
+      ]
+    },
+    {
+      "id": 47,
+      "name": "rail-chain-signal",
+      "direction": 4,
+      "members": [
+        [
+          "rail-chain-signal",
+          4
+        ],
+        [
+          "rail-signal",
+          4
+        ]
+      ]
+    },
+    {
+      "id": 48,
+      "name": "rail-chain-signal",
+      "direction": 8,
+      "members": [
+        [
+          "rail-chain-signal",
+          8
+        ],
+        [
+          "rail-signal",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 49,
+      "name": "rail-chain-signal",
+      "direction": 12,
+      "members": [
+        [
+          "rail-chain-signal",
+          12
+        ],
+        [
+          "rail-signal",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 50,
+      "name": "roboport",
+      "direction": 0,
+      "members": [
+        [
+          "roboport",
+          0
+        ],
+        [
+          "roboport",
+          4
+        ],
+        [
+          "roboport",
+          8
+        ],
+        [
+          "roboport",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 51,
+      "name": "rocket-silo",
+      "direction": 0,
+      "members": [
+        [
+          "rocket-silo",
+          0
+        ],
+        [
+          "rocket-silo",
+          4
+        ],
+        [
+          "rocket-silo",
+          8
+        ],
+        [
+          "rocket-silo",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 52,
+      "name": "solar-panel",
+      "direction": 0,
+      "members": [
+        [
+          "solar-panel",
+          0
+        ],
+        [
+          "solar-panel",
+          4
+        ],
+        [
+          "solar-panel",
+          8
+        ],
+        [
+          "solar-panel",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 53,
+      "name": "spidertron",
+      "direction": 0,
+      "members": [
+        [
+          "spidertron",
+          0
+        ],
+        [
+          "spidertron",
+          4
+        ],
+        [
+          "spidertron",
+          8
+        ],
+        [
+          "spidertron",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 54,
+      "name": "steam-engine",
+      "direction": 0,
+      "members": [
+        [
+          "steam-engine",
+          0
+        ],
+        [
+          "steam-engine",
+          8
+        ],
+        [
+          "steam-turbine",
+          0
+        ],
+        [
+          "steam-turbine",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 55,
+      "name": "steam-engine",
+      "direction": 4,
+      "members": [
+        [
+          "steam-engine",
+          4
+        ],
+        [
+          "steam-engine",
+          12
+        ],
+        [
+          "steam-turbine",
+          4
+        ],
+        [
+          "steam-turbine",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 56,
+      "name": "storage-tank",
+      "direction": 0,
+      "members": [
+        [
+          "storage-tank",
+          0
+        ],
+        [
+          "storage-tank",
+          4
+        ],
+        [
+          "storage-tank",
+          8
+        ],
+        [
+          "storage-tank",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 57,
+      "name": "tank",
+      "direction": 0,
+      "members": [
+        [
+          "tank",
+          0
+        ],
+        [
+          "tank",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 58,
+      "name": "tank",
+      "direction": 4,
+      "members": [
+        [
+          "tank",
+          4
+        ],
+        [
+          "tank",
+          12
+        ]
+      ]
+    },
+    {
+      "id": 59,
+      "name": "train-stop",
+      "direction": 0,
+      "members": [
+        [
+          "train-stop",
+          0
+        ]
+      ]
+    },
+    {
+      "id": 60,
+      "name": "train-stop",
+      "direction": 4,
+      "members": [
+        [
+          "train-stop",
+          4
+        ]
+      ]
+    },
+    {
+      "id": 61,
+      "name": "train-stop",
+      "direction": 8,
+      "members": [
+        [
+          "train-stop",
+          8
+        ]
+      ]
+    },
+    {
+      "id": 62,
+      "name": "train-stop",
+      "direction": 12,
+      "members": [
+        [
+          "train-stop",
+          12
+        ]
+      ]
+    }
+  ],
+  "id": "83db48f2c5fa"
+}

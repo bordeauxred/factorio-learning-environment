@@ -1,0 +1,6775 @@
+{
+  "channels": [
+    [
+      [
+        "accumulator",
+        0
+      ],
+      [
+        "accumulator",
+        4
+      ],
+      [
+        "accumulator",
+        8
+      ],
+      [
+        "accumulator",
+        12
+      ]
+    ],
+    [
+      [
+        "active-provider-chest",
+        0
+      ],
+      [
+        "active-provider-chest",
+        4
+      ],
+      [
+        "active-provider-chest",
+        8
+      ],
+      [
+        "active-provider-chest",
+        12
+      ],
+      [
+        "buffer-chest",
+        0
+      ],
+      [
+        "buffer-chest",
+        4
+      ],
+      [
+        "buffer-chest",
+        8
+      ],
+      [
+        "buffer-chest",
+        12
+      ],
+      [
+        "constant-combinator",
+        0
+      ],
+      [
+        "constant-combinator",
+        4
+      ],
+      [
+        "constant-combinator",
+        8
+      ],
+      [
+        "constant-combinator",
+        12
+      ],
+      [
+        "iron-chest",
+        0
+      ],
+      [
+        "iron-chest",
+        4
+      ],
+      [
+        "iron-chest",
+        8
+      ],
+      [
+        "iron-chest",
+        12
+      ],
+      [
+        "passive-provider-chest",
+        0
+      ],
+      [
+        "passive-provider-chest",
+        4
+      ],
+      [
+        "passive-provider-chest",
+        8
+      ],
+      [
+        "passive-provider-chest",
+        12
+      ],
+      [
+        "requester-chest",
+        0
+      ],
+      [
+        "requester-chest",
+        4
+      ],
+      [
+        "requester-chest",
+        8
+      ],
+      [
+        "requester-chest",
+        12
+      ],
+      [
+        "steel-chest",
+        0
+      ],
+      [
+        "steel-chest",
+        4
+      ],
+      [
+        "steel-chest",
+        8
+      ],
+      [
+        "steel-chest",
+        12
+      ],
+      [
+        "storage-chest",
+        0
+      ],
+      [
+        "storage-chest",
+        4
+      ],
+      [
+        "storage-chest",
+        8
+      ],
+      [
+        "storage-chest",
+        12
+      ],
+      [
+        "wooden-chest",
+        0
+      ],
+      [
+        "wooden-chest",
+        4
+      ],
+      [
+        "wooden-chest",
+        8
+      ],
+      [
+        "wooden-chest",
+        12
+      ]
+    ],
+    [
+      [
+        "arithmetic-combinator",
+        0
+      ],
+      [
+        "arithmetic-combinator",
+        8
+      ],
+      [
+        "decider-combinator",
+        0
+      ],
+      [
+        "decider-combinator",
+        8
+      ]
+    ],
+    [
+      [
+        "arithmetic-combinator",
+        4
+      ],
+      [
+        "arithmetic-combinator",
+        12
+      ],
+      [
+        "decider-combinator",
+        4
+      ],
+      [
+        "decider-combinator",
+        12
+      ]
+    ],
+    [
+      [
+        "artillery-turret",
+        0
+      ],
+      [
+        "artillery-turret",
+        4
+      ],
+      [
+        "artillery-turret",
+        8
+      ],
+      [
+        "artillery-turret",
+        12
+      ],
+      [
+        "assembling-machine-1",
+        0
+      ],
+      [
+        "assembling-machine-1",
+        4
+      ],
+      [
+        "assembling-machine-1",
+        8
+      ],
+      [
+        "assembling-machine-1",
+        12
+      ],
+      [
+        "assembling-machine-2",
+        0
+      ],
+      [
+        "assembling-machine-2",
+        4
+      ],
+      [
+        "assembling-machine-2",
+        8
+      ],
+      [
+        "assembling-machine-2",
+        12
+      ],
+      [
+        "assembling-machine-3",
+        0
+      ],
+      [
+        "assembling-machine-3",
+        4
+      ],
+      [
+        "assembling-machine-3",
+        8
+      ],
+      [
+        "assembling-machine-3",
+        12
+      ],
+      [
+        "beacon",
+        0
+      ],
+      [
+        "beacon",
+        4
+      ],
+      [
+        "beacon",
+        8
+      ],
+      [
+        "beacon",
+        12
+      ],
+      [
+        "centrifuge",
+        0
+      ],
+      [
+        "centrifuge",
+        4
+      ],
+      [
+        "centrifuge",
+        8
+      ],
+      [
+        "centrifuge",
+        12
+      ],
+      [
+        "chemical-plant",
+        0
+      ],
+      [
+        "chemical-plant",
+        4
+      ],
+      [
+        "chemical-plant",
+        8
+      ],
+      [
+        "chemical-plant",
+        12
+      ],
+      [
+        "electric-furnace",
+        0
+      ],
+      [
+        "electric-furnace",
+        4
+      ],
+      [
+        "electric-furnace",
+        8
+      ],
+      [
+        "electric-furnace",
+        12
+      ],
+      [
+        "lab",
+        0
+      ],
+      [
+        "lab",
+        4
+      ],
+      [
+        "lab",
+        8
+      ],
+      [
+        "lab",
+        12
+      ],
+      [
+        "radar",
+        0
+      ],
+      [
+        "radar",
+        4
+      ],
+      [
+        "radar",
+        8
+      ],
+      [
+        "radar",
+        12
+      ]
+    ],
+    [
+      [
+        "big-electric-pole",
+        0
+      ],
+      [
+        "big-electric-pole",
+        4
+      ],
+      [
+        "big-electric-pole",
+        8
+      ],
+      [
+        "big-electric-pole",
+        12
+      ]
+    ],
+    [
+      [
+        "boiler",
+        0
+      ],
+      [
+        "boiler",
+        8
+      ],
+      [
+        "heat-exchanger",
+        0
+      ],
+      [
+        "heat-exchanger",
+        8
+      ]
+    ],
+    [
+      [
+        "boiler",
+        4
+      ],
+      [
+        "boiler",
+        12
+      ],
+      [
+        "heat-exchanger",
+        4
+      ],
+      [
+        "heat-exchanger",
+        12
+      ]
+    ],
+    [
+      [
+        "bulk-inserter",
+        0
+      ],
+      [
+        "bulk-inserter",
+        4
+      ],
+      [
+        "bulk-inserter",
+        8
+      ],
+      [
+        "bulk-inserter",
+        12
+      ],
+      [
+        "burner-inserter",
+        0
+      ],
+      [
+        "burner-inserter",
+        4
+      ],
+      [
+        "burner-inserter",
+        8
+      ],
+      [
+        "burner-inserter",
+        12
+      ],
+      [
+        "fast-inserter",
+        0
+      ],
+      [
+        "fast-inserter",
+        4
+      ],
+      [
+        "fast-inserter",
+        8
+      ],
+      [
+        "fast-inserter",
+        12
+      ],
+      [
+        "inserter",
+        0
+      ],
+      [
+        "inserter",
+        4
+      ],
+      [
+        "inserter",
+        8
+      ],
+      [
+        "inserter",
+        12
+      ],
+      [
+        "long-handed-inserter",
+        0
+      ],
+      [
+        "long-handed-inserter",
+        4
+      ],
+      [
+        "long-handed-inserter",
+        8
+      ],
+      [
+        "long-handed-inserter",
+        12
+      ],
+      [
+        "medium-electric-pole",
+        0
+      ],
+      [
+        "medium-electric-pole",
+        4
+      ],
+      [
+        "medium-electric-pole",
+        8
+      ],
+      [
+        "medium-electric-pole",
+        12
+      ],
+      [
+        "small-electric-pole",
+        0
+      ],
+      [
+        "small-electric-pole",
+        4
+      ],
+      [
+        "small-electric-pole",
+        8
+      ],
+      [
+        "small-electric-pole",
+        12
+      ],
+      [
+        "small-lamp",
+        0
+      ],
+      [
+        "small-lamp",
+        4
+      ],
+      [
+        "small-lamp",
+        8
+      ],
+      [
+        "small-lamp",
+        12
+      ]
+    ],
+    [
+      [
+        "burner-mining-drill",
+        0
+      ],
+      [
+        "burner-mining-drill",
+        4
+      ],
+      [
+        "burner-mining-drill",
+        8
+      ],
+      [
+        "burner-mining-drill",
+        12
+      ]
+    ],
+    [
+      [
+        "car",
+        0
+      ],
+      [
+        "car",
+        8
+      ]
+    ],
+    [
+      [
+        "car",
+        4
+      ],
+      [
+        "car",
+        12
+      ]
+    ],
+    [
+      [
+        "cargo-wagon",
+        0
+      ],
+      [
+        "cargo-wagon",
+        8
+      ],
+      [
+        "fluid-wagon",
+        0
+      ],
+      [
+        "fluid-wagon",
+        8
+      ]
+    ],
+    [
+      [
+        "cargo-wagon",
+        4
+      ],
+      [
+        "cargo-wagon",
+        12
+      ],
+      [
+        "fluid-wagon",
+        4
+      ],
+      [
+        "fluid-wagon",
+        12
+      ]
+    ],
+    [
+      [
+        "electric-mining-drill",
+        0
+      ],
+      [
+        "electric-mining-drill",
+        4
+      ],
+      [
+        "electric-mining-drill",
+        8
+      ],
+      [
+        "electric-mining-drill",
+        12
+      ]
+    ],
+    [
+      [
+        "express-splitter",
+        0
+      ],
+      [
+        "express-splitter",
+        8
+      ],
+      [
+        "fast-splitter",
+        0
+      ],
+      [
+        "fast-splitter",
+        8
+      ],
+      [
+        "splitter",
+        0
+      ],
+      [
+        "splitter",
+        8
+      ]
+    ],
+    [
+      [
+        "express-splitter",
+        4
+      ],
+      [
+        "express-splitter",
+        12
+      ],
+      [
+        "fast-splitter",
+        4
+      ],
+      [
+        "fast-splitter",
+        12
+      ],
+      [
+        "splitter",
+        4
+      ],
+      [
+        "splitter",
+        12
+      ]
+    ],
+    [
+      [
+        "express-transport-belt",
+        0
+      ],
+      [
+        "express-transport-belt",
+        4
+      ],
+      [
+        "express-transport-belt",
+        8
+      ],
+      [
+        "express-transport-belt",
+        12
+      ],
+      [
+        "express-underground-belt",
+        0
+      ],
+      [
+        "express-underground-belt",
+        4
+      ],
+      [
+        "express-underground-belt",
+        8
+      ],
+      [
+        "express-underground-belt",
+        12
+      ],
+      [
+        "fast-transport-belt",
+        0
+      ],
+      [
+        "fast-transport-belt",
+        4
+      ],
+      [
+        "fast-transport-belt",
+        8
+      ],
+      [
+        "fast-transport-belt",
+        12
+      ],
+      [
+        "fast-underground-belt",
+        0
+      ],
+      [
+        "fast-underground-belt",
+        4
+      ],
+      [
+        "fast-underground-belt",
+        8
+      ],
+      [
+        "fast-underground-belt",
+        12
+      ],
+      [
+        "transport-belt",
+        0
+      ],
+      [
+        "transport-belt",
+        4
+      ],
+      [
+        "transport-belt",
+        8
+      ],
+      [
+        "transport-belt",
+        12
+      ],
+      [
+        "underground-belt",
+        0
+      ],
+      [
+        "underground-belt",
+        4
+      ],
+      [
+        "underground-belt",
+        8
+      ],
+      [
+        "underground-belt",
+        12
+      ]
+    ],
+    [
+      [
+        "flamethrower-turret",
+        0
+      ],
+      [
+        "flamethrower-turret",
+        8
+      ]
+    ],
+    [
+      [
+        "flamethrower-turret",
+        4
+      ],
+      [
+        "flamethrower-turret",
+        12
+      ]
+    ],
+    [
+      [
+        "gate",
+        0
+      ],
+      [
+        "gate",
+        8
+      ]
+    ],
+    [
+      [
+        "gate",
+        4
+      ],
+      [
+        "gate",
+        12
+      ]
+    ],
+    [
+      [
+        "gun-turret",
+        0
+      ],
+      [
+        "gun-turret",
+        4
+      ],
+      [
+        "gun-turret",
+        8
+      ],
+      [
+        "gun-turret",
+        12
+      ],
+      [
+        "laser-turret",
+        0
+      ],
+      [
+        "laser-turret",
+        4
+      ],
+      [
+        "laser-turret",
+        8
+      ],
+      [
+        "laser-turret",
+        12
+      ],
+      [
+        "power-switch",
+        0
+      ],
+      [
+        "power-switch",
+        4
+      ],
+      [
+        "power-switch",
+        8
+      ],
+      [
+        "power-switch",
+        12
+      ],
+      [
+        "steel-furnace",
+        0
+      ],
+      [
+        "steel-furnace",
+        4
+      ],
+      [
+        "steel-furnace",
+        8
+      ],
+      [
+        "steel-furnace",
+        12
+      ],
+      [
+        "stone-furnace",
+        0
+      ],
+      [
+        "stone-furnace",
+        4
+      ],
+      [
+        "stone-furnace",
+        8
+      ],
+      [
+        "stone-furnace",
+        12
+      ],
+      [
+        "substation",
+        0
+      ],
+      [
+        "substation",
+        4
+      ],
+      [
+        "substation",
+        8
+      ],
+      [
+        "substation",
+        12
+      ]
+    ],
+    [
+      [
+        "heat-pipe",
+        0
+      ],
+      [
+        "heat-pipe",
+        4
+      ],
+      [
+        "heat-pipe",
+        8
+      ],
+      [
+        "heat-pipe",
+        12
+      ]
+    ],
+    [
+      [
+        "land-mine",
+        0
+      ],
+      [
+        "land-mine",
+        4
+      ],
+      [
+        "land-mine",
+        8
+      ],
+      [
+        "land-mine",
+        12
+      ]
+    ],
+    [
+      [
+        "locomotive",
+        0
+      ],
+      [
+        "locomotive",
+        8
+      ]
+    ],
+    [
+      [
+        "locomotive",
+        4
+      ],
+      [
+        "locomotive",
+        12
+      ]
+    ],
+    [
+      [
+        "nuclear-reactor",
+        0
+      ],
+      [
+        "nuclear-reactor",
+        4
+      ],
+      [
+        "nuclear-reactor",
+        8
+      ],
+      [
+        "nuclear-reactor",
+        12
+      ]
+    ],
+    [
+      [
+        "offshore-pump",
+        0
+      ]
+    ],
+    [
+      [
+        "offshore-pump",
+        4
+      ]
+    ],
+    [
+      [
+        "offshore-pump",
+        8
+      ]
+    ],
+    [
+      [
+        "offshore-pump",
+        12
+      ]
+    ],
+    [
+      [
+        "oil-refinery",
+        0
+      ],
+      [
+        "oil-refinery",
+        4
+      ],
+      [
+        "oil-refinery",
+        8
+      ],
+      [
+        "oil-refinery",
+        12
+      ]
+    ],
+    [
+      [
+        "pipe",
+        0
+      ],
+      [
+        "pipe",
+        4
+      ],
+      [
+        "pipe",
+        8
+      ],
+      [
+        "pipe",
+        12
+      ],
+      [
+        "stone-wall",
+        0
+      ],
+      [
+        "stone-wall",
+        4
+      ],
+      [
+        "stone-wall",
+        8
+      ],
+      [
+        "stone-wall",
+        12
+      ]
+    ],
+    [
+      [
+        "pipe-to-ground",
+        0
+      ]
+    ],
+    [
+      [
+        "pipe-to-ground",
+        4
+      ]
+    ],
+    [
+      [
+        "pipe-to-ground",
+        8
+      ]
+    ],
+    [
+      [
+        "pipe-to-ground",
+        12
+      ]
+    ],
+    [
+      [
+        "programmable-speaker",
+        0
+      ],
+      [
+        "programmable-speaker",
+        4
+      ],
+      [
+        "programmable-speaker",
+        8
+      ],
+      [
+        "programmable-speaker",
+        12
+      ]
+    ],
+    [
+      [
+        "pump",
+        0
+      ],
+      [
+        "pump",
+        8
+      ]
+    ],
+    [
+      [
+        "pump",
+        4
+      ],
+      [
+        "pump",
+        12
+      ]
+    ],
+    [
+      [
+        "pumpjack",
+        0
+      ],
+      [
+        "pumpjack",
+        4
+      ],
+      [
+        "pumpjack",
+        8
+      ],
+      [
+        "pumpjack",
+        12
+      ]
+    ],
+    [
+      [
+        "straight-rail",
+        0
+      ],
+      [
+        "straight-rail",
+        8
+      ]
+    ],
+    [
+      [
+        "straight-rail",
+        4
+      ],
+      [
+        "straight-rail",
+        12
+      ]
+    ],
+    [
+      [
+        "rail-chain-signal",
+        0
+      ],
+      [
+        "rail-signal",
+        0
+      ]
+    ],
+    [
+      [
+        "rail-chain-signal",
+        4
+      ],
+      [
+        "rail-signal",
+        4
+      ]
+    ],
+    [
+      [
+        "rail-chain-signal",
+        8
+      ],
+      [
+        "rail-signal",
+        8
+      ]
+    ],
+    [
+      [
+        "rail-chain-signal",
+        12
+      ],
+      [
+        "rail-signal",
+        12
+      ]
+    ],
+    [
+      [
+        "roboport",
+        0
+      ],
+      [
+        "roboport",
+        4
+      ],
+      [
+        "roboport",
+        8
+      ],
+      [
+        "roboport",
+        12
+      ]
+    ],
+    [
+      [
+        "rocket-silo",
+        0
+      ],
+      [
+        "rocket-silo",
+        4
+      ],
+      [
+        "rocket-silo",
+        8
+      ],
+      [
+        "rocket-silo",
+        12
+      ]
+    ],
+    [
+      [
+        "solar-panel",
+        0
+      ],
+      [
+        "solar-panel",
+        4
+      ],
+      [
+        "solar-panel",
+        8
+      ],
+      [
+        "solar-panel",
+        12
+      ]
+    ],
+    [
+      [
+        "spidertron",
+        0
+      ],
+      [
+        "spidertron",
+        4
+      ],
+      [
+        "spidertron",
+        8
+      ],
+      [
+        "spidertron",
+        12
+      ]
+    ],
+    [
+      [
+        "steam-engine",
+        0
+      ],
+      [
+        "steam-engine",
+        8
+      ],
+      [
+        "steam-turbine",
+        0
+      ],
+      [
+        "steam-turbine",
+        8
+      ]
+    ],
+    [
+      [
+        "steam-engine",
+        4
+      ],
+      [
+        "steam-engine",
+        12
+      ],
+      [
+        "steam-turbine",
+        4
+      ],
+      [
+        "steam-turbine",
+        12
+      ]
+    ],
+    [
+      [
+        "storage-tank",
+        0
+      ],
+      [
+        "storage-tank",
+        4
+      ],
+      [
+        "storage-tank",
+        8
+      ],
+      [
+        "storage-tank",
+        12
+      ]
+    ],
+    [
+      [
+        "tank",
+        0
+      ],
+      [
+        "tank",
+        8
+      ]
+    ],
+    [
+      [
+        "tank",
+        4
+      ],
+      [
+        "tank",
+        12
+      ]
+    ],
+    [
+      [
+        "train-stop",
+        0
+      ]
+    ],
+    [
+      [
+        "train-stop",
+        4
+      ]
+    ],
+    [
+      [
+        "train-stop",
+        8
+      ]
+    ],
+    [
+      [
+        "train-stop",
+        12
+      ]
+    ]
+  ],
+  "scenes": [
+    {
+      "scene": "empty-ground",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "iron-ore",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "uranium-ore",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "crude-oil",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "shore-0",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "shore-1",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "shore-2",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "shore-3",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "all-water",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "rail-0",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "rail-4",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-accumulator",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-active-provider-chest",
+      "mismatches": [
+        {
+          "group": 2,
+          "entity": [
+            "buffer-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "buffer-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "buffer-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "buffer-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "iron-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "iron-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "iron-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "iron-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "passive-provider-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "passive-provider-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "passive-provider-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "passive-provider-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "requester-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "requester-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "requester-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "requester-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "steel-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "steel-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "steel-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "steel-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-arithmetic-combinator",
+      "mismatches": [
+        {
+          "group": 3,
+          "entity": [
+            "arithmetic-combinator",
+            8
+          ],
+          "x": 0,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-artillery-turret",
+      "mismatches": [
+        {
+          "group": 5,
+          "entity": [
+            "artillery-turret",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "artillery-turret",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "artillery-turret",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-assembling-machine-1",
+      "mismatches": [
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-2",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-2",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-2",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-2",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-3",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-3",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-3",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-3",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-assembling-machine-2",
+      "mismatches": [
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-1",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-1",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-1",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-1",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-3",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-3",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-3",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-3",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-assembling-machine-3",
+      "mismatches": [
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-1",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-1",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-1",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-1",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-2",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-2",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-2",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 5,
+          "entity": [
+            "assembling-machine-2",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-beacon",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-big-electric-pole",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-boiler",
+      "mismatches": [
+        {
+          "group": 7,
+          "entity": [
+            "boiler",
+            8
+          ],
+          "x": 0,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 0,
+          "y": -2,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 0,
+          "y": -2,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 1,
+          "y": -2,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 1,
+          "y": -2,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": -2,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": -2,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 3,
+          "y": 1,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 3,
+          "y": 1,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-buffer-chest",
+      "mismatches": [
+        {
+          "group": 2,
+          "entity": [
+            "buffer-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "buffer-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "buffer-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "buffer-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-bulk-inserter",
+      "mismatches": [
+        {
+          "group": 9,
+          "entity": [
+            "bulk-inserter",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "bulk-inserter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "bulk-inserter",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "burner-inserter",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "burner-inserter",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "burner-inserter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "burner-inserter",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "fast-inserter",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "fast-inserter",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "fast-inserter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "fast-inserter",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "inserter",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "inserter",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "inserter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "inserter",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-burner-inserter",
+      "mismatches": [
+        {
+          "group": 9,
+          "entity": [
+            "burner-inserter",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-burner-mining-drill",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-car",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-cargo-wagon",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-centrifuge",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-chemical-plant",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-constant-combinator",
+      "mismatches": [
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-decider-combinator",
+      "mismatches": [
+        {
+          "group": 3,
+          "entity": [
+            "decider-combinator",
+            8
+          ],
+          "x": 0,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-electric-furnace",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-electric-mining-drill",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-express-splitter",
+      "mismatches": [
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            0
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            0
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-express-transport-belt",
+      "mismatches": [
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-express-underground-belt",
+      "mismatches": [
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-fast-inserter",
+      "mismatches": [
+        {
+          "group": 9,
+          "entity": [
+            "fast-inserter",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-fast-splitter",
+      "mismatches": [
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            0
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            4
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-fast-transport-belt",
+      "mismatches": [
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-fast-underground-belt",
+      "mismatches": [
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-flamethrower-turret",
+      "mismatches": [
+        {
+          "group": 19,
+          "entity": [
+            "flamethrower-turret",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-fluid-wagon",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-gate",
+      "mismatches": [
+        {
+          "group": 34,
+          "entity": [
+            "stone-wall",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 34,
+          "entity": [
+            "stone-wall",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 34,
+          "entity": [
+            "stone-wall",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 34,
+          "entity": [
+            "stone-wall",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-gun-turret",
+      "mismatches": [
+        {
+          "group": 23,
+          "entity": [
+            "gun-turret",
+            4
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 23,
+          "entity": [
+            "gun-turret",
+            8
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 23,
+          "entity": [
+            "gun-turret",
+            12
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-heat-exchanger",
+      "mismatches": [
+        {
+          "group": 7,
+          "entity": [
+            "heat-exchanger",
+            8
+          ],
+          "x": 0,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 0,
+          "y": -2,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 0,
+          "y": -2,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 1,
+          "y": -2,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 1,
+          "y": -2,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": -2,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": -2,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 3,
+          "y": 1,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 3,
+          "y": 1,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-heat-pipe",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-inserter",
+      "mismatches": [
+        {
+          "group": 9,
+          "entity": [
+            "inserter",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-lamp",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-iron-chest",
+      "mismatches": [
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "iron-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "iron-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "iron-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "iron-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-lab",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-land-mine",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-laser-turret",
+      "mismatches": [
+        {
+          "group": 23,
+          "entity": [
+            "laser-turret",
+            4
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 23,
+          "entity": [
+            "laser-turret",
+            8
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 23,
+          "entity": [
+            "laser-turret",
+            12
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-locomotive",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-long-handed-inserter",
+      "mismatches": [
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "long-handed-inserter",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-medium-electric-pole",
+      "mismatches": [
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "small-electric-pole",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-nuclear-reactor",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-offshore-pump",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-oil-refinery",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-passive-provider-chest",
+      "mismatches": [
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "passive-provider-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "passive-provider-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "passive-provider-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "passive-provider-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-pipe",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-pipe-to-ground",
+      "mismatches": [
+        {
+          "group": 34,
+          "entity": [
+            "stone-wall",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 34,
+          "entity": [
+            "stone-wall",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 34,
+          "entity": [
+            "stone-wall",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 34,
+          "entity": [
+            "stone-wall",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-power-switch",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-programmable-speaker",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-pump",
+      "mismatches": [
+        {
+          "group": 40,
+          "entity": [
+            "pump",
+            8
+          ],
+          "x": 0,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-pumpjack",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-radar",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-straight-rail",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-rail-chain-signal",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-rail-signal",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-requester-chest",
+      "mismatches": [
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "requester-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "requester-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "requester-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "requester-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-roboport",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-rocket-silo",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-small-electric-pole",
+      "mismatches": [
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 9,
+          "entity": [
+            "medium-electric-pole",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-small-lamp",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-solar-panel",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-spidertron",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-splitter",
+      "mismatches": [
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            0
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            4
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-steam-engine",
+      "mismatches": [
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 0,
+          "y": -4,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 0,
+          "y": -4,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 1,
+          "y": -4,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 1,
+          "y": -4,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 0,
+          "y": 4,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 0,
+          "y": 4,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 1,
+          "y": 4,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 1,
+          "y": 4,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 53,
+          "entity": [
+            "steam-turbine",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 53,
+          "entity": [
+            "steam-turbine",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-steam-turbine",
+      "mismatches": [
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 0,
+          "y": -4,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 0,
+          "y": -4,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 1,
+          "y": -4,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 1,
+          "y": -4,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 0,
+          "y": 4,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 0,
+          "y": 4,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 8,
+          "entity": [
+            "boiler",
+            12
+          ],
+          "x": 1,
+          "y": 4,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 8,
+          "entity": [
+            "heat-exchanger",
+            12
+          ],
+          "x": 1,
+          "y": 4,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 53,
+          "entity": [
+            "steam-turbine",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 53,
+          "entity": [
+            "steam-turbine",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-steel-chest",
+      "mismatches": [
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "steel-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "steel-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "steel-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "steel-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-steel-furnace",
+      "mismatches": [
+        {
+          "group": 23,
+          "entity": [
+            "stone-furnace",
+            0
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 23,
+          "entity": [
+            "stone-furnace",
+            4
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 23,
+          "entity": [
+            "stone-furnace",
+            8
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 23,
+          "entity": [
+            "stone-furnace",
+            12
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-stone-furnace",
+      "mismatches": [
+        {
+          "group": 23,
+          "entity": [
+            "steel-furnace",
+            0
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 23,
+          "entity": [
+            "steel-furnace",
+            4
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 23,
+          "entity": [
+            "steel-furnace",
+            8
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 23,
+          "entity": [
+            "steel-furnace",
+            12
+          ],
+          "x": 1,
+          "y": 1,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-stone-wall",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-storage-chest",
+      "mismatches": [
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "storage-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "storage-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "storage-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "storage-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-storage-tank",
+      "mismatches": [
+        {
+          "group": 55,
+          "entity": [
+            "storage-tank",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        },
+        {
+          "group": 55,
+          "entity": [
+            "storage-tank",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": false,
+          "actual": true
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-substation",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-tank",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-train-stop",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-transport-belt",
+      "mismatches": [
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-underground-belt",
+      "mismatches": [
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "express-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "fast-splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 16,
+          "entity": [
+            "splitter",
+            8
+          ],
+          "x": 1,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "express-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "fast-underground-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "transport-belt",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 18,
+          "entity": [
+            "underground-belt",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "blocker-wooden-chest",
+      "mismatches": [
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "constant-combinator",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "wooden-chest",
+            0
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "wooden-chest",
+            4
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "wooden-chest",
+            8
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        },
+        {
+          "group": 2,
+          "entity": [
+            "wooden-chest",
+            12
+          ],
+          "x": 0,
+          "y": 0,
+          "expected": true,
+          "actual": false
+        }
+      ],
+      "checks": 25596
+    },
+    {
+      "scene": "natural-character",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "natural-small-biter",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "natural-tree-01",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "natural-rock-big",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.1484375-0.19921875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.1484375-0.19921875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.19921875-0.2890625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.19921875-0.2890625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.2890625-0.296875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.2890625-0.296875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.296875-0.34765625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.296875-0.34765625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.34765625-0.3984375",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.34765625-0.3984375",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.3984375-0.5",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.3984375-0.5",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.5-0.59765625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.5-0.59765625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.59765625-0.6484375",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.59765625-0.6484375",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.6484375-0.69921875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.6484375-0.69921875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.69921875-0.7890625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.69921875-0.7890625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.7890625-0.8984375",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.7890625-0.8984375",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.8984375-0.98828125",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.8984375-0.98828125",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-0.98828125-1",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-0.98828125-1",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-1-1.046875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-1-1.046875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-1.046875-1.19921875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-1.046875-1.19921875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-1.19921875-1.25",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-1.19921875-1.25",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-1.25-1.2890625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-1.25-1.2890625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-1.2890625-1.296875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-1.2890625-1.296875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-1.296875-1.34765625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-1.296875-1.34765625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-1.34765625-1.3984375",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-1.34765625-1.3984375",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-1.3984375-1.69921875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-1.3984375-1.69921875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-1.69921875-2.19921875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-1.69921875-2.19921875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-2.19921875-2.34765625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-2.19921875-2.34765625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-2.34765625-2.3984375",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-2.34765625-2.3984375",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-2.3984375-2.59765625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-2.3984375-2.59765625",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-0-2.59765625-4.19921875",
+      "mismatches": {},
+      "checks": 25596
+    },
+    {
+      "scene": "fractional-character-1-2.59765625-4.19921875",
+      "mismatches": {},
+      "checks": 25596
+    }
+  ],
+  "checks": 3737016,
+  "mismatch_count": 415,
+  "indistinguishable_pairs": [
+    [
+      12,
+      13
+    ],
+    [
+      23,
+      24
+    ],
+    [
+      12,
+      25
+    ],
+    [
+      13,
+      25
+    ],
+    [
+      12,
+      26
+    ],
+    [
+      13,
+      26
+    ],
+    [
+      25,
+      26
+    ],
+    [
+      34,
+      35
+    ],
+    [
+      34,
+      37
+    ],
+    [
+      35,
+      37
+    ]
+  ]
+}
