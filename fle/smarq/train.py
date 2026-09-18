@@ -754,6 +754,7 @@ def run_training(
                         "heads": selected.action.heads,
                         "failure_reason": result.failure_reason,
                         "success": result.success,
+                        "raw_error": result.info.get("raw_error", ""),
                         "requested_quantity": requested,
                         "executed_quantity": executed,
                         "q_value": selected.q_value,

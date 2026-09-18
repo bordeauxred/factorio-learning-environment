@@ -46,6 +46,7 @@ class ExecutionOutcome:
     requested_quantity: int | str | None = None
     executed_quantity: int | None = None
     overshoot_ticks: int = 0
+    raw_error: str = ""
 
 
 def classify_failure(error: BaseException | str, verb: str) -> str:
@@ -59,7 +60,15 @@ def classify_failure(error: BaseException | str, verb: str) -> str:
         return "blocked"
     if any(
         token in text
-        for token in ("no item", "in inventory", "ingredients", "inventory is full", "no ")
+        for token in (
+            "no item",
+            "in inventory",
+            "ingredients",
+            "inventory is full",
+            "not enough",
+            "do not have",
+            "does not have",
+        )
     ):
         return "insufficient_inventory"
     if any(
@@ -307,6 +316,7 @@ class FLEActionExecutor:
                 requested,
                 executed or 0,
                 overshoot,
+                str(error)[:300],
             )
 
 
@@ -457,6 +467,9 @@ class SemanticEnv(C.SemanticEnvProtocol):
                 "requested_quantity": outcome.requested_quantity,
                 "executed_quantity": outcome.executed_quantity,
                 "advance_overshoot_ticks": outcome.overshoot_ticks,
+                # The game's own words. Without these every unrecognised refusal
+                # collapses into `tool_error` and the logs cannot say why.
+                "raw_error": outcome.raw_error,
             },
         )
         return result, self.masks()

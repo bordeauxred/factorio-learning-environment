@@ -36,6 +36,7 @@ STEP_FIELDS = (
     "per_priority",
     "exploratory",
     "epsilon_per_head",
+    "raw_error",
 )
 
 EPISODE_FIELDS = (
