@@ -50,6 +50,10 @@ class NearOreEnv(SemanticEnv):
     """`SemanticEnv` that teleports the character beside ore at every reset."""
 
     def __init__(self, *args: Any, start_offset: int = 5, **kwargs: Any) -> None:
+        # The training loop filters kwargs against this class's signature, and a
+        # bare **kwargs accepts everything, so drop what the base class does not
+        # take rather than forwarding it blindly.
+        kwargs.pop("seed", None)
         super().__init__(*args, **kwargs)
         self.start_offset = int(start_offset)
         self.ore_tile: tuple[int, int] | None = None

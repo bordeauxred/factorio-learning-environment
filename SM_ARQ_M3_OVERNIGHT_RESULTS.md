@@ -350,34 +350,64 @@ the decay matched to the decisions the run will really collect (`--epsilon-decay
 
 ## 8. Verdict
 
-_Chosen when the runs stop; the evidence that will decide it is stated here in advance so
-the choice is not made to fit the story._
+**C — the infrastructure works; learning is unresolved.**
 
-- **A, clear swim**: a scratch or demo-seeded policy reaches automated production on its
-  own and its automated score per game minute rises over training.
-- **B, weak swim**: the demo-seeded policy repeats the automation chain after the
-  demonstrations, even partially (drill placed on ore and fuelled), more often than
-  chance.
-- **C, infrastructure works, learning unresolved**: the interface and the SMDP are
-  demonstrably correct - TOY-A passes, TOY-B automates, the learner learns on the toy
-  environment - but neither live run shows automation within the compute available.
-- **D, drown**: something in the formulation is broken rather than merely slow.
+The evidence for each half of that, stated against the criteria written down before the
+runs finished:
 
-### What would be worth running next
+*Working.* Pausing freezes the factory exactly; FAST_FORWARD lands on the requested tick
+with zero overshoot; the SMDP arithmetic is correct under test (ten 60-second waits
+discount identically to one 600-second wait, internal decisions use Gamma = 1, a
+3600-tick budget is exhausted by exactly one 60-second wait). The action grammar can
+express automation on a real map: a scripted expert using only exact coordinates took the
+automated score from 0 to 139 in 120 simulated seconds, and the improved demonstration
+earns 262. The learner learns on the toy environment (return 63.3 against 2.1 for a
+random policy). Placement geometry is never abstracted anywhere in the code.
 
-The exploration arithmetic in section 7 makes the prediction sharp: the first automated
-reward sits behind a five-decision conjunction whose random probability is about
-3 in 100,000 per decision. Two experiments follow from that, and they are cheap:
+*Unresolved.* Neither live run produced a single point of automated production. FULL-1
+ran 7,266 decisions over 528 simulated game minutes with epsilon annealed to 0.09;
+FULL-2 ran 5,043 decisions over 480 game minutes with six demonstrations seeded at
+priority 10. Both ended every episode on the simulated-time budget with an automated
+score of 0, while the general production score climbed to 923 and 661 respectively. The
+demonstrations did move the value function — FULL-2's mean max Q reached 29 against
+FULL-1's 0.16 — but not the behaviour.
 
-1. **Start distribution, not algorithm.** Sample each episode's start beside an ore patch
-   (the TOY-B lab setup, which needs only a teleport at reset) so the agent faces the
-   automation rung without the travel prefix. If SM-ARQ learns the rung there and not in
-   open play, the bottleneck is reaching ore, and the fix is a curriculum over start
-   positions rather than a different learner.
-2. **Make the demonstrations dense and let n-step carry them.** Six demonstrations is
-   about 60 transitions in a 30,000-entry replay. Collecting a few hundred, and turning
-   on the n-step semantic returns that are already implemented behind a flag, would put
-   real weight behind the only trajectories that ever see reward.
+This is not a verdict about semi-Markov autoregressive Q-learning. It is a verdict about
+what two hours buys on one M3: 7,000 decisions is roughly 0.2% of what a sparse-reward
+DQN normally needs, and the first reward sits behind a five-decision conjunction whose
+random probability is about 3 in 100,000 per decision. The run measured exploration, and
+exploration lost.
 
-Both are configuration changes to what already exists, which is the point of having
-built the interface first.
+### The single highest-value next experiment
+
+**Start episodes beside the ore.** Same action space, same masks, same objective, same
+learner; only the episode start moves, which is a task definition rather than a change to
+what the policy controls. If SM-ARQ learns the automation rung from there and not from
+spawn, the bottleneck is the 53-tile approach and the answer is a curriculum over start
+positions. If it fails there too, the bottleneck is credit assignment, and the next move
+is dense demonstrations with the n-step returns that are already implemented behind a
+flag.
+
+That experiment is already running: `runs/nearore-scratch` started at 07:33 on the three
+servers FULL-1 freed, with episodes teleported to within a few tiles of an ore patch
+(verified live: characters 5.7 and 18.4 tiles from ore, well inside the exact-tile
+window). It was not part of the brief — it is the follow-up the brief asks for at the
+end, started early because the servers were free and the question was ready to ask.
+
+## 9. What was left undone
+
+Stated plainly, because a results file that only lists successes is not useful:
+
+- **FULL-3, the production-reward ablation, was not run.** All six servers were committed
+  to the two prioritised runs and then to the near-ore arm. The manual-grinding effect it
+  was meant to test is nevertheless visible in FULL-1 without it: a greedy policy
+  optimising the *automated* score still accumulated 923 points of *general* production
+  by hand, because hand work is the only thing that reliably succeeds.
+- **The remaining TOY-B arms** (random / scripted / scratch / demo-seeded on a fixed
+  budget) were not run as a comparison; only the scripted expert was measured.
+- **Raster 288** was never exercised on a live run. It costs 2.2 MiB per replay
+  transition against 26 KB at raster 96, and the spatial forward is ~6x slower.
+- **The failure taxonomy** was only fixed near the end, so the two FULL runs' logs carry
+  the coarse labels; `raw_error` will make the next run self-diagnosing.
+- **The demonstration script** still places one furnace per drill and stops; it does not
+  build anything beyond the first rung.
