@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sprites &mdash; Factorio Learning Environment 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e259d695"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -219,10 +219,10 @@ fle<span class="w"> </span>sprites<span class="w"> </span>--workers<span class="
 <span class="n">sprite_manager</span> <span class="o">=</span> <span class="n">SpriteManager</span><span class="p">()</span>
 
 <span class="c1"># Get sprite for an entity</span>
-<span class="n">sprite</span> <span class="o">=</span> <span class="n">sprite_manager</span><span class="o">.</span><span class="n">get_sprite</span><span class="p">(</span><span class="s1">&#39;burner-mining-drill&#39;</span><span class="p">)</span>
+<span class="n">sprite</span> <span class="o">=</span> <span class="n">sprite_manager</span><span class="o">.</span><span class="n">get_sprite</span><span class="p">(</span><span class="s1">'burner-mining-drill'</span><span class="p">)</span>
 
 <span class="c1"># Get icon for an item</span>
-<span class="n">icon</span> <span class="o">=</span> <span class="n">sprite_manager</span><span class="o">.</span><span class="n">get_icon</span><span class="p">(</span><span class="s1">&#39;iron-plate&#39;</span><span class="p">)</span>
+<span class="n">icon</span> <span class="o">=</span> <span class="n">sprite_manager</span><span class="o">.</span><span class="n">get_icon</span><span class="p">(</span><span class="s1">'iron-plate'</span><span class="p">)</span>
 
 <span class="c1"># Get all available sprites</span>
 <span class="n">available</span> <span class="o">=</span> <span class="n">sprite_manager</span><span class="o">.</span><span class="n">list_sprites</span><span class="p">()</span>
@@ -235,12 +235,12 @@ fle<span class="w"> </span>sprites<span class="w"> </span>--workers<span class="
 <span class="kn">import</span><span class="w"> </span><span class="nn">gym</span>
 
 <span class="c1"># Create environment with visual observations</span>
-<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;iron_ore_throughput&quot;</span><span class="p">)</span>
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">"iron_ore_throughput"</span><span class="p">)</span>
 
 <span class="c1"># Create visual agent</span>
 <span class="n">agent</span> <span class="o">=</span> <span class="n">VisualAgent</span><span class="p">(</span>
     <span class="n">sprite_manager</span><span class="o">=</span><span class="n">SpriteManager</span><span class="p">(),</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4-vision&quot;</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">"gpt-4-vision"</span>
 <span class="p">)</span>
 
 <span class="c1"># Agent can now use visual information</span>
@@ -260,12 +260,12 @@ fle<span class="w"> </span>sprites<span class="w"> </span>--workers<span class="
 </ul>
 <p>Example observation with visuals:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s1">&#39;raw_text&#39;</span><span class="p">:</span> <span class="s1">&#39;...&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;entities&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>
-    <span class="s1">&#39;map_image&#39;</span><span class="p">:</span> <span class="s1">&#39;data:image/png;base64,...&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;sprites&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;burner-mining-drill&#39;</span><span class="p">:</span> <span class="s1">&#39;data:image/png;base64,...&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;iron-chest&#39;</span><span class="p">:</span> <span class="s1">&#39;data:image/png;base64,...&#39;</span>
+    <span class="s1">'raw_text'</span><span class="p">:</span> <span class="s1">'...'</span><span class="p">,</span>
+    <span class="s1">'entities'</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>
+    <span class="s1">'map_image'</span><span class="p">:</span> <span class="s1">'data:image/png;base64,...'</span><span class="p">,</span>
+    <span class="s1">'sprites'</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">'burner-mining-drill'</span><span class="p">:</span> <span class="s1">'data:image/png;base64,...'</span><span class="p">,</span>
+        <span class="s1">'iron-chest'</span><span class="p">:</span> <span class="s1">'data:image/png;base64,...'</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -339,8 +339,8 @@ fle<span class="w"> </span>sprites<span class="w"> </span>--workers<span class="
 <h3>Custom Sprite Sources<a class="headerlink" href="#custom-sprite-sources" title="Link to this heading"></a></h3>
 <p>You can provide custom sprite sources:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sprite_manager</span> <span class="o">=</span> <span class="n">SpriteManager</span><span class="p">(</span>
-    <span class="n">spritemap_dir</span><span class="o">=</span><span class="s1">&#39;/custom/path/spritemaps&#39;</span><span class="p">,</span>
-    <span class="n">sprite_dir</span><span class="o">=</span><span class="s1">&#39;/custom/path/sprites&#39;</span>
+    <span class="n">spritemap_dir</span><span class="o">=</span><span class="s1">'/custom/path/spritemaps'</span><span class="p">,</span>
+    <span class="n">sprite_dir</span><span class="o">=</span><span class="s1">'/custom/path/sprites'</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -350,9 +350,9 @@ fle<span class="w"> </span>sprites<span class="w"> </span>--workers<span class="
 <p>Process multiple sprites efficiently:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get multiple sprites at once</span>
 <span class="n">sprites</span> <span class="o">=</span> <span class="n">sprite_manager</span><span class="o">.</span><span class="n">get_sprites</span><span class="p">([</span>
-    <span class="s1">&#39;burner-mining-drill&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iron-chest&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;stone-furnace&#39;</span>
+    <span class="s1">'burner-mining-drill'</span><span class="p">,</span>
+    <span class="s1">'iron-chest'</span><span class="p">,</span>
+    <span class="s1">'stone-furnace'</span>
 <span class="p">])</span>
 </pre></div>
 </div>
@@ -374,17 +374,17 @@ fle<span class="w"> </span>sprites<span class="w"> </span>--export-dir<span clas
 <span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
 
 <span class="c1"># Get map image</span>
-<span class="n">map_image</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;map_image&#39;</span><span class="p">]</span>
+<span class="n">map_image</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="s1">'map_image'</span><span class="p">]</span>
 
 <span class="c1"># Send to GPT-4 Vision</span>
 <span class="n">response</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4-vision-preview&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">"gpt-4-vision-preview"</span><span class="p">,</span>
     <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
         <span class="p">{</span>
-            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Analyze this Factorio base layout:&quot;</span><span class="p">},</span>
-                <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;image_url&quot;</span><span class="p">,</span> <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">map_image</span><span class="p">}}</span>
+            <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"text"</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"Analyze this Factorio base layout:"</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"image_url"</span><span class="p">,</span> <span class="s2">"image_url"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"url"</span><span class="p">:</span> <span class="n">map_image</span><span class="p">}}</span>
             <span class="p">]</span>
         <span class="p">}</span>
     <span class="p">]</span>
@@ -399,25 +399,25 @@ fle<span class="w"> </span>sprites<span class="w"> </span>--export-dir<span clas
 <span class="n">client</span> <span class="o">=</span> <span class="n">anthropic</span><span class="o">.</span><span class="n">Anthropic</span><span class="p">()</span>
 
 <span class="c1"># Get map image (remove data URL prefix)</span>
-<span class="n">map_image_data</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;map_image&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">map_image_data</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="s1">'map_image'</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">','</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
 
 <span class="n">message</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;claude-3-opus-20240229&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">"claude-3-opus-20240229"</span><span class="p">,</span>
     <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
         <span class="p">{</span>
-            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="p">[</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;base64&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;media_type&quot;</span><span class="p">:</span> <span class="s2">&quot;image/png&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">map_image_data</span>
+                    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"image"</span><span class="p">,</span>
+                    <span class="s2">"source"</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"base64"</span><span class="p">,</span>
+                        <span class="s2">"media_type"</span><span class="p">:</span> <span class="s2">"image/png"</span><span class="p">,</span>
+                        <span class="s2">"data"</span><span class="p">:</span> <span class="n">map_image_data</span>
                     <span class="p">}</span>
                 <span class="p">},</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;What entities do you see in this layout?&quot;</span>
+                    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"text"</span><span class="p">,</span>
+                    <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"What entities do you see in this layout?"</span>
                 <span class="p">}</span>
             <span class="p">]</span>
         <span class="p">}</span>
@@ -487,7 +487,7 @@ fle<span class="w"> </span>sprites<span class="w"> </span>--export-dir<span clas
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, FLE Team.</p>
+    <p>&#169; Copyright 2026, FLE Team.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

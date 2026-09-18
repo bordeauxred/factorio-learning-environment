@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Database Configuration &mdash; Factorio Learning Environment 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e259d695"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -178,12 +178,12 @@
 <h3>Setup<a class="headerlink" href="#setup" title="Link to this heading"></a></h3>
 <ol class="arabic">
 <li><p>Set the database type in <code class="docutils literal notranslate"><span class="pre">.env</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">FLE_DB_TYPE</span><span class="o">=</span><span class="s2">&quot;sqlite&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">FLE_DB_TYPE</span><span class="o">=</span><span class="s2">"sqlite"</span>
 </pre></div>
 </div>
 </li>
 <li><p>Configure the database file location:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">SQLITE_DB_FILE</span><span class="o">=</span><span class="s2">&quot;.fle/data.db&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">SQLITE_DB_FILE</span><span class="o">=</span><span class="s2">".fle/data.db"</span>
 </pre></div>
 </div>
 </li>
@@ -226,7 +226,7 @@
 <h3>Environment Variables<a class="headerlink" href="#environment-variables" title="Link to this heading"></a></h3>
 <p>Configure PostgreSQL in your <code class="docutils literal notranslate"><span class="pre">.env</span></code> file:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Database Configuration - Set to postgres to use PostgreSQL</span>
-<span class="nv">FLE_DB_TYPE</span><span class="o">=</span><span class="s2">&quot;postgres&quot;</span>
+<span class="nv">FLE_DB_TYPE</span><span class="o">=</span><span class="s2">"postgres"</span>
 
 <span class="c1"># PostgreSQL Configuration</span>
 <span class="nv">SKILLS_DB_HOST</span><span class="o">=</span>localhost
@@ -244,7 +244,7 @@
 <li><p>Install PostgreSQL 15+</p></li>
 <li><p>Create a database:</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">fle_database</span><span class="p">;</span>
-<span class="k">CREATE</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="n">fle_user</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">PASSWORD</span><span class="w"> </span><span class="s1">&#39;fle123&#39;</span><span class="p">;</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="n">fle_user</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">PASSWORD</span><span class="w"> </span><span class="s1">'fle123'</span><span class="p">;</span>
 <span class="k">GRANT</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">fle_database</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">fle_user</span><span class="p">;</span>
 </pre></div>
 </div>
@@ -344,7 +344,7 @@
 <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_checkpoint</span><span class="p">(</span><span class="n">trajectory_id</span><span class="p">,</span> <span class="n">step_number</span><span class="p">)</span>
 
 <span class="c1"># Resume environment from checkpoint</span>
-<span class="n">env</span><span class="o">.</span><span class="n">load_state</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;game_state&#39;</span><span class="p">])</span>
+<span class="n">env</span><span class="o">.</span><span class="n">load_state</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">[</span><span class="s1">'game_state'</span><span class="p">])</span>
 
 <span class="c1"># Continue execution</span>
 <span class="n">obs</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">next_action</span><span class="p">)</span>
@@ -399,7 +399,7 @@
 <li><p>Export data from SQLite:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">fle.commons.db_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLiteClient</span>
 
-<span class="n">sqlite_db</span> <span class="o">=</span> <span class="n">SQLiteClient</span><span class="p">(</span><span class="n">db_file</span><span class="o">=</span><span class="s1">&#39;.fle/data.db&#39;</span><span class="p">)</span>
+<span class="n">sqlite_db</span> <span class="o">=</span> <span class="n">SQLiteClient</span><span class="p">(</span><span class="n">db_file</span><span class="o">=</span><span class="s1">'.fle/data.db'</span><span class="p">)</span>
 <span class="n">trajectories</span> <span class="o">=</span> <span class="n">sqlite_db</span><span class="o">.</span><span class="n">export_all</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -408,11 +408,11 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">fle.commons.db_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">PostgreSQLClient</span>
 
 <span class="n">pg_db</span> <span class="o">=</span> <span class="n">PostgreSQLClient</span><span class="p">(</span>
-    <span class="n">host</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+    <span class="n">host</span><span class="o">=</span><span class="s1">'localhost'</span><span class="p">,</span>
     <span class="n">port</span><span class="o">=</span><span class="mi">5432</span><span class="p">,</span>
-    <span class="n">database</span><span class="o">=</span><span class="s1">&#39;fle_database&#39;</span><span class="p">,</span>
-    <span class="n">user</span><span class="o">=</span><span class="s1">&#39;fle_user&#39;</span><span class="p">,</span>
-    <span class="n">password</span><span class="o">=</span><span class="s1">&#39;fle123&#39;</span>
+    <span class="n">database</span><span class="o">=</span><span class="s1">'fle_database'</span><span class="p">,</span>
+    <span class="n">user</span><span class="o">=</span><span class="s1">'fle_user'</span><span class="p">,</span>
+    <span class="n">password</span><span class="o">=</span><span class="s1">'fle123'</span>
 <span class="p">)</span>
 <span class="n">pg_db</span><span class="o">.</span><span class="n">import_all</span><span class="p">(</span><span class="n">trajectories</span><span class="p">)</span>
 </pre></div>
@@ -430,7 +430,7 @@
 cp<span class="w"> </span>.fle/data.db<span class="w"> </span>.fle/data.db.backup
 
 <span class="c1"># Or use SQLite command</span>
-sqlite3<span class="w"> </span>.fle/data.db<span class="w"> </span><span class="s2">&quot;.backup &#39;.fle/data.db.backup&#39;&quot;</span>
+sqlite3<span class="w"> </span>.fle/data.db<span class="w"> </span><span class="s2">".backup '.fle/data.db.backup'"</span>
 </pre></div>
 </div>
 </section>
@@ -450,10 +450,10 @@ psql<span class="w"> </span>-h<span class="w"> </span>localhost<span class="w"> 
 <section id="sqlite-optimization">
 <h3>SQLite Optimization<a class="headerlink" href="#sqlite-optimization" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use WAL mode for better concurrency</span>
-<span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA journal_mode=WAL&quot;</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"PRAGMA journal_mode=WAL"</span><span class="p">)</span>
 
 <span class="c1"># Increase cache size</span>
-<span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA cache_size=-64000&quot;</span><span class="p">)</span>  <span class="c1"># 64MB</span>
+<span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"PRAGMA cache_size=-64000"</span><span class="p">)</span>  <span class="c1"># 64MB</span>
 </pre></div>
 </div>
 </section>
@@ -510,12 +510,12 @@ psql<span class="w"> </span>-h<span class="w"> </span>localhost<span class="w"> 
 du<span class="w"> </span>-h<span class="w"> </span>.fle/data.db
 
 <span class="c1"># Vacuum to reclaim space</span>
-sqlite3<span class="w"> </span>.fle/data.db<span class="w"> </span><span class="s2">&quot;VACUUM;&quot;</span>
+sqlite3<span class="w"> </span>.fle/data.db<span class="w"> </span><span class="s2">"VACUUM;"</span>
 </pre></div>
 </div>
 <p><strong>PostgreSQL</strong>:</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- Check database size</span>
-<span class="k">SELECT</span><span class="w"> </span><span class="n">pg_size_pretty</span><span class="p">(</span><span class="n">pg_database_size</span><span class="p">(</span><span class="s1">&#39;fle_database&#39;</span><span class="p">));</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">pg_size_pretty</span><span class="p">(</span><span class="n">pg_database_size</span><span class="p">(</span><span class="s1">'fle_database'</span><span class="p">));</span>
 
 <span class="c1">-- Vacuum to reclaim space</span>
 <span class="k">VACUUM</span><span class="w"> </span><span class="k">ANALYZE</span><span class="p">;</span>
@@ -554,7 +554,7 @@ sqlite3<span class="w"> </span>.fle/data.db<span class="w"> </span><span class="
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, FLE Team.</p>
+    <p>&#169; Copyright 2026, FLE Team.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

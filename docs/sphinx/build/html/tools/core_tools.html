@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Core Tools Reference &mdash; Factorio Learning Environment 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e259d695"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -159,7 +159,7 @@
 <p><strong>Example:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check player inventory</span>
 <span class="n">inventory</span> <span class="o">=</span> <span class="n">inspect_inventory</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iron plates: </span><span class="si">{</span><span class="n">inventory</span><span class="p">[</span><span class="s1">&#39;iron-plate&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Iron plates: </span><span class="si">{</span><span class="n">inventory</span><span class="p">[</span><span class="s1">'iron-plate'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Check entity inventory</span>
 <span class="n">chest</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">Prototype</span><span class="o">.</span><span class="n">IronChest</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
@@ -196,7 +196,7 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extract iron plates from a chest</span>
 <span class="n">chest</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">Prototype</span><span class="o">.</span><span class="n">IronChest</span><span class="p">,</span> <span class="n">chest_position</span><span class="p">)</span>
 <span class="n">extracted</span> <span class="o">=</span> <span class="n">extract_item</span><span class="p">(</span><span class="n">Prototype</span><span class="o">.</span><span class="n">IronPlate</span><span class="p">,</span> <span class="n">chest</span><span class="p">,</span> <span class="n">quantity</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted </span><span class="si">{</span><span class="n">extracted</span><span class="si">}</span><span class="s2"> iron plates&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Extracted </span><span class="si">{</span><span class="n">extracted</span><span class="si">}</span><span class="s2"> iron plates"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -339,8 +339,8 @@
 <p><strong>Example:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get information about an iron ore patch</span>
 <span class="n">patch</span> <span class="o">=</span> <span class="n">get_resource_patch</span><span class="p">(</span><span class="n">Resource</span><span class="o">.</span><span class="n">IronOre</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patch size: </span><span class="si">{</span><span class="n">patch</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total iron: </span><span class="si">{</span><span class="n">patch</span><span class="o">.</span><span class="n">amount</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Patch size: </span><span class="si">{</span><span class="n">patch</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total iron: </span><span class="si">{</span><span class="n">patch</span><span class="o">.</span><span class="n">amount</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -398,7 +398,7 @@
     <span class="n">end_position</span><span class="o">=</span><span class="n">chest</span><span class="o">.</span><span class="n">position</span><span class="p">,</span>
     <span class="n">connection_type</span><span class="o">=</span><span class="n">Prototype</span><span class="o">.</span><span class="n">TransportBelt</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Need </span><span class="si">{</span><span class="n">amount</span><span class="si">}</span><span class="s2"> belts&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Need </span><span class="si">{</span><span class="n">amount</span><span class="si">}</span><span class="s2"> belts"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -432,8 +432,8 @@
 <p><strong>Example:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get recipe for electronic circuits</span>
 <span class="n">recipe</span> <span class="o">=</span> <span class="n">get_prototype_recipe</span><span class="p">(</span><span class="n">Prototype</span><span class="o">.</span><span class="n">ElectronicCircuit</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ingredients: </span><span class="si">{</span><span class="n">recipe</span><span class="o">.</span><span class="n">ingredients</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Crafting time: </span><span class="si">{</span><span class="n">recipe</span><span class="o">.</span><span class="n">energy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Ingredients: </span><span class="si">{</span><span class="n">recipe</span><span class="o">.</span><span class="n">ingredients</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Crafting time: </span><span class="si">{</span><span class="n">recipe</span><span class="o">.</span><span class="n">energy</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -480,8 +480,8 @@
 <p><strong>Example:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check research progress</span>
 <span class="n">progress</span> <span class="o">=</span> <span class="n">get_research_progress</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current research: </span><span class="si">{</span><span class="n">progress</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Progress: </span><span class="si">{</span><span class="n">progress</span><span class="o">.</span><span class="n">level</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Current research: </span><span class="si">{</span><span class="n">progress</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Progress: </span><span class="si">{</span><span class="n">progress</span><span class="o">.</span><span class="n">level</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -537,7 +537,7 @@
 
 <span class="c1"># Check drill status after waiting</span>
 <span class="n">drill</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">Prototype</span><span class="o">.</span><span class="n">BurnerMiningDrill</span><span class="p">,</span> <span class="n">drill_position</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Drill status: </span><span class="si">{</span><span class="n">drill</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Drill status: </span><span class="si">{</span><span class="n">drill</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -572,13 +572,13 @@
 <p><strong>Example:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print entity information</span>
 <span class="n">drill</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">Prototype</span><span class="o">.</span><span class="n">BurnerMiningDrill</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Drill: </span><span class="si">{</span><span class="n">drill</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Status: </span><span class="si">{</span><span class="n">drill</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Position: </span><span class="si">{</span><span class="n">drill</span><span class="o">.</span><span class="n">position</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Drill: </span><span class="si">{</span><span class="n">drill</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Status: </span><span class="si">{</span><span class="n">drill</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Position: </span><span class="si">{</span><span class="n">drill</span><span class="o">.</span><span class="n">position</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Print inventory</span>
 <span class="n">inventory</span> <span class="o">=</span> <span class="n">inspect_inventory</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inventory: </span><span class="si">{</span><span class="n">inventory</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Inventory: </span><span class="si">{</span><span class="n">inventory</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -604,13 +604,13 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="n">drill</span> <span class="o">=</span> <span class="n">place_entity</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="k">except</span> <span class="n">InvalidEntityPlacementException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Placement failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Placement failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>Print for Debugging</strong>: Use <code class="docutils literal notranslate"><span class="pre">print()</span></code> to observe state</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entities: </span><span class="si">{</span><span class="n">get_entities</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inventory: </span><span class="si">{</span><span class="n">inspect_inventory</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Entities: </span><span class="si">{</span><span class="n">get_entities</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Inventory: </span><span class="si">{</span><span class="n">inspect_inventory</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
@@ -643,7 +643,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, FLE Team.</p>
+    <p>&#169; Copyright 2026, FLE Team.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

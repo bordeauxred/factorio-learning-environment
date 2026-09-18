@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Environment Overview &mdash; Factorio Learning Environment 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e259d695"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -150,23 +150,23 @@
 </pre></div>
 </div>
 <p><strong>Feedback:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span> <span class="n">BurnerMiningDrill</span><span class="p">(</span><span class="n">fuel</span><span class="o">=</span><span class="n">Inventory</span><span class="p">({</span><span class="s1">&#39;coal&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}),</span>
-<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;burner-mining-drill&#39;</span><span class="p">,</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span> <span class="n">BurnerMiningDrill</span><span class="p">(</span><span class="n">fuel</span><span class="o">=</span><span class="n">Inventory</span><span class="p">({</span><span class="s1">'coal'</span><span class="p">:</span> <span class="mi">4</span><span class="p">}),</span>
+<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">name</span><span class="o">=</span><span class="s1">'burner-mining-drill'</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">direction</span><span class="o">=</span><span class="n">Direction</span><span class="o">.</span><span class="n">DOWN</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">position</span><span class="o">=</span><span class="n">Position</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">28.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">61.0</span><span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">energy</span><span class="o">=</span><span class="mf">2666.6666666667</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">tile_dimensions</span><span class="o">=</span><span class="n">TileDimensions</span><span class="p">(</span><span class="n">tile_width</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">tile_height</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">status</span><span class="o">=</span><span class="n">EntityStatus</span><span class="o">.</span><span class="n">WORKING</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">neighbours</span><span class="o">=</span><span class="p">[</span><span class="n">Entity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;iron-chest&#39;</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">DOWN</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">Position</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">27.5</span> <span class="n">y</span><span class="o">=-</span><span class="mf">59.5</span><span class="p">)],</span>
+<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">neighbours</span><span class="o">=</span><span class="p">[</span><span class="n">Entity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'iron-chest'</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">DOWN</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">Position</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">27.5</span> <span class="n">y</span><span class="o">=-</span><span class="mf">59.5</span><span class="p">)],</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">drop_position</span><span class="o">=</span><span class="n">Position</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">27.5</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">59.5</span><span class="p">),</span>
-<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">resources</span><span class="o">=</span><span class="p">[</span><span class="n">Ingredient</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;iron-ore&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">30000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">)]),</span>
-<span class="gp">&gt;&gt;&gt; </span>  <span class="n">Chest</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;iron-chest&#39;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">resources</span><span class="o">=</span><span class="p">[</span><span class="n">Ingredient</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'iron-ore'</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">30000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">)]),</span>
+<span class="gp">&gt;&gt;&gt; </span>  <span class="n">Chest</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'iron-chest'</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">direction</span><span class="o">=</span><span class="n">Direction</span><span class="o">.</span><span class="n">UP</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">position</span><span class="o">=</span><span class="n">Position</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">27.5</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">59.5</span><span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">energy</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">tile_dimensions</span><span class="o">=</span><span class="n">TileDimensions</span><span class="p">(</span><span class="n">tile_width</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">tile_height</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">status</span><span class="o">=</span><span class="n">EntityStatus</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>        <span class="n">inventory</span><span class="o">=</span><span class="n">Inventory</span><span class="p">({</span><span class="s1">&#39;iron-ore&#39;</span><span class="p">:</span> <span class="mi">75</span><span class="p">}))]</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">inventory</span><span class="o">=</span><span class="n">Inventory</span><span class="p">({</span><span class="s1">'iron-ore'</span><span class="p">:</span> <span class="mi">75</span><span class="p">}))]</span>
 </pre></div>
 </div>
 </section>
@@ -224,9 +224,9 @@
 <h2>Action Space<a class="headerlink" href="#action-space" title="Link to this heading"></a></h2>
 <p>The action space is defined as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s1">&#39;agent_idx&#39;</span><span class="p">:</span> <span class="n">Discrete</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">num_agents</span><span class="p">),</span>  <span class="c1"># Index of the agent taking the action</span>
-    <span class="s1">&#39;game_state&#39;</span><span class="p">:</span> <span class="n">Text</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">1000000</span><span class="p">),</span>      <span class="c1"># Optional: game state to reset to</span>
-    <span class="s1">&#39;code&#39;</span><span class="p">:</span> <span class="n">Text</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>               <span class="c1"># Python code to execute</span>
+    <span class="s1">'agent_idx'</span><span class="p">:</span> <span class="n">Discrete</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">num_agents</span><span class="p">),</span>  <span class="c1"># Index of the agent taking the action</span>
+    <span class="s1">'game_state'</span><span class="p">:</span> <span class="n">Text</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">1000000</span><span class="p">),</span>      <span class="c1"># Optional: game state to reset to</span>
+    <span class="s1">'code'</span><span class="p">:</span> <span class="n">Text</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>               <span class="c1"># Python code to execute</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -354,7 +354,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, FLE Team.</p>
+    <p>&#169; Copyright 2026, FLE Team.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

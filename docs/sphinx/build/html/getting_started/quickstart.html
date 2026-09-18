@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Quickstart &mdash; Factorio Learning Environment 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e259d695"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -140,15 +140,15 @@ fle<span class="w"> </span><span class="nb">eval</span><span class="w"> </span>-
 <span class="kn">from</span><span class="w"> </span><span class="nn">fle.env.gym_env.action</span><span class="w"> </span><span class="kn">import</span> <span class="n">Action</span>
 
 <span class="c1"># Create an environment</span>
-<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;iron_ore_throughput&quot;</span><span class="p">)</span>
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">"iron_ore_throughput"</span><span class="p">)</span>
 
 <span class="c1"># Reset the environment</span>
-<span class="n">obs</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;game_state&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+<span class="n">obs</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">'game_state'</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
 
 <span class="c1"># Take an action</span>
 <span class="n">action</span> <span class="o">=</span> <span class="n">Action</span><span class="p">(</span>
     <span class="n">agent_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Which agent takes the action</span>
-    <span class="n">code</span><span class="o">=</span><span class="s1">&#39;print(&quot;Hello Factorio!&quot;)&#39;</span><span class="p">,</span>  <span class="c1"># Python code to execute</span>
+    <span class="n">code</span><span class="o">=</span><span class="s1">'print("Hello Factorio!")'</span><span class="p">,</span>  <span class="c1"># Python code to execute</span>
     <span class="n">game_state</span><span class="o">=</span><span class="kc">None</span>  <span class="c1"># Optional: game state to reset to before running code</span>
 <span class="p">)</span>
 
@@ -190,23 +190,23 @@ fle<span class="w"> </span><span class="nb">eval</span><span class="w"> </span>-
 </pre></div>
 </div>
 <p><strong>Feedback:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span> <span class="n">BurnerMiningDrill</span><span class="p">(</span><span class="n">fuel</span><span class="o">=</span><span class="n">Inventory</span><span class="p">({</span><span class="s1">&#39;coal&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}),</span>
-<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;burner-mining-drill&#39;</span><span class="p">,</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span> <span class="n">BurnerMiningDrill</span><span class="p">(</span><span class="n">fuel</span><span class="o">=</span><span class="n">Inventory</span><span class="p">({</span><span class="s1">'coal'</span><span class="p">:</span> <span class="mi">4</span><span class="p">}),</span>
+<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">name</span><span class="o">=</span><span class="s1">'burner-mining-drill'</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">direction</span><span class="o">=</span><span class="n">Direction</span><span class="o">.</span><span class="n">DOWN</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">position</span><span class="o">=</span><span class="n">Position</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">28.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">61.0</span><span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">energy</span><span class="o">=</span><span class="mf">2666.6666666667</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">tile_dimensions</span><span class="o">=</span><span class="n">TileDimensions</span><span class="p">(</span><span class="n">tile_width</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">tile_height</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">status</span><span class="o">=</span><span class="n">EntityStatus</span><span class="o">.</span><span class="n">WORKING</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">neighbours</span><span class="o">=</span><span class="p">[</span><span class="n">Entity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;iron-chest&#39;</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">DOWN</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">Position</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">27.5</span> <span class="n">y</span><span class="o">=-</span><span class="mf">59.5</span><span class="p">)],</span>
+<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">neighbours</span><span class="o">=</span><span class="p">[</span><span class="n">Entity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'iron-chest'</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">DOWN</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">Position</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">27.5</span> <span class="n">y</span><span class="o">=-</span><span class="mf">59.5</span><span class="p">)],</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">drop_position</span><span class="o">=</span><span class="n">Position</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">27.5</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">59.5</span><span class="p">),</span>
-<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">resources</span><span class="o">=</span><span class="p">[</span><span class="n">Ingredient</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;iron-ore&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">30000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">)]),</span>
-<span class="gp">&gt;&gt;&gt; </span>  <span class="n">Chest</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;iron-chest&#39;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                    <span class="n">resources</span><span class="o">=</span><span class="p">[</span><span class="n">Ingredient</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'iron-ore'</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">30000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">)]),</span>
+<span class="gp">&gt;&gt;&gt; </span>  <span class="n">Chest</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'iron-chest'</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">direction</span><span class="o">=</span><span class="n">Direction</span><span class="o">.</span><span class="n">UP</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">position</span><span class="o">=</span><span class="n">Position</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">27.5</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">59.5</span><span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">energy</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">tile_dimensions</span><span class="o">=</span><span class="n">TileDimensions</span><span class="p">(</span><span class="n">tile_width</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">tile_height</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">status</span><span class="o">=</span><span class="n">EntityStatus</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>        <span class="n">inventory</span><span class="o">=</span><span class="n">Inventory</span><span class="p">({</span><span class="s1">&#39;iron-ore&#39;</span><span class="p">:</span> <span class="mi">75</span><span class="p">}))]</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">inventory</span><span class="o">=</span><span class="n">Inventory</span><span class="p">({</span><span class="s1">'iron-ore'</span><span class="p">:</span> <span class="mi">75</span><span class="p">}))]</span>
 </pre></div>
 </div>
 </section>
@@ -217,7 +217,7 @@ fle<span class="w"> </span><span class="nb">eval</span><span class="w"> </span>-
 
 <span class="c1"># Get all available environment IDs</span>
 <span class="n">env_ids</span> <span class="o">=</span> <span class="n">list_available_environments</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Available environments: </span><span class="si">{</span><span class="n">env_ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Available environments: </span><span class="si">{</span><span class="n">env_ids</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Or use the command-line tool:</p>
@@ -230,12 +230,12 @@ fle<span class="w"> </span><span class="nb">eval</span><span class="w"> </span>-
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gym</span>
 
 <span class="c1"># Create throughput environments</span>
-<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;iron_plate_throughput&quot;</span><span class="p">)</span>
-<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;automation_science_pack_throughput&quot;</span><span class="p">)</span>
-<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;crude_oil_throughput&quot;</span><span class="p">)</span>
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">"iron_plate_throughput"</span><span class="p">)</span>
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">"automation_science_pack_throughput"</span><span class="p">)</span>
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">"crude_oil_throughput"</span><span class="p">)</span>
 
 <span class="c1"># Create open play environment</span>
-<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;open_play&quot;</span><span class="p">)</span>
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">"open_play"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -248,18 +248,18 @@ fle<span class="w"> </span><span class="nb">eval</span><span class="w"> </span>-
 
 <span class="c1"># 1. List available environments</span>
 <span class="n">env_ids</span> <span class="o">=</span> <span class="n">list_available_environments</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> environments&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> environments"</span><span class="p">)</span>
 
 <span class="c1"># 2. Get information about a specific environment</span>
-<span class="n">info</span> <span class="o">=</span> <span class="n">get_environment_info</span><span class="p">(</span><span class="s2">&quot;iron_ore_throughput&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Description: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">info</span> <span class="o">=</span> <span class="n">get_environment_info</span><span class="p">(</span><span class="s2">"iron_ore_throughput"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Description: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">'description'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># 3. Create the environment</span>
-<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;iron_ore_throughput&quot;</span><span class="p">)</span>
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">"iron_ore_throughput"</span><span class="p">)</span>
 
 <span class="c1"># 4. Use the environment</span>
-<span class="n">obs</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;game_state&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initial observation keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">obs</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">'game_state'</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Initial observation keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># 5. Take actions</span>
 <span class="n">current_state</span> <span class="o">=</span> <span class="kc">None</span>
@@ -267,12 +267,12 @@ fle<span class="w"> </span><span class="nb">eval</span><span class="w"> </span>-
     <span class="n">action</span> <span class="o">=</span> <span class="n">Action</span><span class="p">(</span>
         <span class="n">agent_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">game_state</span><span class="o">=</span><span class="n">current_state</span><span class="p">,</span>
-        <span class="n">code</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;print(&quot;Step </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s1">: Hello Factorio!&quot;)&#39;</span>
+        <span class="n">code</span><span class="o">=</span><span class="sa">f</span><span class="s1">'print("Step </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s1">: Hello Factorio!")'</span>
     <span class="p">)</span>
     <span class="n">obs</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
     <span class="n">done</span> <span class="o">=</span> <span class="n">terminated</span> <span class="ow">or</span> <span class="n">truncated</span>
-    <span class="n">current_state</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output_game_state&#39;</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">: Reward=</span><span class="si">{</span><span class="n">reward</span><span class="si">}</span><span class="s2">, Done=</span><span class="si">{</span><span class="n">done</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">current_state</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">'output_game_state'</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Step </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">: Reward=</span><span class="si">{</span><span class="n">reward</span><span class="si">}</span><span class="s2">, Done=</span><span class="si">{</span><span class="n">done</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
         <span class="k">break</span>
@@ -303,7 +303,7 @@ fle<span class="w"> </span><span class="nb">eval</span><span class="w"> </span>-
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, FLE Team.</p>
+    <p>&#169; Copyright 2026, FLE Team.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
