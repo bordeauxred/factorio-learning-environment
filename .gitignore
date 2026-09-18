@@ -84,3 +84,8 @@ cortex
 CLAUDE.md
 /server/CLAUDE.md
 configs
+# RL training artifacts (large, machine-generated)
+/runs/
+*.pt
+*.pkl
+*.pkl.gz
