@@ -107,7 +107,11 @@ iron ore" with dense HER relabelling, adding servers will not help.
 
 ## Rung 3 — ablations and the replay-ratio question
 
-**Hardware:** a native x86 Linux box. 16 to 32 cores, 64 to 128 GB, one GPU.
+**Hardware:** a native x86 Linux box, no GPU. Measured 2026-09-17: `h4d-standard-192`
+on Google Cloud at 6.316 CHF/h runs 128 Factorio servers and 238 steps/s, 6.44 CHF
+per million steps. Size servers at 0.7 x vCPUs; each environment needs about
+1.4 vCPU. The learner is a small MLP and a GPU buys nothing. See
+`docs/rl/results/vm_throughput.md`.
 
 **Cost:** days.
 

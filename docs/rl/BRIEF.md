@@ -116,6 +116,8 @@ scored 0.00.
 1. Stand up a container and measure, with a random policy, how often each of the
    twelve operations succeeds and why it fails. Publish the table. That table is
    the environment specification, and the last attempt never produced it.
+   **Done 2026-09-15: `results/op_census.md`.** Naive contract 0/56 harvests;
+   navigation-absorbing HARVEST 81/82, first item in every episode.
 2. Fix whatever makes the first resource unobtainable. The design intent from the
    project owner is a parameterized-action MDP with **macro-actions that absorb
    navigation**, so reach is an internal execution invariant rather than a
