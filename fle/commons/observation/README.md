@@ -1,5 +1,8 @@
 # Progressive buildability observations
 
+For the separate 512×512-tile, 14-channel minimap and combined-client usage,
+see [MINIMAP.md](MINIMAP.md). It contains no buildability channels.
+
 The tiered `open_world` observation protocol can progressively populate the
 63 buildability channels over the **128×128-tile buildability area**.
 The existing 17-channel context grid remains at its original three-tile
@@ -185,3 +188,13 @@ per-poll speedup: engine work per poll remains bounded by the same budget.
 It reduces cache storage and minimum initial fill work by 80.25% (5.06×).
 These measurements do not characterize a running factory's
 invalidation traffic, full-cache refresh latency, or action execution latency.
+
+Client-side rasterisation and owned float32 training samples are profiled
+separately in
+[`training-rasterisation-128-2026-09-18.md`](../../../tests/benchmarks/results/training-rasterisation-128-2026-09-18.md).
+Run `PYTHONPATH=. python tests/benchmarks/benchmark_training_rasterisation.py`
+to reproduce the CPU/NumPy measurements. With 1,000 entities, the live polling
+client stages (decode, observation assembly and owned sample) measured
+0.44 ms median / 0.52 ms p95, excluding RCON. A full grid-and-table rebuild
+measured 8.12 ms median. Framework conversion, GPU transfer and model execution
+are excluded.

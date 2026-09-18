@@ -47,6 +47,7 @@ local MAX_BUF = 50000 -- records; overflow => client full_sync
 
 local WATER_TILES = { "water", "deepwater", "water-green", "deepwater-green" }
 local buildability = require("observation_buildability")
+local minimap = require("observation_minimap")
 
 local function state()
   local s = storage.obs_diff
@@ -161,6 +162,7 @@ local function rich_row(e)
 end
 
 local function upsert(e)
+  minimap.entity(e)
   buildability.invalidate_entity(e)
   if not (e and e.valid and e.unit_number) then return end
   local s = state()
@@ -249,6 +251,7 @@ end
 local ev = defines.events
 
 script.on_event(ev.on_chunk_generated, function(event)
+  minimap.invalidate_area(event.surface.index, event.area)
   buildability.invalidate_area(event.surface.index, event.area)
   local s = state()
   encode_chunk(event.surface, event.position.x, event.position.y, event.area,
@@ -267,6 +270,7 @@ local function handle_removal(event)
   if not (e and e.valid) then return end
   local s = state()
   local t = e.type
+  minimap.entity(e)
   buildability.invalidate_entity(e)
   buildability.forget(e.unit_number)
   if t == "tree" or t == "simple-entity" or t == "cliff" then
@@ -287,6 +291,7 @@ end
 script.on_event(ev.on_resource_depleted, function(event)
   local e = event.entity
   if e and e.valid then
+    minimap.entity(e)
     buildability.invalidate_entity(e)
     push_t(state(), "d" .. pos_key(e.position))
   end
@@ -294,8 +299,10 @@ end)
 
 for _, id in pairs({ev.on_player_built_tile, ev.on_robot_built_tile,
     ev.on_player_mined_tile, ev.on_robot_mined_tile, ev.script_raised_set_tiles}) do
-  script.on_event(id, buildability.tiles)
+  script.on_event(id, function(event) buildability.tiles(event) minimap.tiles(event) end)
 end
+
+script.on_event(ev.on_chunk_charted, minimap.chart)
 
 script.on_event(ev.on_research_finished, function(event)
   push_e(state(), "q" .. event.research.name)
@@ -406,6 +413,11 @@ function obs_diff_touch(e)
   upsert(e)
 end
 
+function obs_minimap_configure(options) minimap.configure(options) end
+function obs_minimap_invalidate() minimap.invalidate_all() end
+function obs_minimap_drain() header() rcon.print(minimap.drain()) end
+function obs_minimap_full_sync() header() minimap.full_sync() rcon.print(minimap.drain()) end
+
 function obs_buildability_configure(options)
   buildability.configure(options)
 end
@@ -458,6 +470,8 @@ function obs_all_drain()
   end
   local b = buildability.drain()
   if b ~= "" then t = t == "" and b or (t .. ";" .. b) end
+  local m = minimap.drain()
+  if m ~= "" then t = t == "" and m or (t .. ";" .. m) end
   rcon.print(e .. "~" .. t)
 end
 

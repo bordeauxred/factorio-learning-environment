@@ -1,0 +1,36 @@
+         156851 function calls in 0.077 seconds
+
+   Ordered by: cumulative time
+   List reduced from 38 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       50    0.005    0.000    0.055    0.001 benchmark_tensor_obs.py:288(apply_entity)
+     5000    0.011    0.000    0.022    0.000 benchmark_tensor_obs.py:229(_table_upsert)
+     5000    0.006    0.000    0.015    0.000 benchmark_tensor_obs.py:205(_entity_contrib)
+       50    0.000    0.000    0.015    0.000 benchmark_training_rasterisation.py:45(snapshot)
+       50    0.013    0.000    0.013    0.000 {method 'astype' of 'numpy.ndarray' objects}
+    10000    0.010    0.000    0.012    0.000 benchmark_tensor_obs.py:141(_parse_row)
+    10000    0.011    0.000    0.012    0.000 benchmark_tensor_obs.py:283(_apply_contrib)
+       50    0.006    0.000    0.007    0.000 benchmark_tensor_obs.py:456(observation)
+    25050    0.003    0.000    0.003    0.000 {method 'split' of 'str' objects}
+    10000    0.001    0.000    0.001    0.000 {built-in method builtins.sum}
+     5000    0.001    0.000    0.001    0.000 benchmark_tensor_obs.py:117(_cell_of)
+    15000    0.001    0.000    0.001    0.000 {method 'get' of 'dict' objects}
+      100    0.000    0.000    0.001    0.000 fromnumeric.py:48(_wrapfunc)
+     5000    0.001    0.000    0.001    0.000 benchmark_tensor_obs.py:197(_vid)
+       50    0.000    0.000    0.001    0.000 fromnumeric.py:1115(argsort)
+       50    0.001    0.000    0.001    0.000 {method 'argsort' of 'numpy.ndarray' objects}
+    15000    0.001    0.000    0.001    0.000 {method 'items' of 'dict' objects}
+      250    0.001    0.000    0.001    0.000 {method 'copy' of 'numpy.ndarray' objects}
+      250    0.000    0.000    0.001    0.000 benchmark_training_rasterisation.py:54(<genexpr>)
+     5000    0.001    0.000    0.001    0.000 {method 'pop' of 'dict' objects}
+    10000    0.001    0.000    0.001    0.000 {built-in method math.sin}
+    10000    0.001    0.000    0.001    0.000 {built-in method math.cos}
+     5000    0.001    0.000    0.001    0.000 {built-in method builtins.sorted}
+     5000    0.000    0.000    0.000    0.000 {method 'values' of 'dict' objects}
+     5300    0.000    0.000    0.000    0.000 {built-in method builtins.len}
+     5000    0.000    0.000    0.000    0.000 {built-in method math.log2}
+      100    0.000    0.000    0.000    0.000 {built-in method numpy.zeros}
+       50    0.000    0.000    0.000    0.000 fromnumeric.py:2031(nonzero)
+     5000    0.000    0.000    0.000    0.000 benchmark_tensor_obs.py:212(<genexpr>)
+       50    0.000    0.000    0.000    0.000 {method 'nonzero' of 'numpy.ndarray' objects}

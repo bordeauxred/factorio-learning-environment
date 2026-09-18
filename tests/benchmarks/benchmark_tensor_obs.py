@@ -38,6 +38,7 @@ from pathlib import Path
 import numpy as np
 from factorio_rcon import RCONClient
 from fle.commons.observation.buildability import BuildabilityCache
+from fle.commons.observation.minimap import MinimapCache
 
 sys.path.insert(0, str(Path(__file__).parent))
 from benchmark_tiered_obs import TieredClient  # noqa: E402
@@ -113,6 +114,7 @@ class TensorClient(TieredClient):
         self.center_x = 0  # grid window center, CELL-quantized world coords
         self.center_y = 0
         self.buildability = BuildabilityCache()
+        self.minimap = MinimapCache()
 
     def _cell_of(self, x, y):
         gx = int((x - self.center_x + HALF) // CELL)
@@ -375,6 +377,8 @@ class TensorClient(TieredClient):
             return 0
         records = resp.split(";")
         for rec in records:
+            if self.minimap.apply_record(rec):
+                continue
             if self.buildability.apply_record(rec):
                 if rec.startswith("B") and self.buildability.size == GRID * CELL:
                     cx, cy = (v + HALF for v in self.buildability.origin)
@@ -453,7 +457,7 @@ class TensorClient(TieredClient):
         g[8] = self.player_x
         g[9] = self.player_y
 
-    def observation(self, include_buildability=False):
+    def observation(self, include_buildability=False, include_minimap=False):
         """Observation views for an MLP/transformer policy: (flat grid,
         global vec, K-nearest entity view, view mask).
 
@@ -488,7 +492,9 @@ class TensorClient(TieredClient):
         if include_buildability:
             # Separate tile-resolution grid; unknown=-1, blocked=0, legal=1.
             # Sample timestamps have one entry per 8x8 tile block.
-            return (*result, self.buildability.observation(self.tick))
+            result = (*result, self.buildability.observation(self.tick))
+        if include_minimap:
+            result = (*result, self.minimap.observation())
         return result
 
     def _rebuild_grid(self):
