@@ -283,6 +283,25 @@ right INSERT. At the measured ~1.4 decisions per wall second, a scratch run of a
 hours is not expected to stumble into it. That is the honest prior for FULL-1, and it is
 the reason FULL-2 seeds replay with demonstrations of exactly that chain.
 
+### The "automated gains" are not automation
+
+Both runs log a handful of steps with a positive delta in the automated score, and they
+must not be read as the agent automating anything. Every one of them is a successful
+`MINE` that moves the automated score from **-1 back to 0**: the score floors at -1 after
+hand work and recovers when the hand work yields something. The absolute automated score
+never left 0 in either run.
+
+```
+full1-scratch: 4 of 5,459 steps, all MINE, each d_auto=+1 with auto ending at 0
+full2-demo:    1 of 4,110 steps, likewise
+```
+
+Meanwhile the production score climbs steadily (280 on one worker by decision 5,287)
+while the automated score stays at 0. That is the manual-grinding hypothesis from the
+brief, visible in a policy that has already stopped exploring: the agent hand-mines
+because hand-mining is the only thing that ever succeeds, and the automated objective
+correctly refuses to pay for it.
+
 ### Greedy behaviour with no reward collapses onto one verb
 
 As epsilon fell in FULL-1 the action distribution changed, and the change is
