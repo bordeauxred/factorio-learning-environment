@@ -195,8 +195,61 @@ _TOY-A (SMDP correctness) and TOY-B (burner automation) to be filled._
 
 ## 7. Failure analysis
 
-_To be filled: manual grinding, invalid placement, Q divergence, exploration failure,
-simulation bottlenecks._
+### What a random policy's actions actually do
+
+Measured over the first 287 decisions of the live runs, by verb:
+
+| Verb | n | Outcomes |
+|---|---:|---|
+| MOVE_TO | 44 | ok 100% |
+| PLACE | 44 | insufficient_inventory 84%, tool_error 9%, blocked 4% |
+| RESEARCH | 36 | tool_error 100% |
+| FAST_FORWARD | 34 | ok 100% |
+| MINE | 31 | tool_error 87%, insufficient_inventory 6%, ok 6% |
+| CRAFT | 31 | tool_error 74%, insufficient_inventory 22%, ok 3% |
+| PICKUP | 28 | tool_error 85%, ok 10% |
+| ROTATE | 26 | insufficient_inventory 96%, ok 3% |
+| EXTRACT | 7 | tool_error 57%, no_such_entity 43% |
+| INSERT | 6 | insufficient_inventory 100% |
+
+Two different things are visible here and they should not be confused.
+
+**The environment is behaving correctly.** A uniformly random policy picks a prototype it
+does not carry (84% of PLACE), mines tiles with nothing on them (87% of MINE), crafts
+recipes whose ingredients it lacks, and picks up empty ground. These are exactly the
+failed transitions the brief asks for: unmasked, zero-reward, and informative. Locomotion
+and simulated waiting, the two things the environment is allowed to handle, succeed 100%
+of the time.
+
+**The failure taxonomy is miscalibrated.** `tool_error` is a catch-all for game messages
+the classifier does not recognise, and it is swallowing failures that have proper names:
+CRAFT without ingredients is `insufficient_inventory`, MINE on bare grass is an invalid
+target, RESEARCH without science packs cannot succeed at all. ROTATE is worse than
+uninformative — 96% of its failures are labelled `insufficient_inventory` because the
+game's message contains a substring the inventory rule matches. This does not affect
+learning (every failure earns the same ~0 reward either way) but it does affect what can
+be read off the logs, and it should be fixed before the next run by matching on the
+game's message catalogue rather than on substrings.
+
+### Exploration is the binding constraint, and it is quantifiable
+
+The chain to first automated reward is: hop toward ore (one MOVE_TO), select PLACE,
+select `burner-mining-drill` from 87 placeable prototypes, select one of a few hundred
+ore tiles out of 9,216 positions, then INSERT coal into that specific entity. Under
+uniform per-head exploration the placement alone is roughly
+(1/11)·(1/87)·(300/9216) ≈ 3·10⁻⁵ per decision, and it still has to be followed by the
+right INSERT. At the measured ~1.4 decisions per wall second, a scratch run of a few
+hours is not expected to stumble into it. That is the honest prior for FULL-1, and it is
+the reason FULL-2 seeds replay with demonstrations of exactly that chain.
+
+### A configuration error worth recording
+
+The first launch used the default per-head epsilon schedule, which anneals over 100,000
+decisions (200,000 for the position head). A run that collects ~10,000 decisions would
+therefore have stayed above epsilon 0.9 for its whole life: it would have measured
+exploration, not learning. Both runs were stopped after ~25 minutes and relaunched with
+the decay matched to the decisions the run will really collect (`--epsilon-decay-decisions
+5000`), so roughly the second half of each run acts on its Q-values.
 
 ## 8. Verdict
 

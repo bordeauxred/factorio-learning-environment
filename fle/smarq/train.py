@@ -87,17 +87,32 @@ class EpsilonSchedule:
         return float(self.start + fraction * (self.end - self.start))
 
 
+EPSILON_DECAY_DECISIONS = 100_000
+
+
 def epsilon_per_head(decision: int) -> dict[str, float]:
-    """Separate schedules, with geometry retaining exploration the longest."""
-    values = {"verb": EpsilonSchedule().value(decision)}
+    """Separate schedules, with geometry retaining exploration the longest.
+
+    The decay length must match the number of decisions a run will actually
+    collect.  A schedule tuned for 100k decisions leaves epsilon near 0.9 for a
+    run that collects 10k, so the policy never acts on anything it has learned
+    and the run measures exploration rather than learning.
+    """
+    span = max(1, EPSILON_DECAY_DECISIONS)
+    values = {"verb": EpsilonSchedule(decay_decisions=span).value(decision)}
     for head in C.HEADS:
         schedule = (
-            EpsilonSchedule(end=0.10, decay_decisions=200_000)
+            EpsilonSchedule(end=0.25, decay_decisions=span * 2)
             if head == C.POSITION
-            else EpsilonSchedule()
+            else EpsilonSchedule(decay_decisions=span)
         )
         values[head] = schedule.value(decision)
     return values
+
+
+def set_epsilon_decay(decisions: int) -> None:
+    global EPSILON_DECAY_DECISIONS
+    EPSILON_DECAY_DECISIONS = max(1, int(decisions))
 
 
 class FallbackReplay:
@@ -618,8 +633,8 @@ def run_training(
                 policy = LiveBurnerDemo(
                     target=target,
                     drills=2 if index % 2 == 0 else 1,
-                    wait_blocks=6,
-                    max_actions=40,
+                    wait_blocks=4,
+                    max_actions=18,
                 )
             else:
                 policy = (
@@ -933,6 +948,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--decision-cap", type=int, default=200)
     parser.add_argument("--discount-horizon", type=float, default=3600.0)
     parser.add_argument("--demos", type=int, default=0)
+    parser.add_argument(
+        "--epsilon-decay-decisions",
+        type=int,
+        default=100_000,
+        help="decisions over which per-head epsilon anneals; set it to the number "
+        "of decisions the run will really collect",
+    )
     parser.add_argument("--total-decisions", type=int)
     parser.add_argument("--checkpoint-every", type=int, default=1_000)
     parser.add_argument("--resume")
@@ -946,6 +968,7 @@ def main(argv: list[str] | None = None) -> int:
     total_decisions = args.total_decisions
     if total_decisions is None:
         total_decisions = 400 if args.dry_run else 100_000
+    set_epsilon_decay(args.epsilon_decay_decisions)
     config = TrainingConfig(
         run_name=args.run_name,
         env="fake" if args.dry_run else args.env,
