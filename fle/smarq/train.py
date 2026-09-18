@@ -488,7 +488,10 @@ def _default_env_factory(
                 seed=seed,
             )
         try:
-            from fle.smarq.env import SemanticEnv
+            if config.env == "live-nearore":
+                from fle.smarq.nearore import NearOreEnv as SemanticEnv
+            else:
+                from fle.smarq.env import SemanticEnv
         except ImportError as exc:  # pragma: no cover - requires live session
             raise RuntimeError("live environment module is not available") from exc
         port = config.ports[worker % len(config.ports)]
@@ -597,7 +600,7 @@ def run_training(
         raise ValueError("replay_ratio must be positive")
     if config.reward_mode not in C.REWARD_MODES:
         raise ValueError(f"unknown reward mode {config.reward_mode!r}")
-    if config.env == "live" and len(config.ports) < config.workers:
+    if config.env.startswith("live") and len(config.ports) < config.workers:
         raise ValueError("live training requires one distinct --ports entry per worker")
     random.seed(config.seed)
     np.random.seed(config.seed)
@@ -624,7 +627,7 @@ def run_training(
     if config.demos and resume_payload is None:
         demo_env = envs[0]
         for index in range(config.demos):
-            if config.env == "live":
+            if config.env.startswith("live"):
                 # Toy coordinates do not exist on a generated map, so plan the
                 # same burner chain against the world this worker actually has.
                 from fle.smarq.live_demos import LiveBurnerDemo, nearest_resource_tile
@@ -931,7 +934,9 @@ def run_training(
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run-name", default="smarq")
-    parser.add_argument("--env", choices=("fake", "live"), default="fake")
+    parser.add_argument(
+        "--env", choices=("fake", "live", "live-nearore"), default="fake"
+    )
     parser.add_argument("--ports", default="27000")
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument(
