@@ -227,10 +227,18 @@ re-running the brief's own two runs on a working environment: a null result from
 crippled environment answers nothing, and the brief gives FULL-1 and FULL-2 priority.
 The first minutes of the re-runs already show a different environment:
 
-| | original FULL-1 | FULL-1 re-run, first 551 decisions |
+| | original FULL-1 | re-runs on the fixed environment |
 |---|---|---|
-| PLACE accepted | 8 / 538 (1.5%) | **9 / 86 (10.5%)** |
-| MINE succeeded | 0 (all out of reach) | **10 / 86 (11.6%)** |
+| PLACE accepted | 8 / 538 (1.5%) | **34 / 383 (8.9%)** |
+| MINE succeeded | 0, all out of reach | **~11%** |
+| ROTATE succeeded | 0 / 177, all "No entity to rotate" | **43 / 47** |
+| SET_RECIPE succeeded | — | **5 / 5** |
+
+Every verb now fails for reasons that belong to the policy rather than to the harness.
+INSERT, for instance, fails with "No roboport to insert from your inventory": the policy
+chose an item it does not carry, which is precisely the unmasked failure the brief wants
+the agent to learn from. The classifier still files several of these under `tool_error`
+rather than `insufficient_inventory`, which is cosmetic and listed in section 9.
 
 Results are filled from `tests/benchmarks/smarq_status.py`; every number here is
 measured, never projected.
