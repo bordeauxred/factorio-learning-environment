@@ -216,15 +216,26 @@ over 5000 decisions, three workers each on their own Factorio server.
 | run | reward | seeding | ports | status |
 |---|---|---|---|---|
 | FULL-1 `full1-scratch` | automated | scratch | 27000-27002 | running |
-| FULL-2 `full2-demo` | automated | 6 live burner demonstrations at PER priority 10 | 27003-27005 | running |
-| FULL-3 | production (ablation) | scratch | - | not run: all six servers are committed to FULL-1/2, which the brief prioritises |
+| FULL-2 `full2-demo` | automated | 6 live burner demonstrations at PER priority 10 | 27003-27005 | ran 1 h 50 m |
+| FULL-3 | production (ablation) | scratch | - | not run: the six servers were committed to FULL-1/2, which the brief prioritises, and then to the near-ore arm below |
+| NEAR-ORE (extra, not in the brief) | automated | scratch, episodes start beside ore | 27000-27002 | started 07:33 on the servers FULL-1 freed |
 
 Results are filled from `tests/benchmarks/smarq_status.py`; every number here is
 measured, never projected.
 
-| run | decisions | episodes | max automated | automated / game min | decisions per wall s | updates |
-|---|---:|---:|---:|---:|---:|---:|
-| _filling as the runs progress_ | | | | | | |
+| run | decisions | episodes | simulated | final automated (max / mean) | final production (max / mean) | automated per game min | decisions / wall s | updates | wall |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| FULL-1 scratch | 7,266 | 19 | 528.4 game min | **0 / −0.68** | 923 / 229 | −0.024 | 1.03 | 7,266 | 1 h 58 m |
+| FULL-2 demo-seeded | 5,043 (6,045 logged) | 16 | 480.0 game min | **0 / −0.75** | 661 / 183 | −0.025 | 0.98 | ~5,900 | 1 h 50 m (running) |
+
+Aggregate simulation throughput was 4.5 game-seconds per wall-second across three
+workers; episodes ended on the simulated-time budget in every case except the three that
+were cut by the stop signal, so the 30-game-minute horizon bound the episodes as intended
+and repeated FAST_FORWARD never extended one.
+
+**The headline number is that the automated production score never rose above 0 in
+either run.** Its mean at episode end is slightly negative because hand work floors it at
+−1. The general production score, meanwhile, reached 923.
 
 ### What the scratch run does early
 
