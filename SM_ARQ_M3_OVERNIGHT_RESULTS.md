@@ -185,7 +185,26 @@ one decision per second and the runs would see five episodes all night. The runs
 
 ## 5. Toy results
 
-_TOY-A (SMDP correctness) and TOY-B (burner automation) to be filled._
+**TOY-A, semi-Markov correctness** (`tests/smarq/test_smdp_correctness.py`, 10 passed):
+`Gamma(tau) = 2^(-tau/H)` exactly, halving per horizon; ten FAST_FORWARD(60 s) discount
+identically to one FAST_FORWARD(600 s), so the discount is per simulated second and not
+per decision; Bellman targets match hand-computed numbers; internal autoregressive steps
+use `Gamma = 1`; two routes to the same factory state differ in value only by the
+simulated time they spend; a 3600-tick budget is exhausted by exactly one
+FAST_FORWARD(60 s), so waiting cannot buy extra episode time.
+
+**TOY-B, burner automation on a live server**: reported in section 2b. The scripted
+expert took the automated score from 0 to 139 in 120 simulated seconds. A second variant
+that also places a furnace on the drill's own drop tile is in
+`fle/smarq/live_demos.py`; on the open-play map it reliably walks to the ore patch,
+places a drill on an exact ore tile and fuels it, and earns its first automated points
+within one FAST_FORWARD. The furnace step still fails as `blocked` because the drop tile
+computed from the entity row falls inside the 2x2 drill footprint — a demonstration bug,
+not an environment one, and the first thing to fix in the demo script.
+
+The remaining TOY-B arms from the brief (random, scripted expert, scratch, demo-seeded,
+compared on the same fixed budget) were not run: the night's time went into the two FULL
+runs, which the brief gives priority.
 
 ## 6. Full results
 

@@ -180,13 +180,12 @@ class LiveBurnerDemo(ScriptedDemo):
             slot = self._entity_slot_on(observation, tile, vocab)
             if slot is None:
                 continue
-            drop = (
-                int(round(tile[0] + float(observation.entity_view[slot, 12]))),
-                int(round(tile[1] + float(observation.entity_view[slot, 13]))),
-            )
-            if drop == tile:
-                self._served.add(tile)
-                continue
+            # The script places every drill facing SOUTH, and a 2x2 burner
+            # drill facing SOUTH drops its ore two tiles below the tile the
+            # script asked for.  Deriving this from the entity row's drop offset
+            # kept landing inside the drill's own footprint, so the script uses
+            # the offset implied by the direction it chose itself.
+            drop = (tile[0], tile[1] + 2)
             if drop not in self._furnaces:
                 self._furnaces[drop] = tile
                 return semantic_action(
