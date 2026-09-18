@@ -36,8 +36,11 @@ STEP_FIELDS = (
     "per_priority",
     "exploratory",
     "epsilon_per_head",
-    "raw_error",
 )
+
+# Written when the environment supplies it, not required: a caller that has no
+# game message (the fake environment, a test) still writes a valid step line.
+OPTIONAL_STEP_FIELDS = ("raw_error",)
 
 EPISODE_FIELDS = (
     "return",

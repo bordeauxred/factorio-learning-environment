@@ -65,7 +65,10 @@ def test_invalid_placement_fails_instead_of_trying_another_tile() -> None:
         direction="NORTH",
     )
     outcome = executor.execute(action, 1000)
-    assert outcome == ExecutionOutcome(False, "blocked", None, 0, 0)
+    assert (outcome.success, outcome.failure_reason) == (False, "blocked")
+    assert outcome.executed_quantity == 0 and outcome.overshoot_ticks == 0
+    # The game's own words are carried through so the logs can say why.
+    assert "water" in outcome.raw_error
     assert executor.navigated == [((8, 9), False)]
     assert len(executor.calls) == 1
     assert executor.calls[0][1][2:4] == (8, 9)
