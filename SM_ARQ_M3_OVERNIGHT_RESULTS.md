@@ -332,6 +332,37 @@ like from the inside, and it is the sharpest argument for the two follow-up expe
 in section 8: the problem is not that the learner prefers bad actions, it is that nothing
 in its experience distinguishes any action from any other.
 
+### Two environment defects that handicapped both FULL runs
+
+Recording the game's own refusal messages found them within minutes of the first run that
+carried them, and they change how FULL-1 and FULL-2 should be read.
+
+**MINE navigated to build distance, not to mining reach.** The executor walked to within
+`build_distance - 1` (about 9 tiles) of the requested tile for every verb. Building works
+at that distance; mining does not - `resource_reach_distance` is **2.7 tiles** - so the
+tool was called from too far away and answered "Nothing within reach to harvest". This
+was 246 of 246 MINE attempts in the first near-ore run.
+
+**PICKUP could target the character.** The character occupies an entity row like any
+other, and the entity-pointer mask admitted it, so PICKUP on it returned "Unknown item
+name: character" - 152 times, every single PICKUP attempt in that run.
+
+Both are now fixed: navigation takes the reach appropriate to the verb, and the character
+is excluded from the entity pointer, which is a type impossibility and therefore one of
+the few things a structural mask may legitimately remove. Measured immediately after,
+on the same map and the same policy:
+
+| verb | before | after |
+|---|---|---|
+| MINE | 0 / 246 succeeded | **7 / 58** |
+| PICKUP | 0 / 152 succeeded | **8 / 10** |
+
+**This means FULL-1 and FULL-2 ran with two of their eleven verbs unable to succeed.**
+Their null results still stand as reported - the automated score never moved and the
+exploration arithmetic is unchanged, since neither MINE nor PICKUP is on the path to
+automated production - but they were handicapped, and any comparison against later runs
+must say so. The near-ore arm was restarted at 08:09 with both fixes in place.
+
 ### A note on what these logs cannot tell us
 
 The `raw_error` field that records the game's own refusal message was added after these

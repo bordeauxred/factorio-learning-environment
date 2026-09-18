@@ -75,6 +75,8 @@ class TieredClient:
         self.techs_finished: list[str] = []
         self.overflow = False
         self.build_distance = 10.0
+        # Mining uses a much shorter reach than building; read live at reset.
+        self.resource_reach_distance = 2.7
 
 
 class TensorClient(TieredClient):

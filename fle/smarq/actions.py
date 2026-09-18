@@ -247,6 +247,15 @@ def build_masks(vocab: StableVocab, client: TensorClient, metadata: MaskMetadata
     entity = np.zeros((C.N_VERBS, C.ENTITY_SLOTS), dtype=bool)
     _, _, view, live, _ = client.observation()
     live = np.asarray(live, dtype=bool)
+    # The character occupies a row like any other entity, but it cannot be
+    # picked up, rotated, or inserted into: PICKUP on it returns "Unknown item
+    # name: character". That is a type impossibility, so it is one of the few
+    # things a structural mask may remove.
+    for slot in np.nonzero(live)[0]:
+        unit = str(int(client.entity_ids[slot]))
+        row = client.entities.get(unit)
+        if row is not None and client._parse_row(row).get("name") == "character":
+            live[slot] = False
     for action_name in ("PICKUP", "ROTATE"):
         entity[C.VERB_INDEX[action_name]] = live
     recipe_masks: dict[int, np.ndarray] = {}

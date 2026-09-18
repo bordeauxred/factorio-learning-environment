@@ -104,20 +104,38 @@ class FLEActionExecutor:
         additional = min(max(0, modeled - already_run), max(0, remaining))
         return self.clock.advance_ticks(additional)
 
-    def _interaction_position(self, tile: tuple[int, int], exact_destination: bool) -> Position:
+    def _interaction_position(
+        self, tile: tuple[int, int], exact_destination: bool, reach: float | None = None
+    ) -> Position:
+        """Where the character must stand to act on ``tile``.
+
+        The reach that matters depends on the verb: building reaches about 10
+        tiles, but `resource_reach_distance` is only 2.7, so walking to within
+        build distance of an ore tile and then mining it fails with "Nothing
+        within reach to harvest". Navigation is allowed to close that gap; it
+        still never moves the requested tile.
+        """
         if exact_destination:
             return Position(x=tile[0], y=tile[1])
+        reach = float(reach if reach is not None else self.client.build_distance)
         px, py = self.client.player_x, self.client.player_y
         tx, ty = float(tile[0]), float(tile[1])
         dx, dy = px - tx, py - ty
         distance = math.hypot(dx, dy)
-        if distance <= max(1.0, self.client.build_distance - 1.0):
+        margin = max(0.5, reach - 1.0)
+        if distance <= margin:
             return Position(x=px, y=py)
-        offset = min(3.0, max(1.0, self.client.build_distance - 1.0))
+        offset = min(3.0, margin)
         return Position(x=tx + dx / distance * offset, y=ty + dy / distance * offset)
 
-    def _navigate(self, tile: tuple[int, int], remaining: int, exact_destination: bool = False) -> int:
-        destination = self._interaction_position(tile, exact_destination)
+    def _navigate(
+        self,
+        tile: tuple[int, int],
+        remaining: int,
+        exact_destination: bool = False,
+        reach: float | None = None,
+    ) -> int:
+        destination = self._interaction_position(tile, exact_destination, reach)
         if math.hypot(destination.x - self.client.player_x, destination.y - self.client.player_y) < 0.3:
             return 0
         before_modeled = self._modeled_ticks()
@@ -214,6 +232,11 @@ class FLEActionExecutor:
                     action.tile,
                     remaining_ticks,
                     exact_destination=action.verb == "MOVE_TO",
+                    reach=(
+                        self.client.resource_reach_distance
+                        if action.verb == "MINE"
+                        else self.client.build_distance
+                    ),
                 )
             elif entity is not None:
                 spent = self._navigate(
@@ -362,6 +385,7 @@ class SemanticEnv(C.SemanticEnvProtocol):
         self.episode_start_tick = 0
         self.episode_decisions = 0
         self._score = (0.0, 0.0)
+        self._reach_read = False
         self._closed = False
 
     @property
@@ -383,6 +407,16 @@ class SemanticEnv(C.SemanticEnvProtocol):
         )
         if distance:
             self.client.build_distance = float(distance)
+        if not self._reach_read:
+            # Read once: it does not change, and a boundary already costs a
+            # score() call, which is the expensive part.
+            reach = self.instance.rcon_client.send_command(
+                "/sc local c=storage.utils.ensure_valid_character(1) "
+                "rcon.print(c.resource_reach_distance)"
+            )
+            if reach:
+                self.client.resource_reach_distance = float(reach)
+            self._reach_read = True
         grid, globals_, entity_view, entity_mask, entity_ids = self.client.observation()
         raster, origin, player_tile = self.raster_builder.build(self.client)
         production, automated = self.instance.namespace.score()
