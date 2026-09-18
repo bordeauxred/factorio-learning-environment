@@ -83,13 +83,18 @@ an emergency cap of 1000 decisions. Repeated FAST_FORWARD consumes the same budg
 
 **Starting state.** FLE's standard open-play kit: 50 coal, 50 iron and 50 copper plates,
 9 stone furnaces, 3 burner mining drills, 1 electric drill, 32 burner inserters, 50
-belts, 1 assembling machine, boiler, steam engine, poles. **No ore.** Measured on these
-maps, the nearest iron ore is **170 tiles away on port 27004 and 274 tiles on port
-27000**. Automated production therefore requires a genuine journey: with a 96-tile
-window the agent must chain several MOVE_TO hops before an ore tile is even addressable
-by the position head. In game time that journey is cheap (about 13 ticks per tile, so
-~2,200 ticks for 170 tiles, ~2% of a 30-minute episode); the difficulty is exploration,
-not time.
+belts, 1 assembling machine, boiler, steam engine, poles. **No ore.** The nearest iron
+ore is **53.5 tiles from spawn** at (−16, −51) on map seed 44340. Automated production
+therefore needs a short journey first: the exact-tile window is ±48 tiles, so the ore
+tile is not addressable by the position head until the agent has made one MOVE_TO hop
+toward it. In game time the journey is cheap (~13 ticks per tile, under 1% of a
+30-minute episode); the difficulty is exploration, not time.
+
+> A measurement note worth recording, because it nearly went into this document as a
+> fact: `find_entities_filtered` with a `limit` returns an *arbitrary* subset, not the
+> nearest ones. Taking "the nearest" of a limited result set reported ore at 170 and 274
+> tiles on two maps. Re-measured with a radius ladder and no limit, the true distance is
+> 53.5 tiles, which agrees with the independently measured value from an earlier session.
 
 ## 2b. TOY-B: can this interface automate at all?
 
@@ -128,11 +133,55 @@ SMDP formulation actually implemented:
 - Action construction is a chain of zero-time internal decisions: for those, `r = 0`,
   `tau = 0`, `Gamma = 1`, and a partial action bootstraps from the max over its next head.
 
-_Network sizes and measured update rates to be filled when the learner lands._
+**Network**, 1,965,735 parameters (budget was 10M), no recurrence, no transformer:
+
+| Module | Parameters |
+|---|---:|
+| Grid encoder and pooling | 712,384 |
+| Entity embeddings, MLP, pooling | 283,520 |
+| Globals encoder | 4,864 |
+| State encoder | 295,552 |
+| Autoregressive context and discrete heads | 612,973 |
+| Spatial head | 6,905 |
+| Entity pointer | 49,537 |
+
+The spatial head conditions the retained 96×96 feature map on verb and prototype
+embeddings through FiLM and decodes one Q value per exact tile; it is never masked.
+The pointer head scores each live entity embedding against the action context.
+Categorical entity fields (type, recipe, item, fluid) go through embeddings rather than
+being read as ordered floats.
+
+**Learner**: double DQN, target network every 2000 updates, proportional PER
+(alpha 0.6, beta 0.4→1.0), Huber loss, AdamW at 2e-4, batch 128, grad clip 10,
+per-head epsilon-greedy exploration (never a uniformly random complete tuple).
 
 ## 4. M3 performance
 
-_To be filled from `tests/benchmarks/smarq_throughput.py`._
+Two numbers dominated every decision tonight.
+
+**Learner throughput.** The first working learner computed its targets and its
+autoregressive chain with a Python loop over the batch: **0.40 updates/second** on MPS
+at batch 128, raster 96, 2048 entity slots — 51 sample-gradients per second, which would
+have wasted the night. Vectorizing the batch (one batched online forward and one target
+forward, per-head argmax as tensor ops) cut the per-update accelerator dispatches from
+782 to 18 and gave **2.93 updates/second** measured through the real training loop on
+MPS — 7.3× faster, 375 sample-gradients per second. That is the rate the runs below
+actually used.
+
+**Replay memory.** The first implementation stored 1.07 MiB per transition, so the
+nominal 500k capacity from the brief would have needed 521 GiB and even 20k would have
+needed 20.8 GiB on a 36 GiB host that already gives 12.8 GiB to Docker. Storing only
+live entity rows, bit-packing the binary raster channels, and quantizing the grid to
+uint8 with a per-channel affine plus light zlib brought it to **~26 KB per transition**
+(25,924 bytes at 2048 entity slots in an early state), a 40× reduction, with a default
+capacity of 30,000 costing about 2.7 GiB. The brief's 500k is simply not reachable on
+this machine at this observation size, and that is now measured rather than assumed.
+
+**Consequence for the replay ratio.** Environment collection runs at roughly 2.5 semantic
+decisions per wall second per worker; the learner sustains 2.9 updates per wall second
+shared across a run. A replay ratio of 4 would therefore throttle collection to under
+one decision per second and the runs would see five episodes all night. The runs use
+**ratio 0.5** — the highest rate that does not starve the environment, as the brief asks.
 
 ## 5. Toy results
 
