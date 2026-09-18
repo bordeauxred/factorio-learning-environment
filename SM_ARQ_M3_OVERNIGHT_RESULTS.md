@@ -305,14 +305,26 @@ game's message catalogue rather than on substrings.
 
 ### Exploration is the binding constraint, and it is quantifiable
 
-The chain to first automated reward is: hop toward ore (one MOVE_TO), select PLACE,
-select `burner-mining-drill` from 87 placeable prototypes, select one of a few hundred
-ore tiles out of 9,216 positions, then INSERT coal into that specific entity. Under
-uniform per-head exploration the placement alone is roughly
-(1/11)·(1/87)·(300/9216) ≈ 3·10⁻⁵ per decision, and it still has to be followed by the
-right INSERT. At the measured ~1.4 decisions per wall second, a scratch run of a few
-hours is not expected to stumble into it. That is the honest prior for FULL-1, and it is
-the reason FULL-2 seeds replay with demonstrations of exactly that chain.
+The chain to first automated reward has two links, and on the fixed environment both can
+now be priced from measured behaviour.
+
+**Link one, place a drill on ore:** select PLACE (1 of 11 verbs), select
+`burner-mining-drill` (1 of 87 placeable prototypes), select an ore tile (a few hundred of
+9,216 positions). That is roughly (1/11)·(1/87)·(300/9216) ~ 3·10⁻⁵ per decision.
+
+**Link two, fuel it:** select INSERT (1 of 11), point at that drill rather than any other
+live entity, select `coal` **from a 143-item head**, and choose a quantity (1 of 7). Even
+with only a handful of entities on the map that is on the order of 10⁻⁵ to 10⁻⁶.
+
+The measured INSERT failures confirm the second link empirically: 33 of 36 attempts
+failed with "No <item> to insert from your inventory" - the policy naming one of the 129
+items it does not carry. Nothing is wrong there; the brief explicitly forbids masking by
+inventory, and the agent is supposed to learn which items it has. But the joint
+probability of stumbling on both links under uniform per-head exploration is around
+10⁻¹⁰ per decision pair, and no run of a few thousand decisions will find it by chance.
+
+This is the central quantitative result of the night, and it is what makes demonstrations
+or a curriculum a requirement rather than an optimisation.
 
 ### The "automated gains" are not automation
 
