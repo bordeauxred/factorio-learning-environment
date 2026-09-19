@@ -46,6 +46,8 @@ local DISCOVERY_EVERY = 32 -- reconcile passes between untracked-entity sweeps
 local MAX_BUF = 50000 -- records; overflow => client full_sync
 
 local WATER_TILES = { "water", "deepwater", "water-green", "deepwater-green" }
+local buildability = require("observation_buildability")
+local minimap = require("observation_minimap")
 
 local function state()
   local s = storage.obs_diff
@@ -160,6 +162,8 @@ local function rich_row(e)
 end
 
 local function upsert(e)
+  minimap.entity(e)
+  buildability.invalidate_entity(e)
   if not (e and e.valid and e.unit_number) then return end
   local s = state()
   local key = e.unit_number
@@ -173,6 +177,11 @@ end
 
 local function remove_key(s, key)
   if s.cache[key] == nil then return end
+  -- Invalid references cannot provide their old footprint: invalidate safely.
+  local e = s.ents[key]
+  if e and e.valid then buildability.invalidate_entity(e)
+  else buildability.invalidate_all() end
+  buildability.forget(key)
   s.cache[key] = nil
   s.ents[key] = nil
   push_e(s, "r" .. key)
@@ -242,6 +251,8 @@ end
 local ev = defines.events
 
 script.on_event(ev.on_chunk_generated, function(event)
+  minimap.invalidate_area(event.surface.index, event.area)
+  buildability.invalidate_area(event.surface.index, event.area)
   local s = state()
   encode_chunk(event.surface, event.position.x, event.position.y, event.area,
     function(rec) push_t(s, rec) end)
@@ -259,6 +270,9 @@ local function handle_removal(event)
   if not (e and e.valid) then return end
   local s = state()
   local t = e.type
+  minimap.entity(e)
+  buildability.invalidate_entity(e)
+  buildability.forget(e.unit_number)
   if t == "tree" or t == "simple-entity" or t == "cliff" then
     push_t(s, "x" .. pos_key(e.position))
   elseif e.unit_number then
@@ -277,9 +291,18 @@ end
 script.on_event(ev.on_resource_depleted, function(event)
   local e = event.entity
   if e and e.valid then
+    minimap.entity(e)
+    buildability.invalidate_entity(e)
     push_t(state(), "d" .. pos_key(e.position))
   end
 end)
+
+for _, id in pairs({ev.on_player_built_tile, ev.on_robot_built_tile,
+    ev.on_player_mined_tile, ev.on_robot_mined_tile, ev.script_raised_set_tiles}) do
+  script.on_event(id, function(event) buildability.tiles(event) minimap.tiles(event) end)
+end
+
+script.on_event(ev.on_chunk_charted, minimap.chart)
 
 script.on_event(ev.on_research_finished, function(event)
   push_e(state(), "q" .. event.research.name)
@@ -318,6 +341,7 @@ script.on_nth_tick(RECONCILE_INTERVAL, function()
       if not e.valid then
         remove_key(s, key)
       else
+        buildability.reconcile_entity(e)
         local row, sig = rich_row(e)
         if s.cache[key] ~= sig then
           s.cache[key] = sig
@@ -346,6 +370,7 @@ script.on_nth_tick(RECONCILE_INTERVAL, function()
       if not found[key] then
         rc.cache[key] = nil
         push_t(s, "d" .. key)
+        buildability.invalidate_area(surface.index, rc.area)
       end
     end
   end
@@ -388,6 +413,25 @@ function obs_diff_touch(e)
   upsert(e)
 end
 
+function obs_minimap_configure(options) minimap.configure(options) end
+function obs_minimap_invalidate() minimap.invalidate_all() end
+function obs_minimap_drain() header() rcon.print(minimap.drain()) end
+function obs_minimap_full_sync() header() minimap.full_sync() rcon.print(minimap.drain()) end
+
+function obs_buildability_configure(options)
+  buildability.configure(options)
+end
+
+function obs_buildability_invalidate()
+  -- Explicit hook for eventless scripts, fluid edits and bulk world restores.
+  buildability.invalidate_all()
+end
+
+function obs_buildability_full_sync()
+  buildability.full_sync()
+  rcon.print(buildability.drain())
+end
+
 function obs_diff_drain()
   local s = state()
   if s.ebuf_n == 0 then
@@ -424,6 +468,10 @@ function obs_all_drain()
     s.tbuf = {}
     s.tbuf_n = 0
   end
+  local b = buildability.drain()
+  if b ~= "" then t = t == "" and b or (t .. ";" .. b) end
+  local m = minimap.drain()
+  if m ~= "" then t = t == "" and m or (t .. ";" .. m) end
   rcon.print(e .. "~" .. t)
 end
 

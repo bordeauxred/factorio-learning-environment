@@ -37,6 +37,8 @@ from pathlib import Path
 
 import numpy as np
 from factorio_rcon import RCONClient
+from fle.commons.observation.buildability import BuildabilityCache
+from fle.commons.observation.minimap import MinimapCache
 
 sys.path.insert(0, str(Path(__file__).parent))
 from benchmark_tiered_obs import TieredClient  # noqa: E402
@@ -111,6 +113,8 @@ class TensorClient(TieredClient):
         self._vocab = {}  # "kind:name" -> stable int id (session-scoped, >0)
         self.center_x = 0  # grid window center, CELL-quantized world coords
         self.center_y = 0
+        self.buildability = BuildabilityCache()
+        self.minimap = MinimapCache()
 
     def _cell_of(self, x, y):
         gx = int((x - self.center_x + HALF) // CELL)
@@ -122,8 +126,13 @@ class TensorClient(TieredClient):
     def _maybe_recenter(self):
         """Recenter the grid on the player once they leave the dead zone.
         Only grid contributions rebuild - table slots stay stable."""
-        if (abs(self.player_x - self.center_x) <= RECENTER_DEADZONE
-                and abs(self.player_y - self.center_y) <= RECENTER_DEADZONE):
+        if self.buildability.size == GRID * CELL:
+            # Full-resolution channels and context share the server's viewport.
+            return
+        if (
+            abs(self.player_x - self.center_x) <= RECENTER_DEADZONE
+            and abs(self.player_y - self.center_y) <= RECENTER_DEADZONE
+        ):
             return
         self.center_x = CELL * round(self.player_x / CELL)
         self.center_y = CELL * round(self.player_y / CELL)
@@ -203,15 +212,19 @@ class TensorClient(TieredClient):
         gx, gy = cell
         angle = p["direction"] / 16.0 * 2.0 * math.pi
         total_items = sum(c for _, _, c in p["items"])
-        return gy, gx, {
-            ENTITY_CHANNEL.get(p["name"], OTHER_CHANNEL): 1.0,
-            C_STATUS: p["status"] / 10.0,
-            C_SIN: math.sin(angle),
-            C_COS: math.cos(angle),
-            C_ENERGY: p["energy"] / 1e6,
-            C_PROGRESS: p["progress"] / 100.0,
-            C_INV: math.log2(1.0 + total_items),
-        }
+        return (
+            gy,
+            gx,
+            {
+                ENTITY_CHANNEL.get(p["name"], OTHER_CHANNEL): 1.0,
+                C_STATUS: p["status"] / 10.0,
+                C_SIN: math.sin(angle),
+                C_COS: math.cos(angle),
+                C_ENERGY: p["energy"] / 1e6,
+                C_PROGRESS: p["progress"] / 100.0,
+                C_INV: math.log2(1.0 + total_items),
+            },
+        )
 
     # -- entity table --------------------------------------------------------
 
@@ -323,8 +336,9 @@ class TensorClient(TieredClient):
                 self.grid[C_WATER, gy, gx] -= count
         if not hexmask:
             return
-        rows = np.array([int(hexmask[i * 8:(i + 1) * 8], 16) for i in range(32)],
-                        dtype=np.uint32)
+        rows = np.array(
+            [int(hexmask[i * 8 : (i + 1) * 8], 16) for i in range(32)], dtype=np.uint32
+        )
         tile_mask = (rows[:, None] >> np.arange(32, dtype=np.uint32)[None, :]) & 1
         dy, dx = np.nonzero(tile_mask)
         wx = cx * 32 + dx - self.center_x + HALF
@@ -363,6 +377,15 @@ class TensorClient(TieredClient):
             return 0
         records = resp.split(";")
         for rec in records:
+            if self.minimap.apply_record(rec):
+                continue
+            if self.buildability.apply_record(rec):
+                if rec.startswith("B") and self.buildability.size == GRID * CELL:
+                    cx, cy = (v + HALF for v in self.buildability.origin)
+                    if (cx, cy) != (self.center_x, self.center_y):
+                        self.center_x, self.center_y = cx, cy
+                        self._rebuild_grid()
+                continue
             tag = rec[:1]
             if tag == "c":
                 cx, cy, hexmask = rec[1:].split(":", 2)
@@ -434,7 +457,7 @@ class TensorClient(TieredClient):
         g[8] = self.player_x
         g[9] = self.player_y
 
-    def observation(self):
+    def observation(self, include_buildability=False, include_minimap=False):
         """Observation views for an MLP/transformer policy: (flat grid,
         global vec, K-nearest entity view, view mask).
 
@@ -465,7 +488,14 @@ class TensorClient(TieredClient):
             self.view_units = [self._unit_at[int(s)] for s in chosen]
         else:
             self.view_units = []
-        return self.grid.reshape(-1), self.global_vec, view, view_mask
+        result = (self.grid.reshape(-1), self.global_vec, view, view_mask)
+        if include_buildability:
+            # Separate tile-resolution grid; unknown=-1, blocked=0, legal=1.
+            # Sample timestamps have one entry per 8x8 tile block.
+            result = (*result, self.buildability.observation(self.tick))
+        if include_minimap:
+            result = (*result, self.minimap.observation())
+        return result
 
     def _rebuild_grid(self):
         """Rebuild grid contributions for the current window center. Table
@@ -516,18 +546,33 @@ class TensorClient(TieredClient):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=27099)
+    ap.add_argument(
+        "--buildability",
+        action="store_true",
+        help="Progressively cache 63 tile-resolution placement channels",
+    )
+    ap.add_argument(
+        "--buildability-budget",
+        type=int,
+        default=256,
+        help="Maximum placement checks per poll (multiple of 128)",
+    )
     args = ap.parse_args()
 
     rc = RCONClient("localhost", args.port, "factorio")
     rc.connect()
     rc.send_command("/sc game.speed = 10")
     client = TensorClient()
+    if args.buildability:
+        client.buildability.configure(rc, check_budget=args.buildability_budget)
 
     flat, gvec, table, mask = client.observation()
     total = flat.size + gvec.size + table.size + mask.size
     total_kb = (flat.nbytes + gvec.nbytes + table.nbytes + mask.nbytes) / 1024
-    print(f"tensor: grid {client.grid.shape} + global {gvec.shape} + "
-          f"table {table.shape} + mask {mask.shape} = {total} float32 ({total_kb:.0f} KB)\n")
+    print(
+        f"tensor: grid {client.grid.shape} + global {gvec.shape} + "
+        f"table {table.shape} + mask {mask.shape} = {total} float32 ({total_kb:.0f} KB)\n"
+    )
 
     # --- 1. initial sync: terrain burst + entity snapshot -> tensor ---
     t0 = time.perf_counter()
@@ -540,8 +585,11 @@ def main():
     n_t = client.apply_terrain(resp_t)
     n_e = client.apply_entity(resp_e)
     t_apply = (time.perf_counter() - t0) * 1000
-    print(f"initial sync: {n_t + n_e} records ({(len(resp_t) + len(resp_e)) / 1024:.0f} KB); "
-          f"rcon {t_rcon:.0f} ms + apply-to-tensor {t_apply:.0f} ms", flush=True)
+    print(
+        f"initial sync: {n_t + n_e} records ({(len(resp_t) + len(resp_e)) / 1024:.0f} KB); "
+        f"rcon {t_rcon:.0f} ms + apply-to-tensor {t_apply:.0f} ms",
+        flush=True,
+    )
 
     # --- 2. spawn factory + make it hot ---
     SPAWN = """
@@ -568,7 +616,9 @@ def main():
     client.apply_entity(epart)
     client.apply_terrain(tpart)
     t = (time.perf_counter() - t0) * 1000
-    print(f"spawned {spawned} + fueled furnaces -> burst applied to tensor in {t:.1f} ms")
+    print(
+        f"spawned {spawned} + fueled furnaces -> burst applied to tensor in {t:.1f} ms"
+    )
 
     # --- 3. end-to-end steady-state: drain -> reconcile -> tensor ---
     t_rcons, t_applies, sizes = [], [], []
@@ -589,19 +639,27 @@ def main():
 
     for _ in range(3):
         e2e_poll()
-    t_rcons.clear(); t_applies.clear(); sizes.clear()
+    t_rcons.clear()
+    t_applies.clear()
+    sizes.clear()
     totals = [e2e_poll() for _ in range(30)]
-    print(f"\nE2E poll (hot factory): mean {statistics.mean(totals):.1f} ms  "
-          f"p50 {statistics.median(totals):.1f}  min {min(totals):.1f}  max {max(totals):.1f}"
-          f"  -> {1000 / statistics.mean(totals):.0f} obs/s")
-    print(f"  breakdown p50: rcon {statistics.median(t_rcons):.2f} ms, "
-          f"reconcile+tensor {statistics.median(t_applies):.3f} ms "
-          f"(payload p50 {statistics.median(sizes):.0f} B)")
+    print(
+        f"\nE2E poll (hot factory): mean {statistics.mean(totals):.1f} ms  "
+        f"p50 {statistics.median(totals):.1f}  min {min(totals):.1f}  max {max(totals):.1f}"
+        f"  -> {1000 / statistics.mean(totals):.0f} obs/s"
+    )
+    print(
+        f"  breakdown p50: rcon {statistics.median(t_rcons):.2f} ms, "
+        f"reconcile+tensor {statistics.median(t_applies):.3f} ms "
+        f"(payload p50 {statistics.median(sizes):.0f} B)"
+    )
 
     # --- 3b. egocentric tracking: stationary, walking, sprinting ---
-    rc.send_command("""/sc if #game.surfaces[1].find_entities_filtered{type = "character"} == 0 then
+    rc.send_command(
+        """/sc if #game.surfaces[1].find_entities_filtered{type = "character"} == 0 then
     game.surfaces[1].create_entity{name = "character", position = {-100, -100}, force = "player", raise_built = true}
-end rcon.print(1)""".strip())
+end rcon.print(1)""".strip()
+    )
 
     def measure_moving(step_tiles, label, iters=30):
         totals, recenters = [], 0
@@ -609,8 +667,9 @@ end rcon.print(1)""".strip())
         for _ in range(iters):
             if step_tiles:
                 rc.send_command(
-                    "/sc local ch = game.surfaces[1].find_entities_filtered{type = \"character\"}[1] "
-                    f"ch.teleport({{ch.position.x + {step_tiles}, ch.position.y}}) rcon.print(1)")
+                    '/sc local ch = game.surfaces[1].find_entities_filtered{type = "character"}[1] '
+                    f"ch.teleport({{ch.position.x + {step_tiles}, ch.position.y}}) rcon.print(1)"
+                )
             t0 = time.perf_counter()
             resp = rc.send_command("/sc obs_all_drain()") or ""
             epart, _, tpart = resp.partition("~")
@@ -622,9 +681,12 @@ end rcon.print(1)""".strip())
             if center != last_center:
                 recenters += 1
                 last_center = center
-        print(f"  {label:26s} mean {statistics.mean(totals):6.1f} ms  "
-              f"p50 {statistics.median(totals):6.1f}  max {max(totals):6.1f}  "
-              f"({recenters} recenters/{iters} polls)", flush=True)
+        print(
+            f"  {label:26s} mean {statistics.mean(totals):6.1f} ms  "
+            f"p50 {statistics.median(totals):6.1f}  max {max(totals):6.1f}  "
+            f"({recenters} recenters/{iters} polls)",
+            flush=True,
+        )
 
     print("\negocentric tracking (poll incl. drain + apply + observation()):")
     measure_moving(0, "stationary player")
@@ -636,8 +698,10 @@ end rcon.print(1)""".strip())
         t0 = time.perf_counter()
         _ = client.observation()
         ts.append((time.perf_counter() - t0) * 1000)
-    print(f"  observation() view alone   mean {statistics.mean(ts):6.2f} ms  "
-          f"p50 {statistics.median(ts):6.2f} (table copy + relativize)")
+    print(
+        f"  observation() view alone   mean {statistics.mean(ts):6.2f} ms  "
+        f"p50 {statistics.median(ts):6.2f} (table copy + relativize)"
+    )
 
     # --- 4. full rebuild (recenter / recovery path) ---
     ts = []
@@ -645,12 +709,16 @@ end rcon.print(1)""".strip())
         t0 = time.perf_counter()
         client.rebuild()
         ts.append((time.perf_counter() - t0) * 1000)
-    print(f"\nfull tensor rebuild: mean {statistics.mean(ts):.1f} ms  p50 {statistics.median(ts):.1f} ms "
-          f"(from {len(client.entities)} entities, {len(client.ores)} ores, {len(client.trees)} trees)")
+    print(
+        f"\nfull tensor rebuild: mean {statistics.mean(ts):.1f} ms  p50 {statistics.median(ts):.1f} ms "
+        f"(from {len(client.entities)} entities, {len(client.ores)} ores, {len(client.trees)} trees)"
+    )
 
     # --- 5. sanity checks (bring the player back to the factory first) ---
-    rc.send_command("/sc local ch = game.surfaces[1].find_entities_filtered{type = \"character\"}[1] "
-                    "if ch then ch.teleport({0, 0}) end rcon.print(1)")
+    rc.send_command(
+        '/sc local ch = game.surfaces[1].find_entities_filtered{type = "character"}[1] '
+        "if ch then ch.teleport({0, 0}) end rcon.print(1)"
+    )
     time.sleep(0.2)
     resp = rc.send_command("/sc obs_all_drain()") or ""
     epart, _, tpart = resp.partition("~")
@@ -659,14 +727,20 @@ end rcon.print(1)""".strip())
     grid = client.grid
     n_in_window = sum(1 for c in client._contrib.values())
     type_sum = float(grid[0:6].sum())
-    print(f"\nsanity: entity-channel sum {type_sum:.0f} vs tracked-in-window {n_in_window}"
-          f" | ore cells {int((grid[C_ORE] > 0).sum())}, tree cells {int((grid[C_TREE] > 0).sum())},"
-          f" water cells {int((grid[C_WATER] > 0).sum())}")
-    print(f"nonzero grid values: {int((grid != 0).sum())}/{grid.size} "
-          f"({100 * (grid != 0).sum() / grid.size:.1f}%)")
+    print(
+        f"\nsanity: entity-channel sum {type_sum:.0f} vs tracked-in-window {n_in_window}"
+        f" | ore cells {int((grid[C_ORE] > 0).sum())}, tree cells {int((grid[C_TREE] > 0).sum())},"
+        f" water cells {int((grid[C_WATER] > 0).sum())}"
+    )
+    print(
+        f"nonzero grid values: {int((grid != 0).sum())}/{grid.size} "
+        f"({100 * (grid != 0).sum() / grid.size:.1f}%)"
+    )
     n_slots = int(client.table_mask.sum())
-    print(f"entity table: {n_slots}/{TABLE_ROWS} slots occupied, "
-          f"vocab size {len(client._vocab)}")
+    print(
+        f"entity table: {n_slots}/{TABLE_ROWS} slots occupied, "
+        f"vocab size {len(client._vocab)}"
+    )
     assert type_sum == n_in_window, "entity channel counts drifted from contrib map"
     assert n_slots == len(client.entities), "table occupancy drifted from entity dict"
     print("PASS: incremental tensor consistent")
