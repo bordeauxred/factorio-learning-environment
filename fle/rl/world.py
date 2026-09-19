@@ -7,6 +7,9 @@ import math
 from dataclasses import dataclass, field
 from typing import Any
 
+from fle.commons.observation.buildability import BuildabilityCache
+from fle.commons.observation.minimap import MinimapCache
+
 
 @dataclass(frozen=True)
 class EntityRow:
@@ -109,7 +112,10 @@ class OrePatch:
     _tiles: tuple[tuple[int, int], ...] = field(repr=False)
 
     def nearest_tile(self, px: float, py: float) -> tuple[int, int]:
-        return min(self._tiles, key=lambda tile: ((tile[0] - px) ** 2 + (tile[1] - py) ** 2, tile))
+        return min(
+            self._tiles,
+            key=lambda tile: ((tile[0] - px) ** 2 + (tile[1] - py) ** 2, tile),
+        )
 
 
 class WorldClient:
@@ -120,7 +126,28 @@ class WorldClient:
         self.namespace = namespace
         self._init_state()
 
+    def configure_v0_caches(
+        self,
+        rcon: Any,
+        *,
+        build_size: int = 128,
+        check_budget: int = 256,
+        minimap_chunk_budget: int = 4,
+    ) -> tuple[Any, Any]:
+        """Enable the V0 caches consumed from this client's combined drain."""
+        build_response = self.buildability.configure(
+            rcon, size=build_size, check_budget=check_budget
+        )
+        minimap_response = self.minimap.configure(
+            rcon, chunk_budget=minimap_chunk_budget, visibility="generated"
+        )
+        return build_response, minimap_response
+
     def _init_state(self) -> None:
+        if not hasattr(self, "buildability"):
+            self.buildability = BuildabilityCache()
+        if not hasattr(self, "minimap"):
+            self.minimap = MinimapCache()
         self.entities: dict[int, EntityRow] = {}
         self.water: dict[tuple[int, int], int] = {}
         self.ores: dict[tuple[int, int], tuple[str, int]] = {}
@@ -169,13 +196,17 @@ class WorldClient:
             return 0
         records = response.split(";")
         for record in records:
+            if self.minimap.apply_record(record):
+                continue
+            if self.buildability.apply_record(record):
+                continue
             tag = record[:1]
             if tag == "c":
                 cx, cy, hexmask = record[1:].split(":", 2)
                 self.water[(int(cx), int(cy))] = int(hexmask, 16) if hexmask else 0
             elif tag == "o":
-                name, x, y, bucket = record[1:].split(":")
-                self.ores[(int(x), int(y))] = (name, int(bucket))
+                name, x, y, amount = record[1:].split(":")
+                self.ores[(int(x), int(y))] = (name, int(amount))
             elif tag == "d":
                 x, y = record[1:].split(":")
                 self.ores.pop((int(x), int(y)), None)
@@ -206,7 +237,9 @@ class WorldClient:
         ``!overflow`` marker, when the incremental terrain buffer was truncated.
         """
         if self._terrain_synced and not force:
-            raise RuntimeError("obs_terrain_full_sync may only be called once per process")
+            raise RuntimeError(
+                "obs_terrain_full_sync may only be called once per process"
+            )
         response = self.rcon.send_command("/sc obs_terrain_full_sync()") or ""
         self.water.clear()
         self.ores.clear()
@@ -285,7 +318,9 @@ class WorldClient:
         """Return whether terrain for the tile's chunk is in the full cache."""
         return (math.floor(x / 32), math.floor(y / 32)) in self.water
 
-    def known_cells(self, px: float, py: float, radius: float = 64) -> list[tuple[float, float]]:
+    def known_cells(
+        self, px: float, py: float, radius: float = 64
+    ) -> list[tuple[float, float]]:
         cells: list[tuple[float, float]] = []
         min_cell_x = math.floor((px - radius) / 4)
         max_cell_x = math.floor((px + radius) / 4)
@@ -297,7 +332,9 @@ class WorldClient:
                 if math.hypot(x - px, y - py) > radius:
                     continue
                 chunk = (math.floor(x / 32), math.floor(y / 32))
-                if chunk in self.water and not self.is_water(math.floor(x), math.floor(y)):
+                if chunk in self.water and not self.is_water(
+                    math.floor(x), math.floor(y)
+                ):
                     cells.append((x, y))
         return cells
 
@@ -308,7 +345,9 @@ class WorldClient:
         try:
             return json.loads(response)
         except json.JSONDecodeError as exc:
-            raise RuntimeError(f"RCON JSON read returned invalid JSON: {response[:200]}") from exc
+            raise RuntimeError(
+                f"RCON JSON read returned invalid JSON: {response[:200]}"
+            ) from exc
 
     def read_reach(self) -> dict[str, float]:
         return self._read_json(
@@ -324,9 +363,7 @@ class WorldClient:
         return float(result["x"]), float(result["y"])
 
     def read_tick(self) -> int:
-        result = self._read_json(
-            "rcon.print(helpers.table_to_json({tick=game.tick}))"
-        )
+        result = self._read_json("rcon.print(helpers.table_to_json({tick=game.tick}))")
         return int(result["tick"])
 
     def read_current_research(self) -> str | None:

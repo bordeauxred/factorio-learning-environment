@@ -76,9 +76,28 @@ def observation_masks(obs: torch.Tensor) -> dict[str, torch.Tensor]:
     return {head: obs[..., a:b] > 0.5 for head, (a, b) in S.MASK_OFFSETS.items()}
 
 
-def masked_argmax(values: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
-    """Argmax over admitted indices, returning zero for an empty mask."""
-    return values.masked_fill(~mask.bool(), MASKED_VALUE).argmax(dim=-1)
+def masked_argmax(
+    values: torch.Tensor,
+    mask: torch.Tensor,
+    *,
+    empty_value: int | None = None,
+) -> torch.Tensor:
+    """Argmax over admitted indices without inventing an action for empty rows.
+
+    The old implementation silently returned index zero when a row contained no
+    admitted action.  That turns an invalid grammar branch into a superficially
+    valid action.  Callers which intentionally probe branch feasibility may ask
+    for an explicit sentinel; normal callers fail loudly.
+    """
+    admitted = mask.bool()
+    empty = ~admitted.any(dim=-1)
+    if empty_value is None and empty.any():
+        rows = empty.nonzero(as_tuple=False).flatten().tolist()
+        raise ValueError(f"masked_argmax received all-zero mask rows: {rows}")
+    selected = values.masked_fill(~admitted, MASKED_VALUE).argmax(dim=-1)
+    if empty_value is not None:
+        selected = selected.masked_fill(empty, empty_value)
+    return selected
 
 
 class RowEncoder(nn.Module):
@@ -154,7 +173,12 @@ class ObservationEncoder(nn.Module):
             -1, len(S.GRID_CHANNELS), S.GRID_SIDE, S.GRID_SIDE
         )
         encoded = torch.cat(
-            (self.dense(dense), self.targets(targets), self.entities(entities), self.grid(grid)),
+            (
+                self.dense(dense),
+                self.targets(targets),
+                self.entities(entities),
+                self.grid(grid),
+            ),
             dim=-1,
         )
         return self.trunk(encoded)
@@ -171,7 +195,9 @@ class BranchingDQN(nn.Module):
             {head: nn.Linear(512, S.HEAD_SIZES[head]) for head in S.HEADS}
         )
 
-    def forward(self, obs: torch.Tensor) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    def forward(
+        self, obs: torch.Tensor
+    ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
         hidden = self.encoder(obs.float())
         value = self.value(hidden).squeeze(-1)
         advantages = {}
@@ -191,7 +217,9 @@ class DuelingHead(nn.Module):
             {head: nn.Linear(512, S.HEAD_SIZES[head]) for head in S.HEADS}
         )
 
-    def forward(self, hidden: torch.Tensor) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    def forward(
+        self, hidden: torch.Tensor
+    ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
         value = self.value(hidden).squeeze(-1)
         advantages = {}
         for name, layer in self.advantages.items():
@@ -241,7 +269,8 @@ class BootstrappedDQN(nn.Module):
                 (
                     value + self.prior_scale * prior_value,
                     {
-                        name: advantages[name] + self.prior_scale * prior_advantages[name]
+                        name: advantages[name]
+                        + self.prior_scale * prior_advantages[name]
                         for name in S.HEADS
                     },
                 )
@@ -263,9 +292,7 @@ class NoisyLinear(nn.Module):
         self.weight_sigma = nn.Parameter(torch.empty(out_features, in_features))
         self.bias_mu = nn.Parameter(torch.empty(out_features))
         self.bias_sigma = nn.Parameter(torch.empty(out_features))
-        self.register_buffer(
-            "weight_epsilon", torch.empty(out_features, in_features)
-        )
+        self.register_buffer("weight_epsilon", torch.empty(out_features, in_features))
         self.register_buffer("bias_epsilon", torch.empty(out_features))
         self.noise_enabled = True
         self.reset_parameters()
@@ -318,13 +345,12 @@ class NoisyBranchingDQN(nn.Module):
         self.encoder = NoisyObservationEncoder()
         self.value = NoisyLinear(512, 1)
         self.advantages = nn.ModuleDict(
-            {
-                head: NoisyLinear(512, S.HEAD_SIZES[head])
-                for head in S.HEADS
-            }
+            {head: NoisyLinear(512, S.HEAD_SIZES[head]) for head in S.HEADS}
         )
 
-    def forward(self, obs: torch.Tensor) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    def forward(
+        self, obs: torch.Tensor
+    ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
         hidden = self.encoder(obs.float())
         value = self.value(hidden).squeeze(-1)
         advantages = {}
@@ -363,9 +389,7 @@ class QuantileOutputLayer(nn.Module):
         mean = self.mean_layer(inputs).unsqueeze(-1)
         if self.num_quantiles == 1:
             return mean
-        factors = self.residual_layer(inputs).reshape(
-            -1, self.out_features, self.rank
-        )
+        factors = self.residual_layer(inputs).reshape(-1, self.out_features, self.rank)
         residual = torch.einsum("bar,rq->baq", factors, self.quantile_basis)
         residual = residual - residual.mean(dim=-1, keepdim=True)
         return mean + residual
@@ -389,14 +413,14 @@ class QuantileBranchingDQN(nn.Module):
         self.value = QuantileOutputLayer(512, 1, num_quantiles, noisy)
         self.advantages = nn.ModuleDict(
             {
-                head: QuantileOutputLayer(
-                    512, S.HEAD_SIZES[head], num_quantiles, noisy
-                )
+                head: QuantileOutputLayer(512, S.HEAD_SIZES[head], num_quantiles, noisy)
                 for head in S.HEADS
             }
         )
 
-    def forward(self, obs: torch.Tensor) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    def forward(
+        self, obs: torch.Tensor
+    ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
         hidden = self.encoder(obs.float())
         value = self.value(hidden).squeeze(1)
         advantages = {}
@@ -439,6 +463,7 @@ def noisy_sigma_means(network: nn.Module) -> dict[str, float] | None:
     trunk = network.encoder.trunk[0]
     if isinstance(trunk, NoisyLinear):
         result["trunk"] = float(trunk.weight_sigma.detach().abs().mean())
+
     def sigma_mean(module: nn.Module) -> float | None:
         sigmas = [
             child.weight_sigma.detach().abs().mean()
@@ -504,9 +529,7 @@ def complete_action_quantiles(
         for head in S.OP_HEADS[op_name]:
             column = S.HEADS.index(head)
             head_actions = actions[selected, column]
-            selected_rows = torch.arange(
-                len(head_actions), device=actions.device
-            )
+            selected_rows = torch.arange(len(head_actions), device=actions.device)
             per_head.append(advantages[head][selected][selected_rows, head_actions])
         argument_advantage[selected] = torch.stack(per_head).mean(dim=0)
     return value + op_advantage + argument_advantage
@@ -535,22 +558,37 @@ def greedy_actions_from_outputs(
     masks: dict[str, torch.Tensor],
 ) -> torch.Tensor:
     """Maximize the complete action Q while respecting every branch mask."""
+    # Legacy observations deliberately leave irrelevant argument heads empty.
+    # Keep that representation explicit, then reject operations whose required
+    # argument domain is empty.
+    selected_by_head = {
+        head: masked_argmax(advantages[head], masks[head], empty_value=-1)
+        for head in S.HEADS
+    }
     actions = torch.stack(
-        [masked_argmax(advantages[head], masks[head]) for head in S.HEADS], dim=1
+        [selected_by_head[head].clamp_min(0) for head in S.HEADS], dim=1
     )
     op_scores = []
+    op_viability = []
     for op_index, op_name in enumerate(S.OPS):
         active_maxima = []
+        viable = torch.ones(value.shape[0], dtype=torch.bool, device=value.device)
         for head in S.OP_HEADS[op_name]:
             selected = actions[:, S.HEADS.index(head)]
-            active_maxima.append(advantages[head].gather(1, selected[:, None]).squeeze(1))
-        op_scores.append(
+            viable &= selected_by_head[head] >= 0
+            active_maxima.append(
+                advantages[head].gather(1, selected[:, None]).squeeze(1)
+            )
+        score = (
             value
             + advantages["op"][:, op_index]
             + torch.stack(active_maxima).mean(dim=0)
         )
+        op_scores.append(score.masked_fill(~viable, MASKED_VALUE))
+        op_viability.append(viable)
     scores = torch.stack(op_scores, dim=1)
-    actions[:, S.HEADS.index("op")] = masked_argmax(scores, masks["op"])
+    effective_op_mask = masks["op"].bool() & torch.stack(op_viability, dim=1)
+    actions[:, S.HEADS.index("op")] = masked_argmax(scores, effective_op_mask)
     return actions
 
 
@@ -600,7 +638,9 @@ def averaged_bootstrap_outputs(
     """Average complete dueling outputs across bootstrap heads for evaluation."""
     values = torch.stack([value for value, _ in outputs]).mean(dim=0)
     advantages = {
-        name: torch.stack([head_advantages[name] for _, head_advantages in outputs]).mean(dim=0)
+        name: torch.stack(
+            [head_advantages[name] for _, head_advantages in outputs]
+        ).mean(dim=0)
         for name in S.HEADS
     }
     return values, advantages
@@ -621,7 +661,10 @@ def bootstrapped_actions(
         masks = observation_masks(tensor)
         outputs = network(tensor)
         per_head_actions = torch.stack(
-            [greedy_actions_from_outputs(value, advantages, masks) for value, advantages in outputs]
+            [
+                greedy_actions_from_outputs(value, advantages, masks)
+                for value, advantages in outputs
+            ]
         )
         row_indices = torch.arange(len(obs), device=device)
         head_indices = torch.as_tensor(acting_heads, dtype=torch.long, device=device)
@@ -816,7 +859,9 @@ def pair_candidates_from_outputs(
     candidates = list(best_by_pair.values())
     q_array = np.asarray([candidate.q for candidate in candidates], dtype=np.float64)
     std = float(q_array.std())
-    z_values = (q_array - q_array.mean()) / std if std > 1e-8 else np.zeros_like(q_array)
+    z_values = (
+        (q_array - q_array.mean()) / std if std > 1e-8 else np.zeros_like(q_array)
+    )
     return [
         PairCandidate(
             candidate.action,
@@ -1022,9 +1067,7 @@ class UCBExplorer:
         if self.key_mode != "rung" or candidate.op != "CRAFT":
             return self.counts[self._key(rung, candidate)]
         prefix = (rung, candidate.op, candidate.primary_id)
-        return sum(
-            count for key, count in self.counts.items() if key[:3] == prefix
-        )
+        return sum(count for key, count in self.counts.items() if key[:3] == prefix)
 
     def reconcile_executed_quantity(
         self, diagnostic: dict, executed_quantity: int | None
@@ -1167,14 +1210,16 @@ class UCBExplorer:
             bonuses = {
                 self._key(rung, candidate): active_c
                 * np.sqrt(
-                    np.log(self.total + 1) /
-                    (self.counts[self._key(rung, candidate)] + 1)
+                    np.log(self.total + 1)
+                    / (self.counts[self._key(rung, candidate)] + 1)
                 )
                 for candidate in candidates
             }
             frontier_forced = bool(frontier_candidates)
             if frontier_forced:
-                chosen = frontier_candidates[int(rng.integers(len(frontier_candidates)))]
+                chosen = frontier_candidates[
+                    int(rng.integers(len(frontier_candidates)))
+                ]
                 action = chosen.action.copy()
                 key = self._key(rung, chosen)
                 random_floor = False
@@ -1206,8 +1251,9 @@ class UCBExplorer:
             else:
                 chosen = max(
                     candidates,
-                    key=lambda candidate: candidate.standardized_q
-                    + bonuses[self._key(rung, candidate)],
+                    key=lambda candidate: (
+                        candidate.standardized_q + bonuses[self._key(rung, candidate)]
+                    ),
                 )
                 action = chosen.action.copy()
                 key = self._key(rung, chosen)
@@ -1224,14 +1270,8 @@ class UCBExplorer:
                 and rng.random() < forced_arg_eps
             )
             if force_secondary:
-                action = sample_secondary_heads(
-                    action, obs[row], chosen.op, rng
-                )
-            if (
-                not frontier_forced
-                and pair_n_before == 0
-                and chosen.op == "PLACE"
-            ):
+                action = sample_secondary_heads(action, obs[row], chosen.op, rng)
+            if not frontier_forced and pair_n_before == 0 and chosen.op == "PLACE":
                 action = _sample_resource_place_offset(
                     action, obs[row], chosen.primary, rng
                 )
@@ -1250,10 +1290,10 @@ class UCBExplorer:
             )
             key = self._key(rung, chosen)
             n_before = self.counts[key]
-            selected_bonus = active_c * np.sqrt(
-                np.log(self.total + 1) / (n_before + 1)
+            selected_bonus = active_c * np.sqrt(np.log(self.total + 1) / (n_before + 1))
+            greedy_pair = max(
+                candidates, key=lambda candidate: candidate.standardized_q
             )
-            greedy_pair = max(candidates, key=lambda candidate: candidate.standardized_q)
             exploratory = (
                 random_floor
                 or n_before == 0
@@ -1374,7 +1414,11 @@ def action_diagnostics(
         details = action_details(observation, action)
         key = (str(details["op"]), int(details["primary_id"]))
         chosen = next(
-            (candidate for candidate in candidates if (candidate.op, candidate.primary_id) == key),
+            (
+                candidate
+                for candidate in candidates
+                if (candidate.op, candidate.primary_id) == key
+            ),
             None,
         )
         rows.append(
@@ -1450,7 +1494,9 @@ class EpisodeMilestones:
             self.reached[3] = True
         elif op == "PLACE" and primary == "burner-mining-drill":
             self.reached[4] = True
-        elif op == "INSERT" and entity_class == "mining-drill" and primary in FUEL_ITEMS:
+        elif (
+            op == "INSERT" and entity_class == "mining-drill" and primary in FUEL_ITEMS
+        ):
             self.reached[5] = True
         if step is not None:
             for index, (was_reached, is_reached) in enumerate(
@@ -1462,10 +1508,14 @@ class EpisodeMilestones:
 
     @property
     def deepest(self) -> int:
-        return max((index for index, reached in enumerate(self.reached) if reached), default=-1)
+        return max(
+            (index for index, reached in enumerate(self.reached) if reached), default=-1
+        )
 
 
-def is_new_return_frontier(previous_rung: int, current_rung: int, return_rung: int) -> bool:
+def is_new_return_frontier(
+    previous_rung: int, current_rung: int, return_rung: int
+) -> bool:
     """Whether this transition newly crossed the configured return threshold."""
     return current_rung >= return_rung and current_rung > previous_rung
 
@@ -1478,7 +1528,11 @@ def advance_frontier_force_window(
     trial_was_new: bool = False,
 ) -> int:
     """Count distinct forced trials, resetting after a new drill-or-deeper rung."""
-    if tries > 0 and current_rung > previous_rung and current_rung >= DRILL_CRAFTED_RUNG:
+    if (
+        tries > 0
+        and current_rung > previous_rung
+        and current_rung >= DRILL_CRAFTED_RUNG
+    ):
         return tries
     return max(0, remaining - int(trial_was_new))
 
@@ -1511,11 +1565,7 @@ def forced_drill_action(
     if not drill_place_admitted(obs) and not drill_recipe_admitted(obs):
         raise ValueError("burner-mining-drill PLACE and CRAFT are not admitted")
     rng = np.random.default_rng(0) if rng is None else rng
-    action = (
-        S.random_valid_action(obs, rng)
-        if base is None
-        else base.copy()
-    )
+    action = S.random_valid_action(obs, rng) if base is None else base.copy()
     if drill_place_admitted(obs):
         action[S.HEADS.index("op")] = S.OP_INDEX["PLACE"]
         action[S.HEADS.index("placeable")] = S.PLACEABLE_INDEX[DRILL_RECIPE]
@@ -1565,7 +1615,9 @@ class MilestoneArchive:
         self.top_aps = top_aps
         self.next_episode_id = 0
         self.episodes: dict[int, ArchivedEpisode] = {}
-        self.rung_ids: dict[int, list[int]] = {index: [] for index in range(len(RUNG_NAMES))}
+        self.rung_ids: dict[int, list[int]] = {
+            index: [] for index in range(len(RUNG_NAMES))
+        }
         self.top_ids: list[int] = []
         self._flat: list[tuple[int, int]] = []
         self.draw_counts: Counter[str] = Counter()
@@ -1714,7 +1766,9 @@ class MilestoneArchive:
     def _sample_frontier(
         self, batch_size: int, rng: np.random.Generator
     ) -> list[tuple[int, int]]:
-        rung_values = [episode.rung for episode in self.episodes.values() if episode.rung >= 0]
+        rung_values = [
+            episode.rung for episode in self.episodes.values() if episode.rung >= 0
+        ]
         if not rung_values:
             groups = [list(self.episodes)] * batch_size
         else:
@@ -1755,7 +1809,9 @@ class MilestoneArchive:
             else:
                 transition_index = int(rng.integers(len(episode.transitions)))
             references.append((episode_id, transition_index))
-            self.draw_counts[f"source:{'frontier_window' if use_window else 'episode_uniform'}"] += 1
+            self.draw_counts[
+                f"source:{'frontier_window' if use_window else 'episode_uniform'}"
+            ] += 1
         return references
 
     def _record_draw(
@@ -1920,7 +1976,9 @@ class NStepAccumulator:
 
     def _emit(self, length: int, *, boundary: bool = False) -> NStepTransition:
         steps = list(self.pending)[:length]
-        reward = sum((self.gamma**index) * step.reward for index, step in enumerate(steps))
+        reward = sum(
+            (self.gamma**index) * step.reward for index, step in enumerate(steps)
+        )
         last = steps[-1]
         discount = 0.0 if last.done or boundary else self.gamma**length
         first = self.pending.popleft()
@@ -2008,9 +2066,7 @@ class ReplayBuffer:
         self.actions = np.empty((capacity, len(S.HEADS)), dtype=np.int16)
         self.rewards = np.empty(capacity, dtype=np.float32)
         self.discounts = np.empty(capacity, dtype=np.float32)
-        self.bootstrap_masks = np.ones(
-            (capacity, num_bootstrap_heads), dtype=np.uint8
-        )
+        self.bootstrap_masks = np.ones((capacity, num_bootstrap_heads), dtype=np.uint8)
         self.behaviours = np.full(capacity, "unknown", dtype=object)
         self.excursions = np.zeros(capacity, dtype=bool)
         self.priorities = np.ones(capacity, dtype=np.float32)
@@ -2064,9 +2120,13 @@ class ReplayBuffer:
             weights = np.ones(batch_size, dtype=np.float64)
         return ReplayBatch(
             obs=torch.as_tensor(self.obs[indices], dtype=torch.float32, device=device),
-            actions=torch.as_tensor(self.actions[indices], dtype=torch.long, device=device),
+            actions=torch.as_tensor(
+                self.actions[indices], dtype=torch.long, device=device
+            ),
             rewards=torch.as_tensor(self.rewards[indices], device=device),
-            next_obs=torch.as_tensor(self.next_obs[indices], dtype=torch.float32, device=device),
+            next_obs=torch.as_tensor(
+                self.next_obs[indices], dtype=torch.float32, device=device
+            ),
             discounts=torch.as_tensor(self.discounts[indices], device=device),
             weights=torch.as_tensor(weights, dtype=torch.float32, device=device),
             indices=np.asarray(indices),
@@ -2205,9 +2265,13 @@ def compute_td_loss_details(
             observation_masks(batch.next_obs),
         )
         next_target_value, next_target_advantages = target(batch.next_obs)
-        next_q = complete_action_q(next_target_value, next_target_advantages, next_actions)
+        next_q = complete_action_q(
+            next_target_value, next_target_advantages, next_actions
+        )
         td_target = batch.rewards + batch.discounts * next_q
-        greedy = greedy_actions_from_outputs(value, advantages, observation_masks(batch.obs))
+        greedy = greedy_actions_from_outputs(
+            value, advantages, observation_masks(batch.obs)
+        )
         mean_max_q = complete_action_q(value, advantages, greedy).mean()
     per_sample_loss = F.smooth_l1_loss(chosen_q, td_target, reduction="none")
     weights = batch.weights
@@ -2250,9 +2314,7 @@ def compute_quantile_td_loss(
     value, advantages = online(batch.obs)
     chosen_quantiles = complete_action_quantiles(value, advantages, batch.actions)
     with torch.no_grad():
-        next_mean_value, next_mean_advantages = online.expected_forward(
-            batch.next_obs
-        )
+        next_mean_value, next_mean_advantages = online.expected_forward(batch.next_obs)
         next_actions = greedy_actions_from_outputs(
             next_mean_value,
             next_mean_advantages,
@@ -2269,17 +2331,15 @@ def compute_quantile_td_loss(
         greedy = greedy_actions_from_outputs(
             mean_value, mean_advantages, observation_masks(batch.obs)
         )
-        mean_max_q = complete_action_quantiles(
-            value, advantages, greedy
-        ).mean(dim=-1).mean()
+        mean_max_q = (
+            complete_action_quantiles(value, advantages, greedy).mean(dim=-1).mean()
+        )
     per_sample_loss = quantile_huber_loss(chosen_quantiles, target_quantiles)
     weights = batch.weights
     if weights is None:
         weights = torch.ones_like(per_sample_loss)
     loss = (weights * per_sample_loss).mean()
-    td_deltas = target_quantiles.mean(dim=-1) - chosen_quantiles.detach().mean(
-        dim=-1
-    )
+    td_deltas = target_quantiles.mean(dim=-1) - chosen_quantiles.detach().mean(dim=-1)
     return loss, mean_max_q, td_deltas
 
 
@@ -2295,7 +2355,9 @@ def compute_bootstrapped_td_loss(
         next_target_outputs = target.learned_outputs(batch.next_obs)
     if batch.bootstrap_masks is None:
         bootstrap_masks = torch.ones(
-            (len(batch.obs), online.num_heads), dtype=torch.bool, device=batch.obs.device
+            (len(batch.obs), online.num_heads),
+            dtype=torch.bool,
+            device=batch.obs.device,
         )
     else:
         bootstrap_masks = batch.bootstrap_masks
@@ -2329,7 +2391,8 @@ def compute_bootstrapped_td_loss(
         active = bootstrap_masks[:, head_index].float()
         weighted_active = weights * active
         losses.append(
-            (weighted_active * per_sample_loss).sum() / weighted_active.sum().clamp_min(1.0)
+            (weighted_active * per_sample_loss).sum()
+            / weighted_active.sum().clamp_min(1.0)
         )
         signed_errors.append(td_target - chosen_q.detach())
 
@@ -2368,7 +2431,11 @@ class ThreadVectorEnv:
         timeout_seconds: float = ENV_TIMEOUT_SECONDS,
     ):
         self.envs = [env_fn() for env_fn in env_fns]
-        self.labels = list(labels) if labels is not None else [str(i) for i in range(len(self.envs))]
+        self.labels = (
+            list(labels)
+            if labels is not None
+            else [str(i) for i in range(len(self.envs))]
+        )
         self.timeout_seconds = timeout_seconds
         self.alive = np.ones(len(self.envs), dtype=bool)
         self.dead_events: list[dict] = []
@@ -2425,7 +2492,9 @@ class ThreadVectorEnv:
             count = len(active) if count is None else min(count, len(active))
             env_indices = active[:count]
         futures = {
-            (row, int(index)): self.executor.submit(self.envs[int(index)].step, actions[row])
+            (row, int(index)): self.executor.submit(
+                self.envs[int(index)].step, actions[row]
+            )
             for row, index in enumerate(env_indices)
         }
         deadline = time.monotonic() + self.timeout_seconds
@@ -2502,7 +2571,9 @@ def linear_epsilon(
     end: float = 0.1,
     decay_steps: int | None = None,
 ) -> float:
-    duration = max(1, decay_steps if decay_steps is not None else int(total_steps * 0.3))
+    duration = max(
+        1, decay_steps if decay_steps is not None else int(total_steps * 0.3)
+    )
     fraction = min(step / duration, 1.0)
     return start + fraction * (end - start)
 
@@ -2621,7 +2692,9 @@ def evaluate_greedy(
     while not done.all():
         active = np.flatnonzero(~done)
         with torch.no_grad():
-            tensor = torch.as_tensor(observations[active], dtype=torch.float32, device=device)
+            tensor = torch.as_tensor(
+                observations[active], dtype=torch.float32, device=device
+            )
             actions = greedy_policy_actions(network, tensor).cpu().numpy()
         for row, episode in enumerate(active):
             obs, reward, terminated, truncated, _ = envs[episode].step(actions[row])
@@ -2811,7 +2884,9 @@ def _make_env_fns(args: argparse.Namespace) -> list[Callable[[], object]]:
             for index, steps in enumerate(max_steps)
         ]
     if not ports:
-        raise ValueError("--ports must name at least one RCON port unless --fake is used")
+        raise ValueError(
+            "--ports must name at least one RCON port unless --fake is used"
+        )
     from fle.rl.env import (
         FleMacroEnv,  # Lazy: importing this may load live-server clients.
     )
@@ -2839,7 +2914,9 @@ def _env_labels(args: argparse.Namespace, count: int) -> list[str]:
     ports = [port.strip() for port in args.ports.split(",") if port.strip()]
     if not ports:
         return [str(index) for index in range(count)]
-    return [ports[index] if index < len(ports) else str(index) for index in range(count)]
+    return [
+        ports[index] if index < len(ports) else str(index) for index in range(count)
+    ]
 
 
 def _behaviours_by_env(args: argparse.Namespace, count: int) -> list[str]:
@@ -2886,7 +2963,10 @@ def train(
     rng = np.random.default_rng(args.seed)
     baseline = evaluate_random(100, args.seed + 10_000) if args.fake else None
     if baseline is not None:
-        print(f"random_baseline episodes=100 mean_episode_reward={baseline:.6f}", flush=True)
+        print(
+            f"random_baseline episodes=100 mean_episode_reward={baseline:.6f}",
+            flush=True,
+        )
 
     if args.algo == "bootdqn":
         online: DQNNetwork | BootstrappedDQN = BootstrappedDQN(
@@ -3017,8 +3097,7 @@ def train(
     action_files = []
     if args.log_actions:
         action_files = [
-            (out / f"actions_{label}.jsonl").open("a", buffering=1)
-            for label in labels
+            (out / f"actions_{label}.jsonl").open("a", buffering=1) for label in labels
         ]
 
     try:
@@ -3255,9 +3334,7 @@ def train(
                 for row, env_index in enumerate(selected_envs):
                     if not force_drill_first_action[env_index]:
                         continue
-                    forced = forced_drill_action(
-                        selected_obs[row], actions[row], rng
-                    )
+                    forced = forced_drill_action(selected_obs[row], actions[row], rng)
                     if behaviours[env_index] == "ucb":
                         diagnostics[row] = explorer.replace_last_selection(
                             diagnostics[row],
@@ -3315,9 +3392,7 @@ def train(
                                     "n": diagnostic.get("n"),
                                     "N": diagnostic.get("N"),
                                     "secondary_heads_sampled": bool(
-                                        diagnostic.get(
-                                            "secondary_heads_sampled", False
-                                        )
+                                        diagnostic.get("secondary_heads_sampled", False)
                                     ),
                                     "frontier_forced": bool(
                                         diagnostic.get("frontier_forced", False)
@@ -3325,9 +3400,7 @@ def train(
                                     "admitted_pair_count": diagnostic.get(
                                         "admitted_pair_count"
                                     ),
-                                    "n0_pair_count": diagnostic.get(
-                                        "n0_pair_count"
-                                    ),
+                                    "n0_pair_count": diagnostic.get("n0_pair_count"),
                                 },
                                 sort_keys=True,
                             )
@@ -3345,9 +3418,7 @@ def train(
                     old_observation = old_observations[action_row]
                     details = action_details(old_observation, action)
                     op_column = S.HEADS.index("op")
-                    op_name = str(
-                        info.get("op", S.OPS[int(action[op_column])])
-                    )
+                    op_name = str(info.get("op", S.OPS[int(action[op_column])]))
                     status = str(info.get("status", ""))
                     behaviour = behaviours[env_index]
                     if behaviour == "ucb":
@@ -3387,36 +3458,27 @@ def train(
                     )
                     if reset_force_window:
                         frontier_force_trials[env_index].clear()
-                    frontier_force_remaining[env_index] = (
-                        advance_frontier_force_window(
-                            int(frontier_force_remaining[env_index]),
-                            previous_rung,
-                            current_rung,
-                            (
-                                args.frontier_force_tries
-                                if behaviour == "ucb"
-                                else 0
-                            ),
-                            trial_was_new=trial_was_new,
-                        )
+                    frontier_force_remaining[env_index] = advance_frontier_force_window(
+                        int(frontier_force_remaining[env_index]),
+                        previous_rung,
+                        current_rung,
+                        (args.frontier_force_tries if behaviour == "ucb" else 0),
+                        trial_was_new=trial_was_new,
                     )
-                    if (
-                        args.frontier_return
-                        and (
-                            (
-                                return_rung is not None
-                                and is_new_return_frontier(
-                                    previous_rung, current_rung, return_rung
-                                )
+                    if args.frontier_return and (
+                        (
+                            return_rung is not None
+                            and is_new_return_frontier(
+                                previous_rung, current_rung, return_rung
                             )
-                            or (
-                                args.return_rung == "drill_admitted"
-                                and status == "ok"
-                                and str(details["op"]) == "CRAFT"
-                                and str(details["primary"]) == DRILL_RECIPE
-                                and previous_rung < DRILL_CRAFTED_RUNG
-                                and current_rung >= DRILL_CRAFTED_RUNG
-                            )
+                        )
+                        or (
+                            args.return_rung == "drill_admitted"
+                            and status == "ok"
+                            and str(details["op"]) == "CRAFT"
+                            and str(details["primary"]) == DRILL_RECIPE
+                            and previous_rung < DRILL_CRAFTED_RUNG
+                            and current_rung >= DRILL_CRAFTED_RUNG
                         )
                     ):
                         try:
@@ -3605,9 +3667,7 @@ def train(
                                 try:
                                     reset_obs, reset_info = envs.reset_one(env_index)
                                 except Exception as root_exc:  # noqa: BLE001
-                                    envs._mark_dead(
-                                        env_index, "reset", repr(root_exc)
-                                    )
+                                    envs._mark_dead(env_index, "reset", repr(root_exc))
                                     continue
                                 use_frontier = False
                             observations[env_index] = reset_obs
@@ -3739,9 +3799,7 @@ def train(
                             },
                             "transition_provenance": dict(transition_provenance),
                             "per_beta": (
-                                linear_beta(
-                                    env_steps, args.total_steps, args.per_beta0
-                                )
+                                linear_beta(env_steps, args.total_steps, args.per_beta0)
                                 if args.per
                                 else None
                             ),
@@ -3769,7 +3827,9 @@ def train(
                             ),
                             "episodes": finished_since_log,
                             "op_histogram": dict(window_ops),
-                            "invalid_combination_rate": invalid / eligible if eligible else 0.0,
+                            "invalid_combination_rate": invalid / eligible
+                            if eligible
+                            else 0.0,
                             "acting_head_histogram": dict(acting_head_counts),
                             "per_head_mean_max_q": (
                                 [
@@ -3795,12 +3855,8 @@ def train(
                             "archive_draws": archive.consume_draw_counts(),
                             "root_episode_counts": {
                                 "episodes": root_episode_counts["episodes"],
-                                "drill_placed": root_episode_counts[
-                                    "drill_placed"
-                                ],
-                                "drill_fuelled": root_episode_counts[
-                                    "drill_fuelled"
-                                ],
+                                "drill_placed": root_episode_counts["drill_placed"],
+                                "drill_fuelled": root_episode_counts["drill_fuelled"],
                                 "automated_ore_produced": root_episode_counts[
                                     "automated_ore_produced"
                                 ],
@@ -3821,15 +3877,9 @@ def train(
                                 "plates": conversion_counts["plates"],
                                 "gears": conversion_counts["gears"],
                                 "drills": conversion_counts["drills"],
-                                "plates_to_gear": conversion_counts[
-                                    "plates_to_gear"
-                                ],
-                                "gear_to_drill": conversion_counts[
-                                    "gear_to_drill"
-                                ],
-                                "drill_to_placed": conversion_counts[
-                                    "drill_to_placed"
-                                ],
+                                "plates_to_gear": conversion_counts["plates_to_gear"],
+                                "gear_to_drill": conversion_counts["gear_to_drill"],
+                                "drill_to_placed": conversion_counts["drill_to_placed"],
                             },
                             "dead_envs": envs.dead_events,
                         }
@@ -3874,14 +3924,13 @@ def train(
         updates,
         explorer,
         archive,
-        {
-            label: int(behaviour_steps[index])
-            for index, label in enumerate(labels)
-        },
+        {label: int(behaviour_steps[index]) for index, label in enumerate(labels)},
         checkpoint_args=vars(args),
     )
 
-    trained = evaluate_greedy(online, 100, args.seed + 20_000, device) if args.fake else None
+    trained = (
+        evaluate_greedy(online, 100, args.seed + 20_000, device) if args.fake else None
+    )
     if baseline is not None and trained is not None:
         print(
             "acceptance "
@@ -3933,7 +3982,9 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--replay-size", type=int, default=100_000)
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--per-alpha", type=float, default=0.6)
-    parser.add_argument("--per-beta0", "--per-beta", dest="per_beta0", type=float, default=0.4)
+    parser.add_argument(
+        "--per-beta0", "--per-beta", dest="per_beta0", type=float, default=0.4
+    )
     parser.add_argument("--per-optimism", type=float, default=1.0)
     parser.add_argument("--per-episode-return-bonus", type=float, default=0.0)
     parser.add_argument("--per-priority-cap-pct", type=float)
@@ -4034,12 +4085,15 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         parser.error("--n-step and --lr must be positive")
     if not 0 <= args.gamma <= 1:
         parser.error("--gamma must be between 0 and 1")
-    if min(
-        args.target_period,
-        args.replay_size,
-        args.batch_size,
-        args.update_every,
-    ) <= 0:
+    if (
+        min(
+            args.target_period,
+            args.replay_size,
+            args.batch_size,
+            args.update_every,
+        )
+        <= 0
+    ):
         parser.error("period, replay, batch, and update sizes must be positive")
     if not 0 <= args.per_alpha <= 1 or not 0 <= args.per_beta0 <= 1:
         parser.error("PER alpha and beta must be between 0 and 1")

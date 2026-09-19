@@ -33,9 +33,15 @@ def test_manifest_and_tile_decoding():
     assert c.values[0, 0, 0] == c.values[0, 7, 7] == 1
     assert (c.values == 1).sum() == 2
     assert (c.values >= 0).sum() == 64
-    assert c.legal_mask(15, 3).sum() == 2
-    assert not c.legal_mask(16, 3).any()
-    assert not c.legal_mask(11, 3).any()
+    # Only fresh, known-blocked cells are forbidden: the sampled block holds
+    # 64 cells of which 2 are legal, and nothing outside it is ever masked.
+    blocked = c.certainly_blocked_mask(15, 3)
+    assert blocked.sum() == 62
+    assert not blocked[c.values != 0].any()
+    assert not c.certainly_blocked_mask(16, 3).any()  # stale -> allowed
+    assert not c.certainly_blocked_mask(11, 3).any()  # negative age -> allowed
+    known, age = c.freshness(15, age_scale=60)
+    assert known.sum() == 64 and age[known == 0].min() == 1.0
     assert not c.apply_record("t0:0")
     lua = (
         Path(__file__).parents[2]

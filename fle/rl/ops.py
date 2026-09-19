@@ -33,12 +33,12 @@ OPS = (
 )
 QUANTITIES_NAIVE_HARVEST = (1, 5, 20, -1)
 QUANTITIES = (1, 5, 20)
-DIRECTIONS = tuple(direction.value for direction in Direction if direction.value in {0, 4, 8, 12})
+DIRECTIONS = tuple(
+    direction.value for direction in Direction if direction.value in {0, 4, 8, 12}
+)
 CONNECTOR_NAMES = ("transport-belt", "pipe", "small-electric-pole")
 
-SMELTABLE_INSERT_ITEMS = frozenset(
-    {"iron-ore", "copper-ore", "stone", "iron-plate"}
-)
+SMELTABLE_INSERT_ITEMS = frozenset({"iron-ore", "copper-ore", "stone", "iron-plate"})
 SMELTABLE_STACK_LIMITS = {
     "iron-ore": 50,
     "copper-ore": 50,
@@ -148,7 +148,9 @@ class VocabData:
             for row in data["recipes"]
             if row.get("products")
         }
-        recipe_categories = {row["name"]: row.get("category") or "crafting" for row in data["recipes"]}
+        recipe_categories = {
+            row["name"]: row.get("category") or "crafting" for row in data["recipes"]
+        }
         recipe_ingredients = {
             row["name"]: tuple(
                 (ingredient["name"], float(ingredient["amount"]))
@@ -296,6 +298,74 @@ class AnchorResolutionError(RuntimeError):
     pass
 
 
+class EntityIdentityError(AnchorResolutionError):
+    """A position lookup returned a different entity than the requested unit."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        requested_unit_number: int | None = None,
+        mutated_unit_number: int | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.requested_unit_number = requested_unit_number
+        self.mutated_unit_number = mutated_unit_number
+
+
+def resolve_entity_by_unit(
+    namespace: Any,
+    world: WorldClient,
+    unit_number: int,
+) -> Entity:
+    """Resolve an entity without the legacy name/position identity fallback.
+
+    Agent tools still accept an ``Entity`` object rather than a unit number, so
+    the wire-protocol row supplies the lookup position.  The returned tool
+    object must carry the same Factorio unit number; a nearby same-prototype
+    entity is never an acceptable substitute.
+    """
+    requested = int(unit_number)
+    row = world.entities.get(requested)
+    if row is None:
+        raise AnchorResolutionError(
+            f"anchor_resolution_failed: unit {requested} is not live"
+        )
+    prototype = prototype_by_name.get(row.name)
+    if prototype is None:
+        candidates = namespace.get_entities(
+            position=Position(x=row.x, y=row.y), radius=0.5
+        )
+        entity = next(
+            (candidate for candidate in candidates if isinstance(candidate, Entity)),
+            None,
+        )
+    else:
+        entity = namespace.get_entity(prototype, Position(x=row.x, y=row.y))
+    if entity is None:
+        raise AnchorResolutionError(
+            f"anchor_resolution_failed: unit {requested} disappeared"
+        )
+    actual = getattr(entity, "unit_number", None)
+    if actual is None:
+        actual = getattr(entity, "unit", None)
+    if actual is None:
+        actual = getattr(entity, "id", None)
+    if actual is None:
+        raise EntityIdentityError(
+            f"entity_identity_unavailable: requested unit {requested}",
+            requested_unit_number=requested,
+        )
+    if int(actual) != requested:
+        raise EntityIdentityError(
+            "entity_identity_mismatch: "
+            f"requested unit {requested}, resolved unit {int(actual)}",
+            requested_unit_number=requested,
+            mutated_unit_number=int(actual),
+        )
+    return entity
+
+
 def is_fuel_item(name: str, vocab: VocabData) -> bool:
     """Return whether the pinned vocabulary gives an item positive fuel value."""
     return float(vocab.item_info.get(name, {}).get("fuel_value") or 0) > 0
@@ -406,14 +476,18 @@ def _random_row(state: SamplerState, rng: Random) -> EntityRow | NoSupport:
     return rng.choice(rows) if rows else NoSupport("no_entity")
 
 
-def _base_entity_action(op: str, state: SamplerState, rng: Random) -> ActionSpec | NoSupport:
+def _base_entity_action(
+    op: str, state: SamplerState, rng: Random
+) -> ActionSpec | NoSupport:
     row = _random_row(state, rng)
     if isinstance(row, NoSupport):
         return row
     return ActionSpec(op, {"anchor": _anchor(row)})
 
 
-def sample_action(op: str, regime: str, state: SamplerState, rng: Random) -> ActionSpec | NoSupport:
+def sample_action(
+    op: str, regime: str, state: SamplerState, rng: Random
+) -> ActionSpec | NoSupport:
     if op not in OPS:
         raise ValueError(f"Unknown operation {op}")
     if regime not in {"naive", "macro", "bare"}:
@@ -471,7 +545,9 @@ def _sample_naive(op: str, state: SamplerState, rng: Random) -> ActionSpec | NoS
         if op == "ROTATE":
             args["direction"] = rng.choice(DIRECTIONS)
         elif op in {"INSERT", "EXTRACT"}:
-            args.update(item=rng.choice(state.vocab.items), quantity=rng.choice(QUANTITIES))
+            args.update(
+                item=rng.choice(state.vocab.items), quantity=rng.choice(QUANTITIES)
+            )
         elif op == "SET_RECIPE":
             args["recipe"] = rng.choice(state.vocab.recipes)
         return ActionSpec(op, args)
@@ -510,7 +586,9 @@ def _sample_macro(op: str, state: SamplerState, rng: Random) -> ActionSpec | NoS
             if math.hypot(tile[0] - px, tile[1] - py) <= 160:
                 patches.append((patch, tile))
         trees = [
-            tree for tree in sorted(state.world.trees) if math.hypot(tree[0] - px, tree[1] - py) <= 160
+            tree
+            for tree in sorted(state.world.trees)
+            if math.hypot(tree[0] - px, tree[1] - py) <= 160
         ]
         kinds = (["patch"] if patches else []) + (["tree"] if trees else [])
         if not kinds:
@@ -518,7 +596,11 @@ def _sample_macro(op: str, state: SamplerState, rng: Random) -> ActionSpec | NoS
         kind = rng.choice(kinds)
         if kind == "patch":
             patch, tile = rng.choice(patches)
-            args = {"target_kind": kind, "patch_id": patch.id, "target": [tile[0] + 0.5, tile[1] + 0.5]}
+            args = {
+                "target_kind": kind,
+                "patch_id": patch.id,
+                "target": [tile[0] + 0.5, tile[1] + 0.5],
+            }
         else:
             tree = rng.choice(trees)
             args = {"target_kind": kind, "target": [tree[0] + 0.5, tree[1] + 0.5]}
@@ -576,15 +658,16 @@ def _sample_macro(op: str, state: SamplerState, rng: Random) -> ActionSpec | NoS
         row = rng.choice(candidates)
         args = {"anchor": _anchor(row)}
         if op == "ROTATE":
-            choices = [direction for direction in DIRECTIONS if direction != row.direction]
+            choices = [
+                direction for direction in DIRECTIONS if direction != row.direction
+            ]
             args["direction"] = rng.choice(choices)
         return ActionSpec(op, args)
     if op == "INSERT":
         if not rows:
             return NoSupport("no_entity")
         candidates = [
-            (row, insertable_items(row, state.inventory, state.vocab))
-            for row in rows
+            (row, insertable_items(row, state.inventory, state.vocab)) for row in rows
         ]
         candidates = [(row, items) for row, items in candidates if items]
         if not candidates:
@@ -617,7 +700,8 @@ def _sample_macro(op: str, state: SamplerState, rng: Random) -> ActionSpec | NoS
         candidates = [
             row
             for row in rows
-            if state.vocab.entity_info.get(row.name, {}).get("type") == "assembling-machine"
+            if state.vocab.entity_info.get(row.name, {}).get("type")
+            == "assembling-machine"
         ]
         if not candidates:
             return NoSupport("no_assembling_machine")
@@ -650,7 +734,10 @@ def _sample_macro(op: str, state: SamplerState, rng: Random) -> ActionSpec | NoS
     candidates = []
     for name, tech in state.research_state.items():
         prerequisites = tech.get("prerequisites", [])
-        ready = all(state.research_state.get(pre, {}).get("researched", False) for pre in prerequisites)
+        ready = all(
+            state.research_state.get(pre, {}).get("researched", False)
+            for pre in prerequisites
+        )
         if tech.get("enabled") and not tech.get("researched") and ready:
             candidates.append(name)
     if not candidates:
@@ -722,7 +809,9 @@ def _adjacent_tile_position(
     return Position(x=x + 0.5, y=y + 0.5)
 
 
-def _adjacent_position(row: EntityRow, world: WorldClient, px: float, py: float) -> Position:
+def _adjacent_position(
+    row: EntityRow, world: WorldClient, px: float, py: float
+) -> Position:
     width = row.tile_width or 1
     height = row.tile_height or 1
     left = math.floor(row.x - width / 2 + 0.5)
@@ -745,7 +834,9 @@ def _adjacent_position(row: EntityRow, world: WorldClient, px: float, py: float)
                 continue
             candidates.append((math.hypot(x + 0.5 - px, y + 0.5 - py), x, y))
     if not candidates:
-        raise AnchorResolutionError(f"approach_failed: no free tile adjacent to u{row.unit}")
+        raise AnchorResolutionError(
+            f"approach_failed: no free tile adjacent to u{row.unit}"
+        )
     _, x, y = min(candidates)
     return Position(x=x + 0.5, y=y + 0.5)
 
@@ -776,9 +867,7 @@ def _approach_entity(
     return None
 
 
-def _live_entity_row(
-    world: WorldClient, anchor: Mapping[str, Any]
-) -> EntityRow | None:
+def _live_entity_row(world: WorldClient, anchor: Mapping[str, Any]) -> EntityRow | None:
     row = world.entities.get(anchor["unit"])
     if row is not None:
         return row
@@ -837,7 +926,9 @@ def execute_action(
     elif op in {"PICKUP", "ROTATE", "INSERT", "EXTRACT", "SET_RECIPE"}:
         row = _live_entity_row(world, args["anchor"])
         if row is None:
-            raise AnchorResolutionError("anchor_resolution_failed: entity row disappeared")
+            raise AnchorResolutionError(
+                "anchor_resolution_failed: entity row disappeared"
+            )
         if regime != "bare" and build_reach is not None:
             approach_result = _approach_entity(row, namespace, world, build_reach)
             if approach_result is not None:
@@ -858,11 +949,17 @@ def execute_action(
         elif op == "ROTATE":
             namespace.rotate_entity(entity, Direction(args["direction"]))
         elif op == "INSERT":
-            namespace.insert_item(_tool_prototype(args["item"]), entity, args["quantity"])
+            namespace.insert_item(
+                _tool_prototype(args["item"]), entity, args["quantity"]
+            )
         elif op == "EXTRACT":
-            namespace.extract_item(_tool_prototype(args["item"]), entity, args["quantity"])
+            namespace.extract_item(
+                _tool_prototype(args["item"]), entity, args["quantity"]
+            )
         else:
-            recipe = prototype_by_name.get(args["recipe"], RECIPE_NAMES.get(args["recipe"], args["recipe"]))
+            recipe = prototype_by_name.get(
+                args["recipe"], RECIPE_NAMES.get(args["recipe"], args["recipe"])
+            )
             namespace.set_entity_recipe(entity, recipe)
     elif op == "CONNECT":
         source = _resolve_entity(namespace, args["source"])
@@ -883,7 +980,9 @@ def execute_action(
     return ExecutionResult(target_distance=target_distance)
 
 
-def inventory_delta(before: Mapping[str, int], after: Mapping[str, int]) -> dict[str, int]:
+def inventory_delta(
+    before: Mapping[str, int], after: Mapping[str, int]
+) -> dict[str, int]:
     return {
         name: after.get(name, 0) - before.get(name, 0)
         for name in sorted(set(before) | set(after))
@@ -916,9 +1015,14 @@ def verify_effect(
     delta = inventory_delta(before.inventory, after.inventory)
     if op == "WAIT":
         actual = after.tick - before.tick
-        return actual >= 1, {"requested_ticks": args.get("ticks", args.get("seconds", 0) * 60), "actual_ticks": actual}
+        return actual >= 1, {
+            "requested_ticks": args.get("ticks", args.get("seconds", 0) * 60),
+            "actual_ticks": actual,
+        }
     if op == "MOVE":
-        distance = math.hypot(after.position[0] - args["target"][0], after.position[1] - args["target"][1])
+        distance = math.hypot(
+            after.position[0] - args["target"][0], after.position[1] - args["target"][1]
+        )
         return distance <= 2.5, {"final_distance": distance}
     if op == "HARVEST":
         positive = {name: count for name, count in delta.items() if count > 0}
@@ -931,7 +1035,10 @@ def verify_effect(
     if op == "CRAFT":
         product = args.get("main_product")
         product_delta = delta.get(product, 0) if product else 0
-        return product_delta > 0, {"main_product": product, "product_delta": product_delta}
+        return product_delta > 0, {
+            "main_product": product,
+            "product_delta": product_delta,
+        }
     if op == "PLACE":
         name = args["prototype"]
         count_before = sum(row.name == name for row in before.entities.values())
@@ -947,8 +1054,13 @@ def verify_effect(
         before_row, after_row = _target_row(action, before), _target_row(action, after)
         before_direction = before_row.direction if before_row else None
         after_direction = after_row.direction if after_row else None
-        ok = after_direction == args["direction"] and after_direction != before_direction
-        return ok, {"direction_before": before_direction, "direction_after": after_direction}
+        ok = (
+            after_direction == args["direction"] and after_direction != before_direction
+        )
+        return ok, {
+            "direction_before": before_direction,
+            "direction_after": after_direction,
+        }
     if op in {"INSERT", "EXTRACT"}:
         item_delta = delta.get(args["item"], 0)
         ok = item_delta < 0 if op == "INSERT" else item_delta > 0
@@ -977,23 +1089,112 @@ def verify_effect(
 
 
 ERROR_PATTERNS = (
-    ("nothing_to_harvest", re.compile(r"nothing within reach|nothing to harvest|no matching resources|no harvestable", re.IGNORECASE)),
-    ("out_of_reach", re.compile(r"out of reach|too far away|move closer|target position is too far", re.IGNORECASE)),
-    ("invalid_quantity", re.compile(r"invalid (?:count|quantity)|count must|quantity must|greater than 0|non.?positive", re.IGNORECASE)),
-    ("no_path", re.compile(r"no path|failed to find a path|could not get path|invalid path|path.*not found", re.IGNORECASE)),
-    ("cannot_place", re.compile(r"cannot place|could not place|suitable position|create_entity returned nil|already exists at the target", re.IGNORECASE)),
-    ("not_in_inventory", re.compile(r"not in (?:the )?inventory|no .+ (?:in inventory|to insert)|do not have (?:the required|enough)", re.IGNORECASE)),
-    ("missing_ingredients", re.compile(r"missing ingredients|missing .+ ingredient|sub-ingredient|still missing", re.IGNORECASE)),
-    ("recipe_disabled", re.compile(r"recipe.*(?:disabled|not unlocked)|not unlocked.*recipe", re.IGNORECASE)),
-    ("not_hand_craftable", re.compile(r"cannot be crafted|requires a crafting machine|smelting in a furnace", re.IGNORECASE)),
+    (
+        "nothing_to_harvest",
+        re.compile(
+            r"nothing within reach|nothing to harvest|no matching resources|no harvestable",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "out_of_reach",
+        re.compile(
+            r"out of reach|too far away|move closer|target position is too far",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "invalid_quantity",
+        re.compile(
+            r"invalid (?:count|quantity)|count must|quantity must|greater than 0|non.?positive",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "no_path",
+        re.compile(
+            r"no path|failed to find a path|could not get path|invalid path|path.*not found",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "cannot_place",
+        re.compile(
+            r"cannot place|could not place|suitable position|create_entity returned nil|already exists at the target",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "not_in_inventory",
+        re.compile(
+            r"not in (?:the )?inventory|no .+ (?:in inventory|to insert)|do not have (?:the required|enough)",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "missing_ingredients",
+        re.compile(
+            r"missing ingredients|missing .+ ingredient|sub-ingredient|still missing",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "recipe_disabled",
+        re.compile(
+            r"recipe.*(?:disabled|not unlocked)|not unlocked.*recipe", re.IGNORECASE
+        ),
+    ),
+    (
+        "not_hand_craftable",
+        re.compile(
+            r"cannot be crafted|requires a crafting machine|smelting in a furnace",
+            re.IGNORECASE,
+        ),
+    ),
     ("tech_researched", re.compile(r"technology .*already researched", re.IGNORECASE)),
-    ("tech_prerequisite", re.compile(r"missing prerequisites|technology .*not enabled", re.IGNORECASE)),
-    ("tech_unknown", re.compile(r"technology .*does not exist|technology is invalid", re.IGNORECASE)),
-    ("unknown_name", re.compile(r"doesn.t exist|isn.t something that exists|invalid (?:item |entity )?prototype|typo", re.IGNORECASE)),
-    ("entity_not_found", re.compile(r"no entity|couldn.t find .* at position|no building found|could not find any entities", re.IGNORECASE)),
-    ("no_suitable_slot", re.compile(r"inventory is full|no suitable slot|no available space|does not support modules", re.IGNORECASE)),
-    ("nothing_to_extract", re.compile(r"no .+ found in any nearby|containing .+|failed to extract|could not extract", re.IGNORECASE)),
-    ("connect_failed", re.compile(r"failed to connect|cannot connect|connect.*failed|placement blockage", re.IGNORECASE)),
+    (
+        "tech_prerequisite",
+        re.compile(r"missing prerequisites|technology .*not enabled", re.IGNORECASE),
+    ),
+    (
+        "tech_unknown",
+        re.compile(r"technology .*does not exist|technology is invalid", re.IGNORECASE),
+    ),
+    (
+        "unknown_name",
+        re.compile(
+            r"doesn.t exist|isn.t something that exists|invalid (?:item |entity )?prototype|typo",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "entity_not_found",
+        re.compile(
+            r"no entity|couldn.t find .* at position|no building found|could not find any entities",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "no_suitable_slot",
+        re.compile(
+            r"inventory is full|no suitable slot|no available space|does not support modules",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "nothing_to_extract",
+        re.compile(
+            r"no .+ found in any nearby|containing .+|failed to extract|could not extract",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "connect_failed",
+        re.compile(
+            r"failed to connect|cannot connect|connect.*failed|placement blockage",
+            re.IGNORECASE,
+        ),
+    ),
     ("assertion", re.compile(r"assertion(?:error)?|assert ", re.IGNORECASE)),
 )
 

@@ -17,6 +17,33 @@ def _mlp(input_size: int, hidden_size: int, output_size: int) -> nn.Sequential:
     )
 
 
+class MaskedRowEncoder(nn.Module):
+    """Encode rows, then concatenate masked mean and max pooling.
+
+    Keeping this primitive here lets both the legacy flat encoder and the V0
+    structured encoder use the same padding-safe pooling semantics.
+    """
+
+    def __init__(self, features: int, hidden_size: int = 64) -> None:
+        super().__init__()
+        self.output_size = hidden_size * 2
+        self.row = _mlp(features, hidden_size, hidden_size)
+
+    @staticmethod
+    def pool(encoded: torch.Tensor, valid: torch.Tensor) -> torch.Tensor:
+        weights = valid.to(encoded.dtype).unsqueeze(-1)
+        count = weights.sum(dim=1).clamp_min(1.0)
+        mean = (encoded * weights).sum(dim=1) / count
+        maximum = encoded.masked_fill(~valid.unsqueeze(-1), -1e8).amax(dim=1)
+        maximum = torch.where(
+            valid.any(dim=1, keepdim=True), maximum, torch.zeros_like(maximum)
+        )
+        return torch.cat((mean, maximum), dim=-1)
+
+    def forward(self, rows: torch.Tensor, valid: torch.Tensor) -> torch.Tensor:
+        return self.pool(self.row(rows), valid.bool())
+
+
 class MacroEncoder(nn.Module):
     """Encode the structured blocks in a flat macro observation.
 

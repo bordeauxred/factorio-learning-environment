@@ -47,7 +47,7 @@ grid, globals_, entities, entity_mask, build = client.observation(
 
 channel = client.buildability.channel_for("pipe-to-ground", 0)  # engine north
 # Unknown and samples older than 120 ticks are excluded:
-legal = client.buildability.legal_mask(client.tick, max_age_ticks=120)
+blocked = client.buildability.certainly_blocked_mask(client.tick, max_age_ticks=120)
 ```
 
 `TensorClient` is currently the reference implementation in

@@ -64,6 +64,183 @@ def split_observation(obs: np.ndarray) -> dict[str, np.ndarray]:
     return blocks
 
 
+def write_globals_vector(
+    out: np.ndarray,
+    state: ObservationInput,
+    *,
+    resource_reach: float,
+    max_steps: int,
+    max_ticks: int,
+) -> None:
+    """Write the existing 16-value macro global encoding into ``out``."""
+    snap = state.snapshot
+    elapsed_ticks = max(0, snap.tick - state.episode_start_tick)
+    remaining_steps = max(0, max_steps - state.step_count)
+    status_index = {
+        "ok": 0,
+        "no_effect": 1,
+    }.get(state.last_status, 2 if state.last_status is not None else None)
+    out[0] = elapsed_ticks / max_ticks
+    out[1] = remaining_steps / max_steps
+    out[2] = snap.position[0] / 256.0
+    out[3] = snap.position[1] / 256.0
+    out[4] = math.log1p(sum(snap.inventory.values())) / math.log1p(1000)
+    out[5] = math.log1p(len(snap.entities)) / 5.0
+    out[6] = math.log1p(max(snap.score_player, 0.0)) / 10.0
+    out[7] = math.log1p(max(snap.score_automated, 0.0)) / 10.0
+    if status_index is not None:
+        out[8 + status_index] = 1.0
+    if state.last_op in S.OP_INDEX:
+        out[11] = S.OP_INDEX[state.last_op] / len(S.OPS)
+    out[12] = float(snap.current_research is not None)
+    out[13] = float(bool(snap.entities))
+    out[14] = resource_reach / 10.0
+
+
+def write_inventory_vector(out: np.ndarray, inventory: Mapping[str, int]) -> None:
+    """Write the existing log-scaled inventory encoding into ``out``."""
+    scale = math.log1p(1000)
+    for name, count in inventory.items():
+        index = S.ITEM_INDEX.get(name)
+        if index is not None and count > 0:
+            out[index] = math.log1p(count) / scale
+
+
+def write_research_vector(
+    out: np.ndarray, research_state: Mapping[str, Mapping[str, object]]
+) -> None:
+    """Write the existing binary completed-technology encoding into ``out``."""
+    for name, tech in research_state.items():
+        index = S.TECH_INDEX.get(name)
+        if index is not None:
+            out[index] = float(bool(tech.get("researched")))
+
+
+def write_recipes_vector(out: np.ndarray, enabled_recipes: Sequence[str]) -> None:
+    """Write the existing binary enabled-recipe encoding into ``out``."""
+    for name in enabled_recipes:
+        index = S.RECIPE_INDEX.get(name)
+        if index is not None:
+            out[index] = 1.0
+
+
+def select_entity_slots(
+    entities: Mapping[int, EntityRow], player_pos: tuple[float, float]
+) -> tuple[EntityRow | None, ...]:
+    """Return the existing nearest-first, fixed-size entity slot table."""
+    px, py = player_pos
+    rows = sorted(
+        entities.values(),
+        key=lambda row: (math.hypot(row.x - px, row.y - py), row.unit),
+    )[: S.N_ENTITY_SLOTS]
+    return tuple(rows) + (None,) * (S.N_ENTITY_SLOTS - len(rows))
+
+
+def entity_class(
+    row: EntityRow, entity_info: Mapping[str, Mapping[str, object]]
+) -> str:
+    """Map an entity row to the existing coarse entity class."""
+    entity_type = entity_info.get(row.name, {}).get("type")
+    return entity_type if entity_type in S.ENTITY_CLASSES else "other"
+
+
+def status_group(status: int, status_names: Mapping[int, str]) -> str:
+    """Map a Factorio status code to the existing status group."""
+    name = status_names.get(status, "other")
+    if name == "working":
+        return "working"
+    if name in {"no_fuel", "no_power", "low_power", "no_minable_resources"}:
+        return "no_fuel_or_power"
+    if name in {
+        "no_ingredients",
+        "item_ingredient_shortage",
+        "waiting_for_source_items",
+    }:
+        return "no_input"
+    if name in {"full_output", "waiting_for_space_in_destination"}:
+        return "output_full"
+    return "other"
+
+
+def write_entity_table(
+    out: np.ndarray,
+    entities: Sequence[EntityRow | None],
+    player_pos: tuple[float, float],
+    *,
+    entity_info: Mapping[str, Mapping[str, object]],
+    status_names: Mapping[int, str],
+) -> None:
+    """Write the existing 24-feature entity table into ``out``."""
+    px, py = player_pos
+    for index, row in enumerate(entities):
+        if row is None:
+            continue
+        out[index, S.ENTITY_CLASSES.index(entity_class(row, entity_info))] = 1.0
+        dx, dy = row.x - px, row.y - py
+        offset = len(S.ENTITY_CLASSES)
+        out[index, offset] = dx / 32.0
+        out[index, offset + 1] = dy / 32.0
+        out[index, offset + 2] = min(math.hypot(dx, dy) / 32.0, 1.0)
+        out[index, offset + 3] = row.direction / 16.0
+        status_start = offset + 4
+        group = status_group(row.status, status_names)
+        out[index, status_start + S.STATUS_GROUPS.index(group)] = 1.0
+        detail_start = status_start + len(S.STATUS_GROUPS)
+        if row.recipe:
+            out[index, detail_start] = 1.0
+            recipe_index = S.RECIPE_INDEX.get(row.recipe)
+            if recipe_index is not None:
+                out[index, detail_start + 1] = recipe_index / len(S.RECIPE_NAMES)
+        items = row.items
+        out[index, detail_start + 2] = math.log1p(sum(items.values())) / math.log1p(
+            1000
+        )
+        out[index, detail_start + 3] = math.log1p(
+            items.get("coal", 0) + items.get("wood", 0)
+        ) / math.log1p(100)
+        out[index, detail_start + 4] = 1.0
+
+
+def entity_dimensions(
+    row: EntityRow, entity_info: Mapping[str, Mapping[str, object]]
+) -> tuple[int, int]:
+    """Resolve the same real footprint used by the macro observation."""
+    info = entity_info.get(row.name, {})
+    width = row.tile_width or int(info.get("tile_width") or 1)
+    height = row.tile_height or int(info.get("tile_height") or 1)
+    if row.direction in {4, 12}:
+        width, height = height, width
+    return width, height
+
+
+def available_technologies(
+    research_state: Mapping[str, Mapping[str, object]],
+    *,
+    trigger_technologies: set[str] | frozenset[str],
+    current_research: str | None,
+    research_queue: Sequence[str],
+) -> list[str]:
+    """Return technologies accepted by the existing prerequisite predicate."""
+    available: list[str] = []
+    for name, tech in research_state.items():
+        prerequisites = tech.get("prerequisites", [])
+        ready = all(
+            bool(research_state.get(str(pre), {}).get("researched"))
+            for pre in prerequisites
+        )
+        if (
+            tech.get("enabled")
+            and not tech.get("researched")
+            and ready
+            and name not in trigger_technologies
+            and name != current_research
+            and name not in research_queue
+            and name in S.TECH_INDEX
+        ):
+            available.append(name)
+    return available
+
+
 class MacroObservationBuilder:
     """Build observations from a cached world and an immutable live snapshot."""
 
@@ -115,57 +292,32 @@ class MacroObservationBuilder:
 
     def _write_globals(self, obs: np.ndarray, state: ObservationInput) -> None:
         start, _ = S.OBS_LAYOUT["globals"]
-        snap = state.snapshot
-        elapsed_ticks = max(0, snap.tick - state.episode_start_tick)
-        remaining_steps = max(0, self.max_steps - state.step_count)
-        status_index = {
-            "ok": 0,
-            "no_effect": 1,
-        }.get(state.last_status, 2 if state.last_status is not None else None)
         values = np.zeros(S.N_GLOBALS, dtype=np.float32)
-        values[0] = elapsed_ticks / self.max_ticks
-        values[1] = remaining_steps / self.max_steps
-        values[2] = snap.position[0] / 256.0
-        values[3] = snap.position[1] / 256.0
-        values[4] = math.log1p(sum(snap.inventory.values())) / math.log1p(1000)
-        values[5] = math.log1p(len(snap.entities)) / 5.0
-        values[6] = math.log1p(max(snap.score_player, 0.0)) / 10.0
-        values[7] = math.log1p(max(snap.score_automated, 0.0)) / 10.0
-        if status_index is not None:
-            values[8 + status_index] = 1.0
-        if state.last_op in S.OP_INDEX:
-            values[11] = S.OP_INDEX[state.last_op] / len(S.OPS)
-        values[12] = float(snap.current_research is not None)
-        values[13] = float(bool(snap.entities))
-        values[14] = self.resource_reach / 10.0
+        write_globals_vector(
+            values,
+            state,
+            resource_reach=self.resource_reach,
+            max_steps=self.max_steps,
+            max_ticks=self.max_ticks,
+        )
         obs[start : start + S.N_GLOBALS] = values
 
     @staticmethod
     def _write_inventory(obs: np.ndarray, inventory: Mapping[str, int]) -> None:
         start, _ = S.OBS_LAYOUT["inventory"]
-        scale = math.log1p(1000)
-        for name, count in inventory.items():
-            index = S.ITEM_INDEX.get(name)
-            if index is not None and count > 0:
-                obs[start + index] = math.log1p(count) / scale
+        write_inventory_vector(obs[start : start + len(S.ITEM_NAMES)], inventory)
 
     @staticmethod
     def _write_tech(
         obs: np.ndarray, research_state: Mapping[str, Mapping[str, object]]
     ) -> None:
         start, _ = S.OBS_LAYOUT["tech"]
-        for name, tech in research_state.items():
-            index = S.TECH_INDEX.get(name)
-            if index is not None:
-                obs[start + index] = float(bool(tech.get("researched")))
+        write_research_vector(obs[start : start + len(S.TECH_NAMES)], research_state)
 
     @staticmethod
     def _write_recipes(obs: np.ndarray, enabled_recipes: Sequence[str]) -> None:
         start, _ = S.OBS_LAYOUT["recipes_enabled"]
-        for name in enabled_recipes:
-            index = S.RECIPE_INDEX.get(name)
-            if index is not None:
-                obs[start + index] = 1.0
+        write_recipes_vector(obs[start : start + len(S.RECIPE_NAMES)], enabled_recipes)
 
     def _target_slots(
         self, player_pos: tuple[float, float]
@@ -222,12 +374,7 @@ class MacroObservationBuilder:
 
     @staticmethod
     def _entity_slots(snapshot: OperationSnapshot) -> tuple[EntityRow | None, ...]:
-        px, py = snapshot.position
-        rows = sorted(
-            snapshot.entities.values(),
-            key=lambda row: (math.hypot(row.x - px, row.y - py), row.unit),
-        )[: S.N_ENTITY_SLOTS]
-        return tuple(rows) + (None,) * (S.N_ENTITY_SLOTS - len(rows))
+        return select_entity_slots(snapshot.entities, snapshot.position)
 
     def _write_targets(
         self,
@@ -256,24 +403,10 @@ class MacroObservationBuilder:
             rows[index, offset + 4] = 1.0
 
     def _entity_class(self, row: EntityRow) -> str:
-        entity_type = self.vocab.entity_info.get(row.name, {}).get("type")
-        return entity_type if entity_type in S.ENTITY_CLASSES else "other"
+        return entity_class(row, self.vocab.entity_info)
 
     def _status_group(self, status: int) -> str:
-        name = self.status_names.get(status, "other")
-        if name == "working":
-            return "working"
-        if name in {"no_fuel", "no_power", "low_power", "no_minable_resources"}:
-            return "no_fuel_or_power"
-        if name in {
-            "no_ingredients",
-            "item_ingredient_shortage",
-            "waiting_for_source_items",
-        }:
-            return "no_input"
-        if name in {"full_output", "waiting_for_space_in_destination"}:
-            return "output_full"
-        return "other"
+        return status_group(status, self.status_names)
 
     def _write_entities(
         self,
@@ -285,37 +418,16 @@ class MacroObservationBuilder:
         rows = obs[start : start + S.N_ENTITY_SLOTS * S.ENTITY_FEATURES].reshape(
             S.N_ENTITY_SLOTS, S.ENTITY_FEATURES
         )
-        px, py = player_pos
-        for index, entity in enumerate(entities):
-            if entity is None:
-                continue
-            rows[index, S.ENTITY_CLASSES.index(self._entity_class(entity))] = 1.0
-            dx, dy = entity.x - px, entity.y - py
-            offset = len(S.ENTITY_CLASSES)
-            rows[index, offset] = dx / 32.0
-            rows[index, offset + 1] = dy / 32.0
-            rows[index, offset + 2] = min(math.hypot(dx, dy) / 32.0, 1.0)
-            rows[index, offset + 3] = entity.direction / 16.0
-            status_start = offset + 4
-            rows[index, status_start + S.STATUS_GROUPS.index(self._status_group(entity.status))] = 1.0
-            detail_start = status_start + len(S.STATUS_GROUPS)
-            if entity.recipe:
-                rows[index, detail_start] = 1.0
-                recipe_index = S.RECIPE_INDEX.get(entity.recipe)
-                if recipe_index is not None:
-                    rows[index, detail_start + 1] = recipe_index / len(S.RECIPE_NAMES)
-            items = entity.items
-            rows[index, detail_start + 2] = math.log1p(sum(items.values())) / math.log1p(1000)
-            rows[index, detail_start + 3] = math.log1p(
-                items.get("coal", 0) + items.get("wood", 0)
-            ) / math.log1p(100)
-            rows[index, detail_start + 4] = 1.0
+        write_entity_table(
+            rows,
+            entities,
+            player_pos,
+            entity_info=self.vocab.entity_info,
+            status_names=self.status_names,
+        )
 
     def _entity_dimensions(self, row: EntityRow) -> tuple[int, int]:
-        info = self.vocab.entity_info.get(row.name, {})
-        width = row.tile_width or int(info.get("tile_width") or 1)
-        height = row.tile_height or int(info.get("tile_height") or 1)
-        return width, height
+        return entity_dimensions(row, self.vocab.entity_info)
 
     def _occupied_tiles(self, entities: Sequence[EntityRow]) -> set[tuple[int, int]]:
         occupied: set[tuple[int, int]] = set()
@@ -433,24 +545,14 @@ class MacroObservationBuilder:
             if index is not None:
                 masks["recipe"][index] = 1.0
 
-        available_techs: list[str] = []
-        for name, tech in state.research_state.items():
-            prerequisites = tech.get("prerequisites", [])
-            ready = all(
-                bool(state.research_state.get(str(pre), {}).get("researched"))
-                for pre in prerequisites
-            )
-            if (
-                tech.get("enabled")
-                and not tech.get("researched")
-                and ready
-                and name not in self.trigger_technologies
-                and name != snap.current_research
-                and name not in snap.research_queue
-                and name in S.TECH_INDEX
-            ):
-                available_techs.append(name)
-                masks["technology"][S.TECH_INDEX[name]] = 1.0
+        available_techs = available_technologies(
+            state.research_state,
+            trigger_technologies=self.trigger_technologies,
+            current_research=snap.current_research,
+            research_queue=snap.research_queue,
+        )
+        for name in available_techs:
+            masks["technology"][S.TECH_INDEX[name]] = 1.0
 
         origin_x, origin_y = math.floor(snap.position[0]), math.floor(snap.position[1])
         for index in range(S.N_OFFSETS):
@@ -499,9 +601,7 @@ class MacroObservationBuilder:
         masks["move_dir"][:] = 1.0
 
         placeable = bool(masks["placeable"].any())
-        rotatable = [
-            row for row in entity_rows if entity_is_rotatable(row, self.vocab)
-        ]
+        rotatable = [row for row in entity_rows if entity_is_rotatable(row, self.vocab)]
         insert_supported = any(
             insertable_items(row, snap.inventory, self.vocab) for row in entity_rows
         )
@@ -522,9 +622,7 @@ class MacroObservationBuilder:
             "PICKUP": bool(entity_rows),
             "ROTATE": bool(rotatable),
             "INSERT": insert_supported,
-            "EXTRACT": any(
-                extractable_items(row, self.vocab) for row in entity_rows
-            ),
+            "EXTRACT": any(extractable_items(row, self.vocab) for row in entity_rows),
             "SET_RECIPE": assembling_machine and crafting_recipes,
             "RESEARCH": bool(available_techs),
             "CONNECT": len(entity_rows) >= 2 and bool(masks["connector"].any()),

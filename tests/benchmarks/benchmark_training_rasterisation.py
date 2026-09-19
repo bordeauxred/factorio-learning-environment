@@ -184,8 +184,8 @@ local n=0 for i=0,999 do local e=s.create_entity{name="iron-chest",position={-60
             "buildability_float32_cast": measure(
                 lambda: obs[4]["values"].astype(np.float32)
             ),
-            "fresh_legal_mask": measure(
-                lambda: client.buildability.legal_mask(client.tick, 120)
+            "certainly_blocked_mask": measure(
+                lambda: client.buildability.certainly_blocked_mask(client.tick, 120)
             ),
             "observation_and_snapshot": measure(
                 lambda: snapshot(client.observation(include_buildability=True))

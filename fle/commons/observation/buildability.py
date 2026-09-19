@@ -137,8 +137,21 @@ class BuildabilityCache:
             self.sampled_ticks[channel, by, bx] = tick
         return True
 
-    def legal_mask(self, current_tick, max_age_ticks):
-        """Conservative dense action mask: unknown/expired samples are False.
+    def certainly_blocked_mask(self, current_tick, max_age_ticks):
+        """Placements the engine has freshly proven impossible.
+
+        True only where a fresh sample says blocked, so the mask is a certain
+        refusal and nothing buildable is ever removed from the action space:
+
+            fresh + blocked -> True  (forbid)
+            fresh + legal   -> False (allow)
+            unknown (-1)    -> False (allow)
+            stale           -> False (allow)
+            never sampled   -> False (allow)
+
+        The cache fills progressively, so a mask keyed on `values == 1` would
+        forbid most of the map for thousands of polls. Unknown and stale cells
+        belong in the observation, not in the mask.
 
         Age limits bound accepted staleness, not silent-world-mutation detection.
         Revalidate the selected action against the engine before execution.
@@ -147,7 +160,27 @@ class BuildabilityCache:
             raise ValueError("max_age_ticks must be nonnegative")
         age = current_tick - self.sampled_ticks
         fresh = (self.sampled_ticks >= 0) & (age >= 0) & (age <= max_age_ticks)
-        return (self.values == 1) & fresh.repeat(8, axis=1).repeat(8, axis=2)
+        return (self.values == 0) & fresh.repeat(8, axis=1).repeat(8, axis=2)
+
+    def freshness(self, current_tick, age_scale):
+        """Per-tile (known, normalised age) planes for the network.
+
+        `known` is 1 where a sample exists, else 0. `age` is
+        clip((tick - sampled) / age_scale, 0, 1) where known, else 1.0, so
+        never-sampled cells read as maximally stale rather than as fresh.
+        """
+        if age_scale <= 0:
+            raise ValueError("age_scale must be positive")
+        known_blocks = self.sampled_ticks >= 0
+        age = np.clip(
+            (current_tick - self.sampled_ticks) / float(age_scale), 0.0, 1.0
+        ).astype(np.float32)
+        age[~known_blocks] = 1.0
+        known = known_blocks.astype(np.float32)
+        return (
+            known.repeat(8, axis=1).repeat(8, axis=2),
+            age.repeat(8, axis=1).repeat(8, axis=2),
+        )
 
     def observation(self, current_tick):
         """Zero-copy arrays and their coordinate/freshness metadata.

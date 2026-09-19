@@ -18,7 +18,7 @@ from collections import Counter
 from collections.abc import Callable, Mapping
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, ClassVar
 
@@ -35,6 +35,7 @@ from fle.rl.observation import (
     MacroObservationBuilder,
     ObservationFrame,
     ObservationInput,
+    available_technologies,
 )
 from fle.rl.ops import (
     ActionSpec,
@@ -57,7 +58,6 @@ from fle.rl.world import EntityRow, WorldClient
 
 TOOL_TIMEOUT_S = 120
 WAIT_WALL_CAP_S = 30.0
-POLL_INTERVAL_S = 0.05
 DELAYED_DRAIN_OPS = frozenset({"PICKUP", "SET_RECIPE", "CONNECT"})
 DETERMINISTIC_NO_SUPPORT_COOLDOWNS = frozenset(
     {
@@ -92,7 +92,13 @@ PIPE_ENDPOINT_NAMES = frozenset(
     }
 )
 BELT_SOURCE_BLOCKED_TYPES = frozenset(
-    {"container", "furnace", "infinity-container", "linked-container", "logistic-container"}
+    {
+        "container",
+        "furnace",
+        "infinity-container",
+        "linked-container",
+        "logistic-container",
+    }
 )
 MOVE_VECTORS: tuple[tuple[float, float], ...] = (
     (0.0, -1.0),
@@ -109,6 +115,23 @@ PEACEFUL_RESET_COMMAND = (
     'for _,entity in pairs(surface.find_entities_filtered{force="enemy"}) do '
     "entity.destroy{raise_destroy=false} end"
 )
+V0_SNAPSHOT_COMMAND = (
+    "/sc local c=storage.agent_characters[1] local valid=c and c.valid "
+    "local inv={} if valid then local i=c.get_main_inventory() "
+    "if i and i.valid then for name,count in pairs(storage.utils.get_contents_compat(i)) do "
+    "inv[#inv+1]=name..'='..count end end end table.sort(inv) "
+    "local q={} for _,t in pairs(game.forces.player.research_queue or {}) do "
+    "q[#q+1]=t.name end table.sort(q) "
+    "local r=game.forces.player.current_research "
+    "local raw=storage.actions.score() or '' "
+    "local player=tonumber(string.match(raw, '%[\"player\"%] = ([^,}]+)')) or 0 "
+    "local automated=tonumber(string.match(raw, '%[\"automated\"%] = ([^,}]+)')) or 0 "
+    "local out={tostring(game.tick),valid and '1' or '0',"
+    "valid and tostring(c.position.x) or '',valid and tostring(c.position.y) or '',"
+    "tostring(player),tostring(automated),r and r.name or '',"
+    "table.concat(q,','),table.concat(inv,',')} "
+    "rcon.print(table.concat(out,'\\t'))"
+)
 
 
 def _effective_max_ticks(max_steps: int, max_ticks: int) -> int:
@@ -116,6 +139,7 @@ def _effective_max_ticks(max_steps: int, max_ticks: int) -> int:
     if max_ticks != DEFAULT_MAX_TICKS:
         return max_ticks
     return max_ticks * max_steps // DEFAULT_MAX_STEPS
+
 
 _TERRAIN_LOCK = threading.Lock()
 _TERRAIN_CACHE: dict[str, Any] | None = None
@@ -133,6 +157,14 @@ class FrontierState:
     aps_baseline: float
     inventory: dict[str, int]
     entity_hash: str
+
+
+@dataclass(frozen=True)
+class V0ObservationFrame:
+    """Observation plus the identity-bearing rows behind its entity slots."""
+
+    obs: dict[str, Any]
+    entities: tuple[EntityRow | None, ...]
 
 
 def _entity_identity_hash(entities: Mapping[int, EntityRow]) -> str:
@@ -189,16 +221,45 @@ class FleMacroEnv(gym.Env):
         clamp_anchor: bool = False,
         clamp_connect: bool = False,
         regime: str = "macro",
+        action_grammar: str = "legacy",
+        mask_place_location: bool = True,
+        mask_place_item: bool = True,
+        mask_inventory_item: bool = True,
+        mask_contained_item: bool = True,
+        mask_entity: bool = True,
+        mask_recipe: bool = True,
+        mask_technology: bool = True,
+        mask_verb: bool = True,
+        place_max_age_ticks: int = 600,
+        v0_batch_snapshot: bool = True,
     ) -> None:
         if speed <= 0 or max_steps <= 0 or max_ticks <= 0:
             raise ValueError("speed, max_steps, and max_ticks must be positive")
         if regime not in {"macro", "bare"}:
             raise ValueError(f"Unknown action regime {regime}")
+        if action_grammar not in {"legacy", "v0"}:
+            raise ValueError(f"Unknown action grammar {action_grammar}")
+        if place_max_age_ticks < 0:
+            raise ValueError("place_max_age_ticks must be nonnegative")
         self.port = port
         self.speed = speed
         self.max_steps = max_steps
         self.max_ticks = _effective_max_ticks(max_steps, max_ticks)
         self.regime = regime
+        self.action_grammar = action_grammar
+        self.place_max_age_ticks = place_max_age_ticks
+        self.v0_batch_snapshot = v0_batch_snapshot
+        self.v0_mask_toggles = {
+            "place_location": mask_place_location,
+            "place_item": mask_place_item,
+            "inventory_item": mask_inventory_item,
+            "contained_item": mask_contained_item,
+            "entity": mask_entity,
+            "recipe": mask_recipe,
+            "technology": mask_technology,
+            "verb": mask_verb,
+        }
+        self.v0_mask_counters: Counter[str] = Counter()
         # ``quantity_aware_support`` remains a compatible constructor name.
         # New callers should use the execution-guard name used by the CLI.
         if clamp_quantity is None:
@@ -209,18 +270,49 @@ class FleMacroEnv(gym.Env):
         self.clamp_anchor = clamp_anchor
         self.clamp_connect = clamp_connect
         self.support_cooldowns = support_cooldowns
-        self.observation_space = gym.spaces.Box(
-            low=-1.0,
-            high=1.0,
-            shape=(S.OBS_SIZE,),
-            dtype=np.float32,
-        )
-        self.action_space = gym.spaces.MultiDiscrete(S.HEAD_DIMS)
+        if action_grammar == "v0":
+            # Lazy by design: package B's offline tests must not depend on the
+            # concurrently built V0 observation module.
+            from fle.rl import v0_schema as V0
+
+            observation_spaces: dict[str, gym.Space] = {
+                name: gym.spaces.Box(
+                    low=np.iinfo(dtype).min
+                    if np.issubdtype(dtype, np.integer)
+                    else -np.inf,
+                    high=np.iinfo(dtype).max
+                    if np.issubdtype(dtype, np.integer)
+                    else np.inf,
+                    shape=shape,
+                    dtype=dtype,
+                )
+                for name, (shape, dtype) in V0.OBS_SPEC.items()
+            }
+            observation_spaces["masks"] = gym.spaces.Dict(
+                {
+                    head: gym.spaces.MultiBinary(size)
+                    for head, size in V0.HEAD_SIZES.items()
+                }
+            )
+            self.observation_space = gym.spaces.Dict(observation_spaces)
+            self.action_space = gym.spaces.MultiDiscrete(
+                tuple(V0.HEAD_SIZES[head] for head in V0.HEADS)
+            )
+        else:
+            self.observation_space = gym.spaces.Box(
+                low=-1.0,
+                high=1.0,
+                shape=(S.OBS_SIZE,),
+                dtype=np.float32,
+            )
+            self.action_space = gym.spaces.MultiDiscrete(S.HEAD_DIMS)
         self.action_space.seed(seed)
 
         self.vocab = VocabData.load(S.VOCAB_PATH)
         raw_vocab = json.loads(S.VOCAB_PATH.read_text())
-        self._status_names = {int(row["code"]): row["name"] for row in raw_vocab["statuses"]}
+        self._status_names = {
+            int(row["code"]): row["name"] for row in raw_vocab["statuses"]
+        }
         self.instance = FactorioInstance(
             address="localhost",
             tcp_port=port,
@@ -231,6 +323,8 @@ class FleMacroEnv(gym.Env):
         )
         self.namespace = self.instance.namespace
         self.world = WorldClient(self.instance.rcon_client, self.namespace)
+        if action_grammar == "v0":
+            self.world.configure_v0_caches(self.instance.rcon_client)
         self.instance.set_speed_and_unpause(speed)
         self._load_static_world()
         reach = self.world.read_reach()
@@ -238,19 +332,20 @@ class FleMacroEnv(gym.Env):
         self.build_reach = float(reach["build"])
         self.crafting_categories = tuple(self.world.read_crafting_categories())
         self.trigger_technologies = self._load_trigger_technologies()
-        self.observer = MacroObservationBuilder(
-            world=self.world,
-            vocab=self.vocab,
-            crafting_categories=self.crafting_categories,
-            resource_reach=self.resource_reach,
-            build_reach=self.build_reach,
-            trigger_technologies=self.trigger_technologies,
-            status_names=self._status_names,
-            max_steps=max_steps,
-            max_ticks=self.max_ticks,
-            quantity_aware_support=clamp_quantity,
-            regime=regime,
-        )
+        if action_grammar != "v0":
+            self.observer = MacroObservationBuilder(
+                world=self.world,
+                vocab=self.vocab,
+                crafting_categories=self.crafting_categories,
+                resource_reach=self.resource_reach,
+                build_reach=self.build_reach,
+                trigger_technologies=self.trigger_technologies,
+                status_names=self._status_names,
+                max_steps=max_steps,
+                max_ticks=self.max_ticks,
+                quantity_aware_support=clamp_quantity,
+                regime=regime,
+            )
 
         self._log_file = None
         if log_path is not None:
@@ -258,7 +353,7 @@ class FleMacroEnv(gym.Env):
             path.parent.mkdir(parents=True, exist_ok=True)
             self._log_file = path.open("a", buffering=1)
         self._current: OperationSnapshot | None = None
-        self._frame: ObservationFrame | None = None
+        self._frame: ObservationFrame | V0ObservationFrame | None = None
         self._enabled_recipes: list[str] = []
         self._research_state: dict[str, dict[str, Any]] = {}
         self._episode_start_tick = 0
@@ -313,6 +408,10 @@ class FleMacroEnv(gym.Env):
     def _snapshot(
         self, fallback: OperationSnapshot | None = None
     ) -> tuple[OperationSnapshot, bool]:
+        if getattr(self, "action_grammar", "legacy") == "v0" and getattr(
+            self, "v0_batch_snapshot", True
+        ):
+            return self._snapshot_v0(fallback)
         character_valid = True
         try:
             position = self.world.read_player_pos()
@@ -358,8 +457,173 @@ class FleMacroEnv(gym.Env):
         )
         return snapshot, character_valid
 
-    def _build_frame(self) -> ObservationFrame:
+    @staticmethod
+    def _parse_v0_items(payload: str) -> dict[str, int]:
+        if not payload:
+            return {}
+        result: dict[str, int] = {}
+        for entry in payload.split(","):
+            name, separator, count = entry.rpartition("=")
+            if not separator:
+                raise ValueError(f"invalid V0 inventory entry {entry!r}")
+            result[name] = int(count)
+        return result
+
+    def _snapshot_v0(
+        self, fallback: OperationSnapshot | None = None
+    ) -> tuple[OperationSnapshot, bool]:
+        """Fetch all scalar V0 step state in one compact RCON response."""
+        started = time.perf_counter()
+        try:
+            response = call_with_timeout(
+                lambda: self.instance.rcon_client.send_command(V0_SNAPSHOT_COMMAND)
+            )
+            # Preserve empty final fields (notably an empty inventory); RCON
+            # may append a line terminator, but tabs are part of the payload.
+            # Factorio's rcon.print strips trailing whitespace, so when the
+            # last fields are all empty (no research, empty queue, empty
+            # inventory) they vanish from the wire. Pad rather than fail.
+            fields = str(response).rstrip("\r\n").split("\t", 8)
+            if len(fields) > 9:
+                raise ValueError(
+                    f"V0 snapshot expected at most 9 fields, received {len(fields)}"
+                )
+            if len(fields) < 9:
+                fields = fields + [""] * (9 - len(fields))
+            (
+                tick_text,
+                valid_text,
+                x_text,
+                y_text,
+                general_text,
+                automated_text,
+                research_text,
+                queue_text,
+                inventory_text,
+            ) = fields
+            character_valid = valid_text == "1"
+            if not character_valid:
+                if fallback is None:
+                    raise RuntimeError("character is invalid")
+                position = fallback.position
+            else:
+                position = (float(x_text), float(y_text))
+            snapshot = OperationSnapshot(
+                inventory=self._parse_v0_items(inventory_text),
+                entities=dict(self.world.entities),
+                position=position,
+                tick=int(tick_text),
+                score_player=float(general_text)
+                - float(getattr(self.instance, "initial_score", 0) or 0),
+                score_automated=float(automated_text),
+                current_research=research_text or None,
+                research_queue=tuple(name for name in queue_text.split(",") if name),
+            )
+        except Exception:
+            if fallback is None:
+                raise
+            snapshot = fallback
+            character_valid = False
+        self._v0_last_snapshot_wall_s = time.perf_counter() - started
+        return snapshot, character_valid
+
+    def _v0_context(self, frame: V0ObservationFrame | None = None) -> dict[str, Any]:
+        """Runtime context consumed by the server-independent V0 action package."""
         assert self._current is not None
+        technologies = available_technologies(
+            self._research_state,
+            trigger_technologies=self.trigger_technologies,
+            current_research=self._current.current_research,
+            research_queue=self._current.research_queue,
+        )
+        return {
+            "snapshot": self._current,
+            "position": self._current.position,
+            "tick": self._current.tick,
+            "inventory_counts": self._current.inventory,
+            "entity_rows": frame.entities if frame is not None else (),
+            "vocab": self.vocab,
+            "enabled_recipes": self._enabled_recipes,
+            "research_state": self._research_state,
+            "crafting_categories": self.crafting_categories,
+            "available_technologies": technologies,
+            "resource_reach": self.resource_reach,
+            "build_reach": self.build_reach,
+            "buildability": self.world.buildability,
+            "place_max_age_ticks": self.place_max_age_ticks,
+            "mask_toggles": self.v0_mask_toggles,
+            "mask_counters": self.v0_mask_counters,
+            "defer_result_measurement": True,
+            "defer_final_drain": True,
+            "advance_simulated_ticks": lambda ticks: self._advance_simulated_ticks(
+                ticks, pause=True
+            ),
+            "logger": self._write_log,
+        }
+
+    def v0_learner_context(self) -> tuple[Any, dict[str, Any]]:
+        """Expose the current world and mask context to the V0 learner."""
+        if self.action_grammar != "v0":
+            raise RuntimeError("V0 learner context requires action_grammar='v0'")
+        if getattr(self, "_frame", None) is None:
+            raise RuntimeError("V0 learner context is unavailable before reset")
+        assert isinstance(self._frame, V0ObservationFrame)
+        return self.world, self._v0_context(self._frame)
+
+    @staticmethod
+    def _copy_v0_observation(obs: Mapping[str, Any]) -> dict[str, Any]:
+        return {
+            key: (
+                {nested: value.copy() for nested, value in block.items()}
+                if isinstance(block, Mapping)
+                else block.copy()
+            )
+            for key, block in obs.items()
+        }
+
+    def _build_v0_frame(self) -> V0ObservationFrame:
+        assert self._current is not None
+        # These imports intentionally occur only when the V0 grammar is used.
+        from fle.rl.observation import select_entity_slots
+        from fle.rl.v0_actions import v0_masks_for_prefix
+        from fle.rl.v0_obs import build_v0_observation
+
+        player_x, player_y = self._current.position
+        obs = build_v0_observation(
+            self.world,
+            player_x=player_x,
+            player_y=player_y,
+            tick=self._current.tick,
+            inventory=self._current.inventory,
+            enabled_recipes=self._enabled_recipes,
+            research_state=self._research_state,
+            vocab=self.vocab,
+            status_names=self._status_names,
+            episode_start_tick=self._episode_start_tick,
+            step_count=self._steps,
+            max_steps=self._episode_max_steps,
+            max_ticks=self.max_ticks,
+            last_status=self._last_status,
+            last_op=self._last_op,
+            current_research=self._current.current_research,
+            research_queue=self._current.research_queue,
+            automated_score=self._current.score_automated,
+            general_score=self._current.score_player,
+            resource_reach=self.resource_reach,
+            build_fresh_ticks=self.place_max_age_ticks,
+            own=True,
+        )
+        entities = tuple(
+            select_entity_slots(self.world.entities, self._current.position)
+        )
+        frame = V0ObservationFrame(obs=obs, entities=entities)
+        obs["masks"] = v0_masks_for_prefix({}, obs, self.world, self._v0_context(frame))
+        return frame
+
+    def _build_frame(self) -> ObservationFrame | V0ObservationFrame:
+        assert self._current is not None
+        if getattr(self, "action_grammar", "legacy") == "v0":
+            return self._build_v0_frame()
         self.observer.max_steps = self._episode_max_steps
         frame = self.observer.build(
             ObservationInput(
@@ -484,7 +748,16 @@ class FleMacroEnv(gym.Env):
             "excursion": self._excursion,
             "restore_hash": self._restore_hash,
         }
-        return self._frame.obs.copy(), info
+        if getattr(self, "action_grammar", "legacy") == "v0":
+            info.update(
+                mask_toggles=dict(self.v0_mask_toggles),
+                mask_counters=dict(self.v0_mask_counters),
+            )
+            observation = self._copy_v0_observation(self._frame.obs)
+            self.instance.game_control.pause_at_speed(max(self.speed, 10))
+        else:
+            observation = self._frame.obs.copy()
+        return observation, info
 
     @staticmethod
     def _anchor(row: EntityRow) -> dict[str, Any]:
@@ -531,21 +804,30 @@ class FleMacroEnv(gym.Env):
         requested_live = (
             live_entities.get(requested_row.unit) if requested_row is not None else None
         )
-        if (
-            requested_live is not None
-            and (op != "ROTATE" or entity_is_rotatable(requested_live, self.vocab))
+        if requested_live is not None and (
+            op != "ROTATE" or entity_is_rotatable(requested_live, self.vocab)
         ):
-            return requested_live, requested, self._anchor_log(slot, requested_live), None
+            return (
+                requested_live,
+                requested,
+                self._anchor_log(slot, requested_live),
+                None,
+            )
         if not getattr(self, "clamp_anchor", False):
-            reason = "no_rotatable_entity" if op == "ROTATE" else "no_live_entity_anchor"
+            reason = (
+                "no_rotatable_entity" if op == "ROTATE" else "no_live_entity_anchor"
+            )
             return None, requested, None, reason
         if not candidates:
-            reason = "no_rotatable_entity" if op == "ROTATE" else "no_live_entity_anchor"
+            reason = (
+                "no_rotatable_entity" if op == "ROTATE" else "no_live_entity_anchor"
+            )
             return None, requested, None, reason
 
         if requested_row is None:
             executed_slot, executed_row = min(
-                candidates, key=lambda candidate: (abs(candidate[0] - slot), candidate[0])
+                candidates,
+                key=lambda candidate: (abs(candidate[0] - slot), candidate[0]),
             )
         else:
             executed_slot, executed_row = min(
@@ -572,17 +854,23 @@ class FleMacroEnv(gym.Env):
         player_pos: tuple[float, float],
     ) -> tuple[float, float]:
         tile_x, tile_y = math.floor(desired[0]), math.floor(desired[1])
-        if self.world.is_known(tile_x, tile_y) and not self.world.is_water(tile_x, tile_y):
+        if self.world.is_known(tile_x, tile_y) and not self.world.is_water(
+            tile_x, tile_y
+        ):
             return desired
         candidates: list[tuple[float, int, int]] = []
         px, py = player_pos
         for radius in range(1, 33):
             for x in range(tile_x - radius, tile_x + radius + 1):
                 for y in (tile_y - radius, tile_y + radius):
-                    self._append_land_candidate(candidates, x, y, desired, vector, (px, py))
+                    self._append_land_candidate(
+                        candidates, x, y, desired, vector, (px, py)
+                    )
             for y in range(tile_y - radius + 1, tile_y + radius):
                 for x in (tile_x - radius, tile_x + radius):
-                    self._append_land_candidate(candidates, x, y, desired, vector, (px, py))
+                    self._append_land_candidate(
+                        candidates, x, y, desired, vector, (px, py)
+                    )
             if candidates:
                 _, x, y = min(candidates)
                 return x + 0.5, y + 0.5
@@ -645,9 +933,7 @@ class FleMacroEnv(gym.Env):
         left = math.floor(centre[0] - width / 2 + 0.5)
         top = math.floor(centre[1] - height / 2 + 0.5)
         footprint = {
-            (x, y)
-            for x in range(left, left + width)
-            for y in range(top, top + height)
+            (x, y) for x in range(left, left + width) for y in range(top, top + height)
         }
         return prototype, centre, footprint
 
@@ -684,8 +970,7 @@ class FleMacroEnv(gym.Env):
             )
         blocked = occupied | set(self.world.trees) | set(self.world.obstacles)
         return all(
-            tile not in blocked and not self.world.is_water(*tile)
-            for tile in footprint
+            tile not in blocked and not self.world.is_water(*tile) for tile in footprint
         )
 
     def _decode(
@@ -820,11 +1105,14 @@ class FleMacroEnv(gym.Env):
             or self._cooldown_action is None
         ):
             return False
-        if self._support_fingerprint(
-            self._current,
-            self._cooldown_action,
-            getattr(self, "_cooldown_entity_unit", None),
-        ) != self._cooldown_fingerprint:
+        if (
+            self._support_fingerprint(
+                self._current,
+                self._cooldown_action,
+                getattr(self, "_cooldown_entity_unit", None),
+            )
+            != self._cooldown_fingerprint
+        ):
             self._cooldown_action = None
             self._cooldown_fingerprint = None
             self._cooldown_entity_unit = None
@@ -979,7 +1267,9 @@ class FleMacroEnv(gym.Env):
             if covered:
                 executed = max(covered)
         elif action.op == "INSERT":
-            executed = min(requested, self._current.inventory.get(action.args["item"], 0))
+            executed = min(
+                requested, self._current.inventory.get(action.args["item"], 0)
+            )
         else:
             row = self._entity_for_anchor(action.args["anchor"])
             present = row.items.get(action.args["item"], 0) if row is not None else 0
@@ -1041,7 +1331,9 @@ class FleMacroEnv(gym.Env):
             else None
         )
         requested_peer_live = (
-            live.get(requested_peer_row.unit) if requested_peer_row is not None else None
+            live.get(requested_peer_row.unit)
+            if requested_peer_row is not None
+            else None
         )
         if not getattr(self, "clamp_connect", False):
             if requested_source_live is None:
@@ -1123,9 +1415,7 @@ class FleMacroEnv(gym.Env):
         sources = [
             candidate
             for candidate in rows
-            if self._connector_endpoint_compatible(
-                candidate[1], connector, source=True
-            )
+            if self._connector_endpoint_compatible(candidate[1], connector, source=True)
         ]
         if not sources:
             return (
@@ -1139,7 +1429,10 @@ class FleMacroEnv(gym.Env):
             )
         source_choice = next(
             (candidate for candidate in sources if candidate[0] == source_slot),
-            min(sources, key=lambda candidate: (abs(candidate[0] - source_slot), candidate[0])),
+            min(
+                sources,
+                key=lambda candidate: (abs(candidate[0] - source_slot), candidate[0]),
+            ),
         )
         peers = [
             candidate
@@ -1161,7 +1454,10 @@ class FleMacroEnv(gym.Env):
             )
         peer_choice = next(
             (candidate for candidate in peers if candidate[0] == peer_slot),
-            min(peers, key=lambda candidate: (abs(candidate[0] - peer_slot), candidate[0])),
+            min(
+                peers,
+                key=lambda candidate: (abs(candidate[0] - peer_slot), candidate[0]),
+            ),
         )
         reasons = []
         if source_choice[0] != source_slot:
@@ -1193,20 +1489,38 @@ class FleMacroEnv(gym.Env):
             return "place_item_not_held"
         if op == "SET_RECIPE":
             row = self._entity_for_anchor(args["anchor"])
-            entity_type = self.vocab.entity_info.get(row.name, {}).get("type") if row else None
-            category = (self.vocab.recipe_categories or {}).get(args["recipe"], "crafting")
+            entity_type = (
+                self.vocab.entity_info.get(row.name, {}).get("type") if row else None
+            )
+            category = (self.vocab.recipe_categories or {}).get(
+                args["recipe"], "crafting"
+            )
             if entity_type != "assembling-machine" or category != "crafting":
                 return "recipe_entity_mismatch"
         return None
 
     def _wait_true_ticks(self, requested_ticks: int) -> ExecutionResult:
+        try:
+            self._advance_simulated_ticks(requested_ticks)
+        except TimeoutError:
+            return ExecutionResult(status="no_effect", reason_class="wait_wall_cap")
+        return ExecutionResult()
+
+    def _advance_simulated_ticks(
+        self, requested_ticks: int, *, pause: bool = False
+    ) -> None:
+        """Advance Factorio time by polling simulation ticks without wall sleeps."""
         start_tick = self.world.read_tick()
+        target_tick = start_tick + requested_ticks
         deadline = time.monotonic() + WAIT_WALL_CAP_S
-        while time.monotonic() < deadline:
-            if self.world.read_tick() >= start_tick + requested_ticks:
-                return ExecutionResult()
-            time.sleep(POLL_INTERVAL_S)
-        return ExecutionResult(status="no_effect", reason_class="wait_wall_cap")
+        self.instance.set_speed_and_unpause(max(self.speed, 10))
+        while self.world.read_tick() < target_tick:
+            if time.monotonic() >= deadline:
+                raise TimeoutError(
+                    f"simulation did not advance {requested_ticks} ticks"
+                )
+        if pause:
+            self.instance.pause()
 
     def _execute(self, action: ActionSpec) -> ExecutionResult:
         if action.op == "WAIT":
@@ -1276,11 +1590,157 @@ class FleMacroEnv(gym.Env):
         )
         return ExecutionResult()
 
+    def _step_v0(
+        self, action
+    ) -> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:
+        """Execute the strict V0 grammar without entering the legacy action path."""
+        from fle.rl import v0_schema as V0
+        from fle.rl.v0_actions import decode_v0_action, execute_v0_action
+
+        assert self._current is not None
+        assert isinstance(self._frame, V0ObservationFrame)
+        decision_started = time.perf_counter()
+        action_array = np.asarray(action, dtype=np.int64)
+        if action_array.shape != (len(V0.HEADS),) or not self.action_space.contains(
+            action_array
+        ):
+            raise ValueError(
+                "action is outside V0 MultiDiscrete"
+                f"{tuple(V0.HEAD_SIZES[head] for head in V0.HEADS)}"
+            )
+        before = self._current
+        context = self._v0_context(self._frame)
+        decode_started = time.perf_counter()
+        decoded = decode_v0_action(action_array, self._frame.obs, context)
+        decode_wall_s = time.perf_counter() - decode_started
+        self.instance.set_speed_and_unpause(max(self.speed, 10))
+        execute_started = time.perf_counter()
+        try:
+            result = execute_v0_action(
+                decoded,
+                self.namespace,
+                self.world,
+                context,
+                obs=self._frame.obs,
+            )
+        finally:
+            self.instance.pause()
+        execute_wall_s = time.perf_counter() - execute_started
+
+        # A single combined drain is sufficient; unlike the legacy path this
+        # never waits in wall time for delayed effects.
+        observe_started = time.perf_counter()
+        self.world.all_drain()
+        after, character_valid = self._snapshot(before)
+        observe_wall_s = time.perf_counter() - observe_started
+        result = replace(
+            result,
+            tau=max(0, after.tick - before.tick) / 60.0,
+            reward=after.score_automated - before.score_automated,
+            general_score=after.score_player,
+            general_score_delta=after.score_player - before.score_player,
+            tick_before=before.tick,
+            tick_after=after.tick,
+        )
+        self._steps += 1
+        if self._excursion:
+            self._excursion_steps += 1
+        episode_ticks = max(0, after.tick - self._episode_start_tick)
+        excursion_done = (
+            self._excursion_budget is not None
+            and self._excursion_steps >= self._excursion_budget
+        )
+        terminated = not character_valid
+        truncated = (
+            self._steps >= self._episode_max_steps
+            or episode_ticks >= self.max_ticks
+            or excursion_done
+        )
+        if terminated:
+            self._end_reason = "death"
+            self._episode_deaths += 1
+            self.deaths += 1
+        elif excursion_done:
+            self._end_reason = "excursion_budget"
+        elif self._steps >= self._episode_max_steps:
+            self._end_reason = "max_steps"
+        elif episode_ticks >= self.max_ticks:
+            self._end_reason = "max_ticks"
+
+        self._current = after
+        self._aps_previous = after.score_automated
+        self._max_aps = max(self._max_aps, after.score_automated)
+        self._last_status = result.status
+        self._last_op = decoded.verb
+        self._op_histogram[decoded.verb] += 1
+        self._status_histogram[result.status] += 1
+        if decoded.verb == "PLACE" and result.success:
+            self._entities_placed += 1
+        if self.world.techs_finished:
+            self._enabled_recipes = self.world.read_enabled_recipes()
+            self._research_state = self.world.read_research_state()
+            self.world.techs_finished.clear()
+        observation_started = time.perf_counter()
+        self._frame = self._build_v0_frame()
+        observation_wall_s = time.perf_counter() - observation_started
+        decision_wall_s = time.perf_counter() - decision_started
+        info = {
+            "op": decoded.verb,
+            "status": result.status,
+            "success": result.success,
+            "reason_class": result.reason.value if result.reason else None,
+            "engine_message": result.message,
+            "tau": result.tau,
+            "ticks": result.tick_after - result.tick_before,
+            "score_player": result.general_score,
+            "score_player_delta": result.general_score_delta,
+            "score_automated": after.score_automated,
+            "requested_unit_number": result.requested_unit_number,
+            "mutated_unit_number": result.mutated_unit_number,
+            "mask_toggles": dict(self.v0_mask_toggles),
+            "mask_counters": dict(self.v0_mask_counters),
+            "action_grammar": "v0",
+            "phase_wall_s": {
+                "decode": decode_wall_s,
+                "execute": execute_wall_s,
+                "drain_and_snapshot": observe_wall_s,
+                "snapshot": getattr(self, "_v0_last_snapshot_wall_s", 0.0),
+                "observation": observation_wall_s,
+                "decision": decision_wall_s,
+            },
+        }
+        self._write_log(
+            {
+                "episode": self._episode_index,
+                "step": self._steps - 1,
+                **info,
+                "reward": result.reward,
+                "action": action_array.tolist(),
+                "args": decoded.args,
+            }
+        )
+        if terminated or truncated:
+            self._episode_done = True
+            self._write_episode_end()
+        return (
+            self._copy_v0_observation(self._frame.obs),
+            float(result.reward),
+            terminated,
+            truncated,
+            info,
+        )
+
     def step(self, action, options: Mapping[str, Any] | None = None):
         if self._episode_done or self._current is None or self._frame is None:
-            raise RuntimeError("reset() must be called before step(), and after episode end")
+            raise RuntimeError(
+                "reset() must be called before step(), and after episode end"
+            )
+        if getattr(self, "action_grammar", "legacy") == "v0":
+            return self._step_v0(action)
         action_array = np.asarray(action, dtype=np.int64)
-        if action_array.shape != (len(S.HEADS),) or not self.action_space.contains(action_array):
+        if action_array.shape != (len(S.HEADS),) or not self.action_space.contains(
+            action_array
+        ):
             raise ValueError(f"action is outside MultiDiscrete{S.HEAD_DIMS}")
         before = self._current
         step_start = time.perf_counter()
@@ -1392,7 +1852,7 @@ class FleMacroEnv(gym.Env):
         try:
             self.world.all_drain()
             if op in DELAYED_DRAIN_OPS:
-                time.sleep(0.25)
+                self._advance_simulated_ticks(15)
                 self.world.all_drain()
             after, character_valid = self._snapshot(before)
         except Exception as exc:  # noqa: BLE001 - preserve a terminal transition
@@ -1407,11 +1867,7 @@ class FleMacroEnv(gym.Env):
             reason_class = execution_result.reason_class or status
         elif spec is not None and tool_attempted:
             ok, effect = verify_effect(spec, before, after)
-            if (
-                op == "CONNECT"
-                and raw_error
-                and effect.get("new_entities", 0) <= 0
-            ):
+            if op == "CONNECT" and raw_error and effect.get("new_entities", 0) <= 0:
                 ok = False
             if ok:
                 reason_class = "ok_after_exception" if raw_error else "effect_verified"
@@ -1442,9 +1898,7 @@ class FleMacroEnv(gym.Env):
         )
         max_steps_done = self._steps >= self._episode_max_steps
         max_ticks_done = episode_ticks >= self.max_ticks
-        truncated = (
-            max_steps_done or max_ticks_done or excursion_done
-        )
+        truncated = max_steps_done or max_ticks_done or excursion_done
         if terminated:
             self._end_reason = "death"
         elif excursion_done:
@@ -1611,9 +2065,7 @@ def _parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def _random_acceptance_action(
-    obs: np.ndarray, rng: np.random.Generator
-) -> np.ndarray:
+def _random_acceptance_action(obs: np.ndarray, rng: np.random.Generator) -> np.ndarray:
     """Sample a valid action, probing CRAFT at the mask's one-output contract."""
     action = S.random_valid_action(obs, rng)
     op = S.OPS[int(action[S.HEADS.index("op")])]
